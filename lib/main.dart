@@ -16,6 +16,104 @@ void main() {
 }
 
 /* =========================
+   Design System & Colors
+   ========================= */
+
+class AppColors {
+  // Lost Items - Red Gradient
+  static const Color lostPrimary = Color(0xFFEF4444);
+  static const Color lostLight = Color(0xFFFEF2F2);
+  static const Color lostDark = Color(0xFFDC2626);
+
+  // Found Items - Green Gradient
+  static const Color foundPrimary = Color(0xFF10B981);
+  static const Color foundLight = Color(0xFFF0FDF4);
+  static const Color foundDark = Color(0xFF059669);
+
+  // Primary Actions - Blue Gradient
+  static const Color primaryBlue = Color(0xFF2563EB);
+  static const Color primaryIndigo = Color(0xFF4F46E5);
+
+  // Neutrals
+  static const Color bgGray = Color(0xFFF9FAFB);
+  static const Color cardWhite = Color(0xFFFFFFFF);
+  static const Color borderGray = Color(0xFFE5E7EB);
+  static const Color textPrimary = Color(0xFF111827);
+  static const Color textSecondary = Color(0xFF6B7280);
+  static const Color textTertiary = Color(0xFF9CA3AF);
+}
+
+class AppGradients {
+  static const LinearGradient primaryGradient = LinearGradient(
+    colors: [Color(0xFF2563EB), Color(0xFF4F46E5)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient lostGradient = LinearGradient(
+    colors: [Color(0xFFEF4444), Color(0xFFF87171)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient foundGradient = LinearGradient(
+    colors: [Color(0xFF10B981), Color(0xFF34D399)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient bgGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [Color(0xFFFFFFFF), Color(0xFFF9FAFB), Color(0xFFEFF6FF)],
+  );
+}
+
+class AppTextStyles {
+  static TextStyle displayLarge = GoogleFonts.andika(
+    fontSize: 32,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+    height: 1.2,
+  );
+
+  static TextStyle headlineLarge = GoogleFonts.andika(
+    fontSize: 24,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+    height: 1.3,
+  );
+
+  static TextStyle titleLarge = GoogleFonts.andika(
+    fontSize: 20,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+    height: 1.4,
+  );
+
+  static TextStyle bodyLarge = GoogleFonts.andika(
+    fontSize: 16,
+    fontWeight: FontWeight.w400,
+    color: AppColors.textPrimary,
+    height: 1.5,
+  );
+
+  static TextStyle bodyMedium = GoogleFonts.andika(
+    fontSize: 14,
+    fontWeight: FontWeight.w400,
+    color: AppColors.textSecondary,
+    height: 1.5,
+  );
+
+  static TextStyle labelMedium = GoogleFonts.andika(
+    fontSize: 12,
+    fontWeight: FontWeight.w500,
+    color: AppColors.textSecondary,
+    height: 1.4,
+  );
+}
+
+/* =========================
    Models
    ========================= */
 
@@ -559,11 +657,12 @@ class _AuthScreenState extends State<AuthScreen>
     );
     setState(() => _loading = false);
     if (err == null) {
-      if (mounted)
+      if (mounted) {
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const MainPage()),
           (r) => false,
         );
+      }
     } else {
       _showError(err);
     }
@@ -579,11 +678,12 @@ class _AuthScreenState extends State<AuthScreen>
     );
     setState(() => _loading = false);
     if (err == null) {
-      if (mounted)
+      if (mounted) {
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const MainPage()),
           (r) => false,
         );
+      }
     } else {
       _showError(err);
     }
@@ -637,8 +737,9 @@ class _AuthScreenState extends State<AuthScreen>
                                   controller: _lIdentifier,
                                   label: 'Phone (0750 222 34 44) or Email',
                                   validator: (v) {
-                                    if (v == null || v.trim().isEmpty)
+                                    if (v == null || v.trim().isEmpty) {
                                       return 'Required';
+                                    }
                                     return null;
                                   },
                                 ),
@@ -648,8 +749,9 @@ class _AuthScreenState extends State<AuthScreen>
                                   label: 'Password',
                                   obscure: true,
                                   validator: (v) {
-                                    if (v == null || v.length < 6)
+                                    if (v == null || v.length < 6) {
                                       return 'Minimum 6 chars';
+                                    }
                                     return null;
                                   },
                                 ),
@@ -687,8 +789,9 @@ class _AuthScreenState extends State<AuthScreen>
                                   controller: _sName,
                                   label: 'Name',
                                   validator: (v) {
-                                    if (v == null || v.trim().length < 2)
+                                    if (v == null || v.trim().length < 2) {
                                       return 'Enter at least 2 characters';
+                                    }
                                     return null;
                                   },
                                 ),
@@ -697,14 +800,16 @@ class _AuthScreenState extends State<AuthScreen>
                                   controller: _sPhone,
                                   label: 'Phone (0750 222 34 44)',
                                   validator: (v) {
-                                    if (v == null || v.trim().isEmpty)
+                                    if (v == null || v.trim().isEmpty) {
                                       return 'Phone is required';
+                                    }
                                     final clean = v.replaceAll(
                                       RegExp(r'\s'),
                                       '',
                                     );
-                                    if (!phoneReg.hasMatch(clean))
+                                    if (!phoneReg.hasMatch(clean)) {
                                       return 'Enter 11 digits: 0750 222 34 44';
+                                    }
                                     return null;
                                   },
                                 ),
@@ -715,8 +820,9 @@ class _AuthScreenState extends State<AuthScreen>
                                   validator: (v) {
                                     if (v != null &&
                                         v.isNotEmpty &&
-                                        !emailReg.hasMatch(v))
+                                        !emailReg.hasMatch(v)) {
                                       return 'Invalid email';
+                                    }
                                     return null;
                                   },
                                 ),
@@ -726,8 +832,9 @@ class _AuthScreenState extends State<AuthScreen>
                                   label: 'Password',
                                   obscure: true,
                                   validator: (v) {
-                                    if (v == null || v.length < 6)
+                                    if (v == null || v.length < 6) {
                                       return 'Minimum 6 chars';
+                                    }
                                     return null;
                                   },
                                 ),
@@ -982,7 +1089,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             )
           else
-            ...posts.map((p) => PostCard(post: p)).toList(),
+            ...posts.map((p) => PostCard(post: p)),
+
           const SizedBox(height: 72),
         ],
       ),
@@ -1033,7 +1141,10 @@ class PostCard extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
-            BoxShadow(color: Colors.grey.withOpacity(0.08), blurRadius: 6),
+            BoxShadow(
+              color: AppColors.textPrimary.withAlpha(20),
+              blurRadius: 6,
+            ),
           ],
         ),
         child: Row(
@@ -1597,7 +1708,7 @@ class ProfileScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.grey.withOpacity(0.08),
+                                color: AppColors.textPrimary.withAlpha(20),
                                 blurRadius: 6,
                               ),
                             ],
@@ -1749,8 +1860,7 @@ class ProfileScreen extends StatelessWidget {
                             ],
                           ),
                         ),
-                      )
-                      .toList(),
+                      ),
                 ],
               ),
             ),
@@ -1790,6 +1900,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
     } else {
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Could not open WhatsApp')));
@@ -1820,6 +1931,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     );
     if (res == true) {
       await app.reportPost(post.id, userId);
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Post reported. Thank you!')),
       );
@@ -1846,6 +1958,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     );
     await app.addComment(post.id, c);
     _commentCtrl.clear();
+    if (!mounted) return;
     setState(() {}); // refresh comments
   }
 
@@ -1872,6 +1985,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     );
     if (res == true) {
       await app.deletePost(post.id);
+      if (!mounted) return;
       Navigator.of(context).pop(); // back to previous screen
     }
   }
@@ -1925,7 +2039,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.08),
+                    color: AppColors.textPrimary.withAlpha(20),
                     blurRadius: 6,
                   ),
                 ],
@@ -2051,7 +2165,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey.withOpacity(0.08),
+                            color: AppColors.textPrimary.withAlpha(20),
                             blurRadius: 6,
                           ),
                         ],
@@ -2234,7 +2348,10 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           boxShadow: [
-            BoxShadow(color: Colors.grey.withOpacity(0.08), blurRadius: 6),
+            BoxShadow(
+              color: AppColors.textPrimary.withAlpha(20),
+              blurRadius: 6,
+            ),
           ],
         ),
         child: SingleChildScrollView(
@@ -2328,8 +2445,9 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                           child: TextFormField(
                             controller: _city,
                             validator: (v) {
-                              if (v == null || v.trim().isEmpty)
+                              if (v == null || v.trim().isEmpty) {
                                 return 'Required';
+                              }
                               return null;
                             },
                             decoration: InputDecoration(
@@ -2351,8 +2469,9 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                           child: TextFormField(
                             controller: _street,
                             validator: (v) {
-                              if (v == null || v.trim().isEmpty)
+                              if (v == null || v.trim().isEmpty) {
                                 return 'Required';
+                              }
                               return null;
                             },
                             decoration: InputDecoration(
@@ -2441,8 +2560,10 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                                   context,
                                   listen: false,
                                 );
+                                final messenger = ScaffoldMessenger.of(context);
+                                final navigator = Navigator.of(context);
                                 if (app.currentUser == null) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
+                                  messenger.showSnackBar(
                                     const SnackBar(
                                       content: Text('Please login to post'),
                                     ),
@@ -2466,8 +2587,9 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                                   userId: app.currentUser!.id,
                                 );
                                 await app.addPost(newPost);
+                                if (!mounted) return;
                                 setState(() => _loading = false);
-                                if (mounted) Navigator.of(context).pop();
+                                navigator.pop();
                               },
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),

@@ -15,9 +15,7 @@ void main() {
   runApp(const FindItApp());
 }
 
-/* =========================
-   Design System & Colors
-   ========================= */
+// ============ DESIGN SYSTEM ============
 
 class AppColors {
   // Lost Items - Red Gradient
@@ -43,79 +41,7 @@ class AppColors {
   static const Color textTertiary = Color(0xFF9CA3AF);
 }
 
-class AppGradients {
-  static const LinearGradient primaryGradient = LinearGradient(
-    colors: [Color(0xFF2563EB), Color(0xFF4F46E5)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
-
-  static const LinearGradient lostGradient = LinearGradient(
-    colors: [Color(0xFFEF4444), Color(0xFFF87171)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
-
-  static const LinearGradient foundGradient = LinearGradient(
-    colors: [Color(0xFF10B981), Color(0xFF34D399)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
-
-  static const LinearGradient bgGradient = LinearGradient(
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-    colors: [Color(0xFFFFFFFF), Color(0xFFF9FAFB), Color(0xFFEFF6FF)],
-  );
-}
-
-class AppTextStyles {
-  static TextStyle displayLarge = GoogleFonts.andika(
-    fontSize: 32,
-    fontWeight: FontWeight.w600,
-    color: AppColors.textPrimary,
-    height: 1.2,
-  );
-
-  static TextStyle headlineLarge = GoogleFonts.andika(
-    fontSize: 24,
-    fontWeight: FontWeight.w600,
-    color: AppColors.textPrimary,
-    height: 1.3,
-  );
-
-  static TextStyle titleLarge = GoogleFonts.andika(
-    fontSize: 20,
-    fontWeight: FontWeight.w600,
-    color: AppColors.textPrimary,
-    height: 1.4,
-  );
-
-  static TextStyle bodyLarge = GoogleFonts.andika(
-    fontSize: 16,
-    fontWeight: FontWeight.w400,
-    color: AppColors.textPrimary,
-    height: 1.5,
-  );
-
-  static TextStyle bodyMedium = GoogleFonts.andika(
-    fontSize: 14,
-    fontWeight: FontWeight.w400,
-    color: AppColors.textSecondary,
-    height: 1.5,
-  );
-
-  static TextStyle labelMedium = GoogleFonts.andika(
-    fontSize: 12,
-    fontWeight: FontWeight.w500,
-    color: AppColors.textSecondary,
-    height: 1.4,
-  );
-}
-
-/* =========================
-   Models
-   ========================= */
+// ============ MODELS ============
 
 class Comment {
   String id;
@@ -252,9 +178,7 @@ class UserModel {
   };
 }
 
-/* =========================
-   App State (Provider)
-   ========================= */
+// ============ APP STATE ============
 
 class AppState extends ChangeNotifier {
   static const _kUserKey = 'findit_user';
@@ -466,9 +390,7 @@ class AppState extends ChangeNotifier {
   }
 }
 
-/* =========================
-   App
-   ========================= */
+// ============ APP ============
 
 class FindItApp extends StatelessWidget {
   const FindItApp({super.key});
@@ -504,9 +426,7 @@ class FindItApp extends StatelessWidget {
   }
 }
 
-/* =========================
-   Root Router: Welcome / Auth / Main App
-   ========================= */
+// ============ ROUTING ============
 
 class RootRouter extends StatelessWidget {
   const RootRouter({super.key});
@@ -519,9 +439,7 @@ class RootRouter extends StatelessWidget {
   }
 }
 
-/* =========================
-   Welcome & Auth Screens
-   ========================= */
+// ============ AUTH SCREENS ============
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -898,9 +816,7 @@ class _AuthScreenState extends State<AuthScreen>
   }
 }
 
-/* =========================
-   MainPage with Bottom Navigation
-   ========================= */
+// ============ MAIN PAGE ============
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -972,9 +888,7 @@ class _MainPageState extends State<MainPage> {
   }
 }
 
-/* =========================
-   Home Screen
-   ========================= */
+// ============ HOME SCREEN ============
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -1098,9 +1012,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-/* =========================
-   Post Card widget
-   ========================= */
+// ============ POST CARD ============
 
 class PostCard extends StatelessWidget {
   final Post post;
@@ -1265,9 +1177,7 @@ class PostCard extends StatelessWidget {
   }
 }
 
-/* =========================
-   Activity Screen
-   ========================= */
+// ============ ACTIVITY SCREEN ============
 
 class ActivityScreen extends StatelessWidget {
   const ActivityScreen({super.key});
@@ -1603,9 +1513,7 @@ class ActivityScreen extends StatelessWidget {
   }
 }
 
-/* =========================
-   Profile Screen
-   ========================= */
+// ============ PROFILE SCREEN ============
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -1871,9 +1779,7 @@ class ProfileScreen extends StatelessWidget {
   }
 }
 
-/* =========================
-   Post Detail Screen
-   ========================= */
+// ============ POST DETAIL SCREEN ============
 
 class PostDetailScreen extends StatefulWidget {
   final String postId;
@@ -2271,9 +2177,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   }
 }
 
-/* =========================
-   Create Post Sheet
-   ========================= */
+// ============ CREATE POST SHEET ============
 
 class CreatePostSheet extends StatefulWidget {
   const CreatePostSheet({super.key});
@@ -2624,11 +2528,8 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
   }
 }
 
-/* =========================
-   Phone Input Formatter
-   ========================= */
+// ============ PHONE INPUT FORMATTER ============
 
-// Auto-format phone numbers: 0750 222 34 44
 class PhoneInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(

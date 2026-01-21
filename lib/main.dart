@@ -824,7 +824,7 @@ class MainPage extends StatefulWidget {
   State<MainPage> createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   int _selected = 0;
   static const _tabs = [HomeScreen(), ActivityScreen(), ProfileScreen()];
 
@@ -883,6 +883,10 @@ class _MainPageState extends State<MainPage> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      transitionAnimationController: AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 400),
+      ),
       builder: (_) => const CreatePostSheet(),
     );
   }
@@ -931,20 +935,25 @@ class _HomeScreenState extends State<HomeScreen> {
     return RefreshIndicator(
       onRefresh: _refresh,
       child: ListView(
+        physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         children: [
-          TextField(
-            controller: searchCtrl,
-            decoration: InputDecoration(
-              hintText: 'Search items or locations...',
-              prefixIcon: const Icon(Icons.search),
-              filled: true,
-              fillColor: Colors.white,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(24),
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+            child: TextField(
+              controller: searchCtrl,
+              decoration: InputDecoration(
+                hintText: 'Search items or locations...',
+                prefixIcon: const Icon(Icons.search),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(24),
+                ),
               ),
+              onChanged: (_) => setState(() {}),
             ),
-            onChanged: (_) => setState(() {}),
           ),
           const SizedBox(height: 12),
           SizedBox(
@@ -956,22 +965,28 @@ class _HomeScreenState extends State<HomeScreen> {
               itemBuilder: (_, i) {
                 final c = cities[i];
                 final active = c == cityFilter;
-                return ChoiceChip(
-                  label: Text(
-                    c,
-                    style: GoogleFonts.andika(
-                      color: active ? Colors.white : Colors.black87,
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeOut,
+                  child: ChoiceChip(
+                    label: Text(
+                      c,
+                      style: GoogleFonts.andika(
+                        color: active ? Colors.white : Colors.black87,
+                      ),
                     ),
-                  ),
-                  selected: active,
-                  onSelected: (_) => setState(() => cityFilter = c),
-                  selectedColor: const Color(0xFF2563EB),
-                  backgroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    side: BorderSide(
-                      color: active ? Colors.transparent : Colors.grey.shade300,
+                    selected: active,
+                    onSelected: (_) => setState(() => cityFilter = c),
+                    selectedColor: const Color(0xFF2563EB),
+                    backgroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        color: active
+                            ? Colors.transparent
+                            : Colors.grey.shade300,
+                      ),
+                      borderRadius: BorderRadius.circular(24),
                     ),
-                    borderRadius: BorderRadius.circular(24),
                   ),
                 );
               },
@@ -1003,7 +1018,12 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             )
           else
-            ...posts.map((p) => PostCard(post: p)),
+            ...posts.map(
+              (p) => AnimatedSwitcher(
+                duration: const Duration(milliseconds: 350),
+                child: PostCard(key: ValueKey(p.id), post: p),
+              ),
+            ),
 
           const SizedBox(height: 72),
         ],
@@ -1044,9 +1064,16 @@ class PostCard extends StatelessWidget {
         : const Color(0xFF10B981);
     return GestureDetector(
       onTap: () => Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => PostDetailScreen(postId: post.id)),
+        PageRouteBuilder(
+          pageBuilder: (_, __, ___) => PostDetailScreen(postId: post.id),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+        ),
       ),
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
@@ -1054,8 +1081,9 @@ class PostCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: AppColors.textPrimary.withAlpha(20),
-              blurRadius: 6,
+              color: AppColors.textPrimary.withAlpha(16),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -1087,6 +1115,13 @@ class PostCard extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: badgeColor,
                           borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: badgeColor.withAlpha(40),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
                         child: Text(
                           post.type.toUpperCase(),
@@ -1159,10 +1194,17 @@ class PostCard extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
+                elevation: 0,
+                shadowColor: Colors.transparent,
               ),
               onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => PostDetailScreen(postId: post.id),
+                PageRouteBuilder(
+                  pageBuilder: (_, __, ___) =>
+                      PostDetailScreen(postId: post.id),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                        return FadeTransition(opacity: animation, child: child);
+                      },
                 ),
               ),
               child: Text(
@@ -1280,110 +1322,133 @@ class ActivityScreen extends StatelessWidget {
                             ),
                           );
                         },
-                        child: Card(
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeOut,
                           margin: const EdgeInsets.symmetric(vertical: 8),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.textPrimary.withAlpha(16),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Row(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: post.imageUrls.isNotEmpty
-                                      ? CachedNetworkImage(
-                                          imageUrl: post.imageUrls[0],
-                                          width: 80,
-                                          height: 80,
-                                          fit: BoxFit.cover,
-                                        )
-                                      : Container(
-                                          width: 80,
-                                          height: 80,
-                                          color: Colors.grey[200],
-                                          child: const Icon(
-                                            Icons.image,
-                                            color: Colors.grey,
+                          child: Row(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(14),
+                                child: post.imageUrls.isNotEmpty
+                                    ? CachedNetworkImage(
+                                        imageUrl: post.imageUrls[0],
+                                        width: 80,
+                                        height: 80,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : Container(
+                                        width: 80,
+                                        height: 80,
+                                        color: Colors.grey[200],
+                                        child: const Icon(
+                                          Icons.image,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 6,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: post.type == 'lost'
+                                                ? const Color(0xFFEF4444)
+                                                : const Color(0xFF10B981),
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color:
+                                                    (post.type == 'lost'
+                                                            ? const Color(
+                                                                0xFFEF4444,
+                                                              )
+                                                            : const Color(
+                                                                0xFF10B981,
+                                                              ))
+                                                        .withAlpha(40),
+                                                blurRadius: 8,
+                                                offset: const Offset(0, 2),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Text(
+                                            post.type.toUpperCase(),
+                                            style: GoogleFonts.andika(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 8,
-                                              vertical: 4,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: post.type == 'lost'
-                                                  ? const Color(0xFFEF4444)
-                                                  : const Color(0xFF10B981),
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                            child: Text(
-                                              post.type.toUpperCase(),
-                                              style: GoogleFonts.andika(
-                                                color: Colors.white,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Expanded(
-                                            child: Text(
-                                              post.itemName,
-                                              style: GoogleFonts.andika(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Row(
-                                        children: [
-                                          const Icon(
-                                            Icons.location_on,
-                                            size: 14,
-                                            color: Colors.grey,
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            post.city,
+                                        const SizedBox(width: 10),
+                                        Expanded(
+                                          child: Text(
+                                            post.itemName,
                                             style: GoogleFonts.andika(
-                                              fontSize: 12,
-                                              color: Colors.grey[700],
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold,
                                             ),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                           ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        timeago.format(post.createdAt),
-                                        style: GoogleFonts.andika(
-                                          fontSize: 11,
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.location_on,
+                                          size: 15,
                                           color: Colors.grey,
                                         ),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          post.city,
+                                          style: GoogleFonts.andika(
+                                            fontSize: 13,
+                                            color: Colors.grey[700],
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      timeago.format(post.createdAt),
+                                      style: GoogleFonts.andika(
+                                        fontSize: 12,
+                                        color: Colors.grey,
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
                       );

@@ -1596,7 +1596,9 @@ class ProfileScreen extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () {
-              // TODO: implement settings
+              Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (_) => const SettingsScreen()));
             },
             icon: const Icon(Icons.settings),
           ),
@@ -1739,6 +1741,21 @@ class ProfileScreen extends StatelessWidget {
                                             borderRadius: BorderRadius.circular(
                                               12,
                                             ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color:
+                                                    (p.type == 'lost'
+                                                            ? const Color(
+                                                                0xFFEF4444,
+                                                              )
+                                                            : const Color(
+                                                                0xFF10B981,
+                                                              ))
+                                                        .withAlpha(40),
+                                                blurRadius: 8,
+                                                offset: const Offset(0, 2),
+                                              ),
+                                            ],
                                           ),
                                           child: Text(
                                             p.type.toUpperCase(),
@@ -1757,6 +1774,8 @@ class ProfileScreen extends StatelessWidget {
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold,
                                             ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
                                       ],
@@ -1776,6 +1795,8 @@ class ProfileScreen extends StatelessWidget {
                                             fontSize: 12,
                                             color: Colors.grey,
                                           ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       ],
                                     ),
@@ -2617,6 +2638,50 @@ class PhoneInputFormatter extends TextInputFormatter {
     return newValue.copyWith(
       text: formatted.toString(),
       selection: TextSelection.collapsed(offset: formatted.length),
+    );
+  }
+}
+
+// ============ SETTINGS SCREEN ============
+
+class SettingsScreen extends StatelessWidget {
+  const SettingsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Settings', style: GoogleFonts.andika())),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Settings',
+              style: GoogleFonts.andika(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 24),
+            ListTile(
+              leading: const Icon(Icons.logout, color: Color(0xFFEF4444)),
+              title: Text('Logout', style: GoogleFonts.andika()),
+              onTap: () async {
+                final app = Provider.of<AppState>(context, listen: false);
+                await app.logout();
+                if (context.mounted) {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (_) => const WelcomeScreen()),
+                    (r) => false,
+                  );
+                }
+              },
+            ),
+            // Add more settings options here
+          ],
+        ),
+      ),
     );
   }
 }

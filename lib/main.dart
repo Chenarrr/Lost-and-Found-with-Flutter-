@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'dart:ui';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:image_picker/image_picker.dart';
@@ -964,51 +965,55 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(28),
                   borderSide: BorderSide.none,
                 ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 18),
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 18,
+                  horizontal: 18,
+                ),
               ),
               onChanged: (_) => setState(() {}),
             ),
           ),
           const SizedBox(height: 12),
           SizedBox(
-            SizedBox(
-              height: 48,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: cities.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 10),
-                itemBuilder: (_, i) {
-                  final c = cities[i];
-                  final active = c == cityFilter;
-                  return AnimatedContainer(
-                    duration: const Duration(milliseconds: 250),
-                    curve: Curves.easeOut,
-                    child: ChoiceChip(
-                      label: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        child: Text(
-                          c,
-                          style: GoogleFonts.inter(
-                            color: active ? Colors.white : Colors.black87,
-                            fontWeight: active ? FontWeight.w600 : FontWeight.normal,
-                            fontSize: 15,
-                          ),
+            height: 48,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: cities.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 10),
+              itemBuilder: (_, i) {
+                final c = cities[i];
+                final active = c == cityFilter;
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeOut,
+                  child: ChoiceChip(
+                    label: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      child: Text(
+                        c,
+                        style: GoogleFonts.inter(
+                          color: active ? Colors.white : Colors.black87,
+                          fontWeight: active
+                              ? FontWeight.w600
+                              : FontWeight.normal,
+                          fontSize: 15,
                         ),
                       ),
-                      selected: active,
-                      onSelected: (_) => setState(() => cityFilter = c),
-                      selectedColor: const Color(0xFF2563EB),
-                      backgroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      elevation: active ? 4 : 0,
-                      shadowColor: active ? const Color(0xFF2563EB).withOpacity(0.15) : Colors.transparent,
                     ),
-                  );
-                },
-              ),
-            ),
+                    selected: active,
+                    onSelected: (_) => setState(() => cityFilter = c),
+                    selectedColor: const Color(0xFF2563EB),
+                    backgroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    elevation: active ? 4 : 0,
+                    shadowColor: active
+                        ? const Color(0xFF2563EB).withOpacity(0.15)
+                        : Colors.transparent,
                   ),
                 );
               },
@@ -1046,7 +1051,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: PostCard(key: ValueKey(p.id), post: p),
               ),
             ),
-
           const SizedBox(height: 72),
         ],
       ),
@@ -1060,257 +1064,125 @@ class PostCard extends StatelessWidget {
   final Post post;
   const PostCard({super.key, required this.post});
 
-  Widget _imageWidget(String url) {
-    if (url.startsWith('http')) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(18),
-        child: CachedNetworkImage(
-          imageUrl: url,
-          fit: BoxFit.cover,
-          placeholder: (_, __) => Container(color: Colors.grey[200]),
-          errorWidget: (_, __, ___) => Container(color: Colors.grey[200]),
-        ),
-      );
-    } else {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(18),
-        child: Image.file(
-          File(url),
-          fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) {
-            return Container(color: Colors.grey[200]);
-          },
-        ),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final badgeColor = post.type == 'lost'
-        final badgeColor = post.type == 'lost'
-            ? const Color(0xFFEF4444)
-            : const Color(0xFF10B981);
-        return GestureDetector(
-          onTap: () => Navigator.of(context).push(
-            PageRouteBuilder(
-              pageBuilder: (_, __, ___) => PostDetailScreen(postId: post.id),
-              transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                return FadeTransition(opacity: animation, child: child);
-              },
-            ),
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+      margin: const EdgeInsets.only(bottom: 18),
+      padding: const EdgeInsets.all(0),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.7),
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
           ),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-            margin: const EdgeInsets.only(bottom: 18),
-            padding: const EdgeInsets.all(0),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.7),
-              borderRadius: BorderRadius.circular(28),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
-                  blurRadius: 24,
-                  offset: const Offset(0, 8),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: Padding(
+            padding: const EdgeInsets.all(18),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            post.type == 'lost'
+                                ? Icons.close
+                                : Icons.check_circle,
+                            size: 16,
+                            color: post.type == 'lost'
+                                ? Color(0xFFEF4444)
+                                : Color(0xFF10B981),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            '${post.city}, ${post.street}',
+                            style: GoogleFonts.inter(
+                              fontSize: 13,
+                              color: Colors.grey[700],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Text(
+                            timeago.format(post.createdAt),
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          const SizedBox(width: 14),
+                          const Icon(
+                            Icons.person,
+                            size: 15,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            post.userName,
+                            style: GoogleFonts.inter(
+                              fontSize: 13,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF2563EB),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    elevation: 0,
+                    shadowColor: Colors.transparent,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 22,
+                      vertical: 16,
+                    ),
+                  ),
+                  onPressed: () => Navigator.of(context).push(
+                    PageRouteBuilder(
+                      pageBuilder: (_, __, ___) =>
+                          PostDetailScreen(postId: post.id),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                            return FadeTransition(
+                              opacity: animation,
+                              child: child,
+                            );
+                          },
+                    ),
+                  ),
+                  child: Text(
+                    'View',
+                    style: GoogleFonts.inter(
+                      fontSize: 15,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ],
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(28),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                child: Padding(
-                  padding: const EdgeInsets.all(18),
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: 96,
-                        height: 80,
-                        child: post.imageUrls.isNotEmpty
-                            ? _imageWidget(post.imageUrls.first)
-                            : Container(color: Colors.grey[200]),
-                      ),
-                      const SizedBox(width: 18),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: badgeColor.withOpacity(0.85),
-                                    borderRadius: BorderRadius.circular(16),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: badgeColor.withOpacity(0.18),
-                                        blurRadius: 8,
-                                      ),
-                                    ],
-                                  ),
-                                  child: Text(
-                                    post.type.toUpperCase(),
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 13,
-                                      letterSpacing: 1.2,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: Text(
-                                    post.itemName,
-                                    style: GoogleFonts.inter(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.location_on,
-                                  size: 16,
-                                  color: Colors.grey,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  '${post.city}, ${post.street}',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 13,
-                                    color: Colors.grey[700],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              children: [
-                                Text(
-                                  timeago.format(post.createdAt),
-                                  style: GoogleFonts.inter(
-                                    fontSize: 12,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                                const SizedBox(width: 14),
-                                const Icon(Icons.person, size: 15, color: Colors.grey),
-                                const SizedBox(width: 6),
-                                Text(
-                                  post.userName,
-                                  style: GoogleFonts.inter(
-                                    fontSize: 13,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF2563EB),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          elevation: 0,
-                          shadowColor: Colors.transparent,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 22,
-                            vertical: 16,
-                          ),
-                        ),
-                        onPressed: () => Navigator.of(context).push(
-                          PageRouteBuilder(
-                            pageBuilder: (_, __, ___) =>
-                                PostDetailScreen(postId: post.id),
-                            transitionsBuilder:
-                                (context, animation, secondaryAnimation, child) {
-                                  return FadeTransition(opacity: animation, child: child);
-                                },
-                          ),
-                        ),
-                        child: Text(
-                          'View',
-                          style: GoogleFonts.inter(fontSize: 15, color: Colors.white, fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
           ),
-        );
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Text(
-                        timeago.format(post.createdAt),
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      const Icon(Icons.person, size: 14, color: Colors.grey),
-                      const SizedBox(width: 4),
-                      Text(
-                        post.userName,
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 8),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2563EB),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                elevation: 0,
-                shadowColor: Colors.transparent,
-              ),
-              onPressed: () => Navigator.of(context).push(
-                PageRouteBuilder(
-                  pageBuilder: (_, __, ___) =>
-                      PostDetailScreen(postId: post.id),
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) {
-                        return FadeTransition(opacity: animation, child: child);
-                      },
-                ),
-              ),
-              child: Text(
-                'View',
-                style: GoogleFonts.inter(fontSize: 14, color: Colors.white),
-              ),
-            ),
-          ],
         ),
       ),
     );

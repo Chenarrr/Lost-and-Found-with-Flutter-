@@ -415,7 +415,7 @@ class FindItApp extends StatelessWidget {
               colorScheme: ColorScheme.fromSeed(
                 seedColor: const Color(0xFF2563EB),
               ),
-              textTheme: GoogleFonts.andikaTextTheme(),
+              textTheme: GoogleFonts.interTextTheme(),
               scaffoldBackgroundColor: const Color(0xFFF9FAFB),
             ),
             home: const RootRouter(),
@@ -468,7 +468,7 @@ class WelcomeScreen extends StatelessWidget {
                   const SizedBox(width: 12),
                   Text(
                     'Find It',
-                    style: GoogleFonts.andika(
+                    style: GoogleFonts.inter(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
@@ -478,7 +478,7 @@ class WelcomeScreen extends StatelessWidget {
               const SizedBox(height: 48),
               Text(
                 'Reuniting lost items across Kurdistan',
-                style: GoogleFonts.andika(fontSize: 18),
+                style: GoogleFonts.inter(fontSize: 18),
               ),
               const SizedBox(height: 24),
               const Spacer(),
@@ -511,7 +511,7 @@ class WelcomeScreen extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       child: Text(
                         'Get Started',
-                        style: GoogleFonts.andika(
+                        style: GoogleFonts.inter(
                           fontSize: 16,
                           color: Colors.white,
                         ),
@@ -617,7 +617,7 @@ class _AuthScreenState extends State<AuthScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login or Signup', style: GoogleFonts.andika()),
+        title: Text('Login or Signup', style: GoogleFonts.inter()),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
@@ -636,8 +636,8 @@ class _AuthScreenState extends State<AuthScreen>
                       borderRadius: BorderRadius.circular(24),
                     ),
                     tabs: [
-                      Tab(child: Text('Login', style: GoogleFonts.andika())),
-                      Tab(child: Text('Signup', style: GoogleFonts.andika())),
+                      Tab(child: Text('Login', style: GoogleFonts.inter())),
+                      Tab(child: Text('Signup', style: GoogleFonts.inter())),
                     ],
                   ),
                   Expanded(
@@ -688,7 +688,7 @@ class _AuthScreenState extends State<AuthScreen>
                                     ),
                                     child: Text(
                                       'Login',
-                                      style: GoogleFonts.andika(fontSize: 16),
+                                      style: GoogleFonts.inter(fontSize: 16),
                                     ),
                                   ),
                                 ),
@@ -771,7 +771,7 @@ class _AuthScreenState extends State<AuthScreen>
                                     ),
                                     child: Text(
                                       'Create account',
-                                      style: GoogleFonts.andika(fontSize: 16),
+                                      style: GoogleFonts.inter(fontSize: 16),
                                     ),
                                   ),
                                 ),
@@ -836,10 +836,10 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
           children: [
             CircleAvatar(
               backgroundColor: const Color(0xFF2563EB),
-              child: Text('F', style: GoogleFonts.andika(color: Colors.white)),
+              child: Text('F', style: GoogleFonts.inter(color: Colors.white)),
             ),
             const SizedBox(width: 8),
-            Text('Find It', style: GoogleFonts.andika()),
+            Text('Find It', style: GoogleFonts.inter()),
           ],
         ),
         actions: [
@@ -870,7 +870,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _openCreatePost(context),
-        label: Text('Post', style: GoogleFonts.andika()),
+        label: Text('Post', style: GoogleFonts.inter()),
         icon: const Icon(Icons.add),
         backgroundColor: const Color(0xFF2563EB),
       ),
@@ -971,7 +971,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: ChoiceChip(
                     label: Text(
                       c,
-                      style: GoogleFonts.andika(
+                      style: GoogleFonts.inter(
                         color: active ? Colors.white : Colors.black87,
                       ),
                     ),
@@ -1003,7 +1003,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 12),
                     Text(
                       'No items found',
-                      style: GoogleFonts.andika(
+                      style: GoogleFonts.inter(
                         fontSize: 18,
                         color: Colors.grey[700],
                       ),
@@ -1011,7 +1011,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 4),
                     Text(
                       'Try adjusting your filters',
-                      style: GoogleFonts.andika(color: Colors.grey),
+                      style: GoogleFonts.inter(color: Colors.grey),
                     ),
                   ],
                 ),
@@ -1136,7 +1136,7 @@ class PostCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           post.itemName,
-                          style: GoogleFonts.andika(
+                          style: GoogleFonts.inter(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
@@ -1155,7 +1155,7 @@ class PostCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         '${post.city}, ${post.street}',
-                        style: GoogleFonts.andika(
+                        style: GoogleFonts.inter(
                           fontSize: 12,
                           color: Colors.grey,
                         ),
@@ -1167,7 +1167,7 @@ class PostCard extends StatelessWidget {
                     children: [
                       Text(
                         timeago.format(post.createdAt),
-                        style: GoogleFonts.andika(
+                        style: GoogleFonts.inter(
                           fontSize: 12,
                           color: Colors.grey,
                         ),
@@ -1177,7 +1177,7 @@ class PostCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         post.userName,
-                        style: GoogleFonts.andika(
+                        style: GoogleFonts.inter(
                           fontSize: 12,
                           color: Colors.grey,
                         ),
@@ -1209,7 +1209,7 @@ class PostCard extends StatelessWidget {
               ),
               child: Text(
                 'View',
-                style: GoogleFonts.andika(fontSize: 14, color: Colors.white),
+                style: GoogleFonts.inter(fontSize: 14, color: Colors.white),
               ),
             ),
           ],
@@ -1231,8 +1231,8 @@ class ActivityScreen extends StatelessWidget {
 
     if (user == null) {
       return Scaffold(
-        appBar: AppBar(title: Text('Activity', style: GoogleFonts.andika())),
-        body: Center(child: Text('Please log in', style: GoogleFonts.andika())),
+        appBar: AppBar(title: Text('Activity', style: GoogleFonts.inter())),
+        body: Center(child: Text('Please log in', style: GoogleFonts.inter())),
       );
     }
 

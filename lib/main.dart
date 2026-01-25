@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'dart:ui';
+
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:image_picker/image_picker.dart';
@@ -430,8 +430,7 @@ class FindItApp extends StatelessWidget {
                 seedColor: AppColors.primaryBlue,
                 primary: AppColors.primaryBlue,
                 secondary: AppColors.primaryBlueDark,
-                background: AppColors.bgGray,
-                surface: AppColors.cardWhite,
+                surface: AppColors.bgGray,
                 onPrimary: Colors.white,
                 onSurface: AppColors.textPrimary,
               ),
@@ -987,11 +986,11 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(
             margin: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withAlpha(204), // 0.8 * 255 ≈ 204
               borderRadius: BorderRadius.circular(28),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.07),
+                  color: Colors.black.withAlpha(18), // 0.07 * 255 ≈ 18
                   blurRadius: 18,
                   offset: const Offset(0, 6),
                 ),
@@ -1060,7 +1059,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     elevation: active ? 4 : 0,
                     shadowColor: active
-                        ? AppColors.primaryBlue.withOpacity(0.15)
+                        ? AppColors.primaryBlue.withAlpha(38) // 0.15 * 255 ≈ 38
                         : Colors.transparent,
                   ),
                 );
@@ -1115,8 +1114,8 @@ class PostCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cardColor = post.type == 'lost'
-        ? AppColors.lostLight.withOpacity(0.85)
-        : AppColors.foundLight.withOpacity(0.85);
+        ? AppColors.lostLight.withAlpha(217) // 0.85 * 255 ≈ 217
+        : AppColors.foundLight.withAlpha(217);
     final accentColor = post.type == 'lost'
         ? AppColors.lostPrimary
         : AppColors.foundPrimary;
@@ -1129,7 +1128,7 @@ class PostCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: accentColor.withOpacity(0.10),
+            color: accentColor.withAlpha(26), // 0.10 * 255 ≈ 26
             blurRadius: 18,
             offset: const Offset(0, 6),
           ),

@@ -1,6 +1,7 @@
 // Widget tests for Find It app
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:flutter_application/main.dart';
 
@@ -8,10 +9,11 @@ void main() {
   testWidgets('App loads and shows Find It branding', (
     WidgetTester tester,
   ) async {
+    // Mock SharedPreferences so FutureBuilder resolves instantly
+    SharedPreferences.setMockInitialValues({});
+
     // Build the app and trigger a frame
     await tester.pumpWidget(const FindItApp());
-
-    // Wait for SharedPreferences to load
     await tester.pumpAndSettle();
 
     // Verify the app title appears

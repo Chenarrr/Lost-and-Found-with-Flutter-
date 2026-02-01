@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_application/models/comment.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -53,44 +54,6 @@ class AppColors {
   static const Color textPrimary = Color(0xFF18122B);
   static const Color textSecondary = Color(0xFF6E6A86);
   static const Color textTertiary = Color(0xFFA1A1AA);
-}
-
-// ============ MODELS ============
-
-class Comment {
-  String id;
-  String postId;
-  String userId;
-  String userName;
-  String text;
-  DateTime createdAt;
-
-  Comment({
-    required this.id,
-    required this.postId,
-    required this.userId,
-    required this.userName,
-    required this.text,
-    required this.createdAt,
-  });
-
-  factory Comment.fromJson(Map<String, dynamic> j) => Comment(
-    id: j['id'],
-    postId: j['postId'],
-    userId: j['userId'],
-    userName: j['userName'],
-    text: j['text'],
-    createdAt: DateTime.parse(j['createdAt']),
-  );
-
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'postId': postId,
-    'userId': userId,
-    'userName': userName,
-    'text': text,
-    'createdAt': createdAt.toIso8601String(),
-  };
 }
 
 class Post {

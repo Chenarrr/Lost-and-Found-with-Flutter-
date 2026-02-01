@@ -1,0 +1,407 @@
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:uuid/uuid.dart';
+import 'package:timeago/timeago.dart' as timeago;
+import 'package:flutter_application/providers/app_state.dart';
+import 'package:flutter_application/models/comment.dart';
+import 'package:flutter_application/config/app_colors.dart';
+
+class PostDetailScreen extends StatefulWidget {
+  final String postId;
+  const PostDetailScreen({super.key, required this.postId});
+
+  @override
+  State<PostDetailScreen> createState() => _PostDetailScreenState();
+}
+
+class _PostDetailScreenState extends State<PostDetailScreen> {
+  final TextEditingController _commentCtrl = TextEditingController();
+
+  @override
+  void dispose() {
+    _commentCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _contactWhatsApp(String phone, String itemName) async {
+    final msg = Uri.encodeComponent('Hi, I saw your post about: $itemName');
+    final url = Uri.parse(
+      'https://wa.me/${phone.replaceAll('+', '')}?text=$msg',
+    );
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Could not open WhatsApp')));
+    }
+  }
+
+  Future<void> _confirmReport(AppState app, post) async {
+    final userId = app.currentUser?.id ?? 'anon';
+    final res = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('Report Post', style: GoogleFonts.andika()),
+        content: Text(
+          'Report this post as fake or inappropriate?',
+          style: GoogleFonts.andika(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text('Cancel', style: GoogleFonts.andika()),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text('Report', style: GoogleFonts.andika(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+    if (res == true) {
+      await app.reportPost(post.id, userId);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Post reported. Thank you!')),
+      );
+    }
+  }
+
+  Future<void> _addComment(AppState app, post) async {
+    final text = _commentCtrl.text.trim();
+    if (text.isEmpty) return;
+    final user = app.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please login to comment')));
+      return;
+    }
+    final c = Comment(
+      id: const Uuid().v4(),
+      postId: post.id,
+      userId: user.id,
+      userName: user.name,
+      text: text,
+      createdAt: DateTime.now(),
+    );
+    await app.addComment(post.id, c);
+    _commentCtrl.clear();
+    if (!mounted) return;
+    setState(() {}); // refresh comments
+  }
+
+  Future<void> _deletePost(AppState app, post) async {
+    final res = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('Delete Post', style: GoogleFonts.andika()),
+        content: Text(
+          'Are you sure you want to delete this post?',
+          style: GoogleFonts.andika(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text('Cancel', style: GoogleFonts.andika()),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text('Delete', style: GoogleFonts.andika(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+    if (res == true) {
+      await app.deletePost(post.id);
+      if (!mounted) return;
+      Navigator.of(context).pop(); // back to previous screen
+    }
+  }
+
+  Widget _imageWidget(String url) {
+    if (url.startsWith('http')) {
+      return CachedNetworkImage(
+        imageUrl: url,
+        fit: BoxFit.cover,
+        placeholder: (_, __) => Container(color: Colors.grey[200]),
+        errorWidget: (_, __, ___) => Container(color: Colors.grey[200]),
+      );
+    } else {
+      return Image.file(
+        File(url),
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) {
+          return Container(color: Colors.grey[200]);
+        },
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final app = Provider.of<AppState>(context);
+    final post = app.posts.firstWhere((p) => p.id == widget.postId);
+
+    return Scaffold(
+      appBar: AppBar(title: Text('Post Details', style: GoogleFonts.andika())),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: ListView(
+          children: [
+            // Post images (single image - placeholder for carousel)
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: SizedBox(
+                height: 240,
+                child: post.imageUrls.isNotEmpty
+                    ? _imageWidget(post.imageUrls.first)
+                    : Container(color: Colors.grey[200]),
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Post info
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.textPrimary.withAlpha(20),
+                    blurRadius: 6,
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: post.type == 'lost'
+                              ? const Color(0xFFEF4444)
+                              : const Color(0xFF10B981),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          post.type.toUpperCase(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
+                      TextButton(
+                        onPressed: () => _confirmReport(app, post),
+                        child: Text(
+                          'Report',
+                          style: GoogleFonts.andika(color: Colors.red),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    post.itemName,
+                    style: GoogleFonts.andika(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${post.city}, ${post.street}',
+                    style: GoogleFonts.andika(color: Colors.grey[700]),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.access_time,
+                        size: 14,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        timeago.format(post.createdAt),
+                        style: GoogleFonts.andika(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      const Icon(Icons.person, size: 14, color: Colors.grey),
+                      const SizedBox(width: 4),
+                      Text(
+                        post.userName,
+                        style: GoogleFonts.andika(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () =>
+                          _contactWhatsApp(post.userPhone, post.itemName),
+                      icon: const Icon(Icons.message),
+                      label: Text(
+                        'Contact via WhatsApp',
+                        style: GoogleFonts.andika(),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryBlue,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Description',
+                    style: GoogleFonts.andika(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    post.description ?? 'No description provided.',
+                    style: GoogleFonts.andika(),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Comments',
+                    style: GoogleFonts.andika(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  // Comments list
+                  ...post.comments.map(
+                    (c) => Container(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.textPrimary.withAlpha(20),
+                            blurRadius: 6,
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 16,
+                                backgroundColor: const Color(0xFF2563EB),
+                                child: Text(
+                                  c.userName.substring(0, 1).toUpperCase(),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                c.userName,
+                                style: GoogleFonts.andika(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const Spacer(),
+                              Text(
+                                timeago.format(c.createdAt),
+                                style: GoogleFonts.andika(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Text(c.text, style: GoogleFonts.andika()),
+                        ],
+                      ),
+                    ),
+                  ),
+                  // Add comment field
+                  const SizedBox(height: 16),
+                  Text('Add a comment', style: GoogleFonts.andika()),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _commentCtrl,
+                          decoration: InputDecoration(
+                            hintText: 'Type your comment...',
+                            filled: true,
+                            fillColor: Colors.grey[100],
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: () => _addComment(app, post),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF2563EB),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text('Send', style: GoogleFonts.andika()),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  if (app.currentUser != null &&
+                      app.currentUser!.id == post.userId)
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        onPressed: () => _deletePost(app, post),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Colors.red),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          'Delete Post',
+                          style: GoogleFonts.andika(color: Colors.red),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

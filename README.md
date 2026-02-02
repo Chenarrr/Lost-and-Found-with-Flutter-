@@ -1,85 +1,132 @@
-# Find It - Lost & Found App
+# Find It - Lost & Found Flutter App
 
-`Find It` is a Flutter-based mobile application designed to help people in Kurdistan find their lost items and report items they have found. It provides a simple and intuitive platform for users to post, search, and comment on lost and found items, with the goal of reuniting people with their belongings.
+Find It is a Flutter-based mobile application designed specifically for the Kurdistan region to help people find lost items and report found items. The app provides an intuitive platform for posting, searching, and commenting on lost and found items with the goal of reuniting people with their belongings.
 
-The application is fully client-side, using `shared_preferences` to store all data locally on the user's device.
+## Architecture
 
-### Features
+This is a **single-file Flutter application** (~2500 lines) with all core logic in `lib/main.dart`, organized in clearly marked sections. The app is fully client-side, using `shared_preferences` for local data persistence with no backend requirements.
 
-*   **User Authentication:** Simple sign-up and login functionality.
-*   **Post Creation:** Users can create posts for "lost" or "found" items, including details like item name, description, location, and images.
-*   **Browse & Filter:** A main feed displays all posts, with options to filter by city or search for specific items.
-*   **Post Details:** View detailed information about a post, including images and user comments.
-*   **Commenting System:** Users can leave comments on posts to ask questions or provide information.
-*   **Activity Tracking:** A dedicated screen shows the user's own posts and comments.
-*   **User Profile:** A simple profile screen displays user information.
-*   **Contact via WhatsApp:** A button to directly open a WhatsApp chat with the item's poster.
-*   **Reporting:** Users can report posts that are inappropriate or fake.
+## Features
+
+- **User Authentication:** Simple sign-up and login with local storage
+- **Post Management:** Create "lost" or "found" posts with item details, location, and up to 3 images
+- **Smart Filtering:** Browse all posts with city filters and search functionality
+- **Interactive Comments:** Comment system for community interaction and information sharing
+- **Activity Dashboard:** Track your own posts and comments in a dedicated activity screen  
+- **User Profiles:** Simple profile management with user information display
+- **WhatsApp Integration:** Direct contact with item posters via WhatsApp deep links
+- **Report System:** Community-driven reporting for inappropriate or fake posts
+- **Kurdish Language Support:** Uses Andika font for optimal Kurdish text rendering
+- **Auto-formatting:** Smart phone number formatting for Kurdistan region (11-digit format)
+
+## Tech Stack
+
+- **Framework:** Flutter 
+- **State Management:** Provider with ChangeNotifier
+- **Local Storage:** shared_preferences
+- **UI Components:** Material Design with custom styling
+- **Fonts:** Google Fonts (Andika)
+- **Image Handling:** cached_network_image + image_picker
+- **Navigation:** Standard Flutter navigation
+
+## Key Dependencies
+
+```yaml
+dependencies:
+  provider: ^6.1.2           # State management
+  shared_preferences: ^2.3.2 # Local data persistence  
+  google_fonts: ^6.2.1       # Andika font family
+  timeago: ^3.7.0            # Human-readable timestamps
+  url_launcher: ^6.3.1       # WhatsApp integration
+  image_picker: ^1.1.2       # Gallery image selection
+  cached_network_image: ^3.4.1 # Network image caching
+  uuid: ^4.5.1               # Unique ID generation
+```
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
-
 ### Prerequisites
 
-*   [Flutter SDK](https://flutter.dev/docs/get-started/install)
-*   [Dart SDK](https://dart.dev/get-dart)
-*   An IDE like [Android Studio](https://developer.android.com/studio) or [Visual Studio Code](https://code.visualstudio.com/) with the Flutter plugin.
+- [Flutter SDK](https://flutter.dev/docs/get-started/install) (3.0+)
+- [Dart SDK](https://dart.dev/get-dart) (3.0+)
+- An IDE: [Android Studio](https://developer.android.com/studio) or [VS Code](https://code.visualstudio.com/) with Flutter extension
 
 ### Installation
 
-1.  Clone the repo
-    ```sh
-    git clone https://your_repository_url/flutter_application.git
-    ```
-2.  Navigate to the project directory
-    ```sh
-    cd flutter_application
-    ```
-3.  Install dependencies
-    ```sh
-    flutter pub get
-    ```
+1. Clone the repository
+   ```bash
+   git clone <repository-url>
+   cd Lost-and-Found-with-Flutter-
+   ```
 
-## Usage
+2. Install dependencies
+   ```bash
+   flutter pub get
+   ```
 
-To run the application, use the following command:
+3. Run the app
+   ```bash
+   flutter run
+   ```
 
-```sh
-flutter run
-```
+### Development Commands
 
-This command will launch the application on a connected device or emulator.
-
-## Testing
-
-To run the widget tests, use:
-
-```sh
-flutter test
+```bash
+flutter pub get          # Install dependencies
+flutter run              # Run on connected device/emulator  
+flutter test             # Run widget tests
+flutter analyze          # Check for lint issues
+flutter build apk        # Build Android APK
+flutter build ios        # Build iOS app (macOS only)
 ```
 
 ## Project Structure
 
-The project follows the standard Flutter project structure.
+```
+lib/
+├── main.dart                    # Single-file app with all logic (~2500 lines)
+├── config/
+│   └── app_colors.dart         # Design system with semantic color tokens
+├── models/                      # Data models with JSON serialization
+│   ├── comment.dart            
+│   ├── post.dart               
+│   └── user_model.dart         
+├── providers/
+│   └── app_state.dart          # ChangeNotifier for business logic
+├── routes/                      # Navigation components
+│   ├── main_page.dart          
+│   └── root_router.dart        
+├── screens/                     # UI screens
+│   ├── activity_screen.dart    
+│   ├── create_post_sheet.dart  
+│   ├── home_screen.dart        
+│   ├── post_detail_screen.dart 
+│   ├── profile_screen.dart     
+│   ├── settings_screen.dart    
+│   └── auth/                   # Authentication screens
+└── widgets/                     # Reusable UI components
+    ├── phone_input_formatter.dart
+    └── post_card.dart          
+```
 
-- `lib/`: Contains the Dart source code for the application.
-- `android/`, `ios/`, `web/`, etc.: Platform-specific code.
-- `pubspec.yaml`: Defines project dependencies and metadata.
-- `test/`: Contains tests for the application.
+### Architecture Patterns
 
-## Contributing
+- **State Management:** Provider pattern with ChangeNotifier
+- **Data Flow:** SharedPreferences ↔ AppState ↔ UI Widgets  
+- **Navigation:** Standard Flutter MaterialPageRoute
+- **Styling:** Centralized design tokens with GoogleFonts.andika()
+- **Image Handling:** Network URLs + local file paths with caching
 
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+## Design System
 
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+### Color Scheme
+- **Lost Items:** Red theme (`#EF4444`) for lost item posts
+- **Found Items:** Green theme (`#10B981`) for found item posts  
+- **Primary:** Blue theme for general UI elements
+- **Typography:** Andika font family (Kurdish language optimized)
 
-1.  Fork the Project
-2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4.  Push to the Branch (`git push origin feature/AmazingFeature`)
-5.  Open a Pull Request
-
-## License
-
-Distributed under the MIT License. See `LICENSE` for more information.
+### UI Conventions
+- Border radius: `12px` (inputs), `16px` (cards), `24px` (buttons/chips)
+- Cards: White background with subtle shadow
+- Phone format: Kurdistan 11-digit format (`0750 222 34 44`)
+- Image limit: Maximum 3 images per post

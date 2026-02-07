@@ -9,11 +9,12 @@ void main() {
   testWidgets('App loads and shows Find It branding', (
     WidgetTester tester,
   ) async {
-    // Mock SharedPreferences so FutureBuilder resolves instantly
+    // Mock SharedPreferences for tests.
     SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
 
-    // Build the app and trigger a frame
-    await tester.pumpWidget(const FindItApp());
+    // Build the app and trigger a frame.
+    await tester.pumpWidget(FindItApp(prefs: prefs));
     await tester.pumpAndSettle();
 
     // Verify the app title appears

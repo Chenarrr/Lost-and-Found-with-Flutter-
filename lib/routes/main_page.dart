@@ -23,11 +23,15 @@ class _MainPageState extends State<MainPage> {
   ];
 
   void _openCreatePost() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => const CreatePostSheet(),
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => CreatePostSheet(
+          onGoHome: () {
+            if (!mounted) return;
+            setState(() => _selectedIndex = 0);
+          },
+        ),
+      ),
     );
   }
 

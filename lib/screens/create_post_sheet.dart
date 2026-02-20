@@ -11,7 +11,9 @@ import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 class CreatePostSheet extends StatefulWidget {
-  const CreatePostSheet({super.key});
+  const CreatePostSheet({super.key, this.onGoHome});
+
+  final VoidCallback? onGoHome;
 
   @override
   State<CreatePostSheet> createState() => _CreatePostSheetState();
@@ -19,7 +21,7 @@ class CreatePostSheet extends StatefulWidget {
 
 class _CreatePostSheetState extends State<CreatePostSheet> {
   static const _uuid = Uuid();
-  static const _citySuggestions = [
+  static const _cityOptions = [
     'Erbil',
     'Sulaymaniyah',
     'Duhok',
@@ -32,12 +34,12 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
   final _itemNameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _streetController = TextEditingController();
-  final _cityController = TextEditingController();
 
   final List<String> _imagePaths = [];
 
   PostType _postType = PostType.lost;
   PostCategory _category = PostCategory.electronics;
+  String? _selectedCity;
   bool _isLoading = false;
 
   @override
@@ -45,7 +47,6 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
     _itemNameController.dispose();
     _descriptionController.dispose();
     _streetController.dispose();
-    _cityController.dispose();
     super.dispose();
   }
 
@@ -58,6 +59,11 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
             : AppColors.primaryBlueDark,
       ),
     );
+  }
+
+  void _goHome() {
+    widget.onGoHome?.call();
+    Navigator.of(context).pop();
   }
 
   Widget _buildImagePreview(String path) {
@@ -106,6 +112,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
     if (!_formKey.currentState!.validate()) return;
 
     final app = Provider.of<AppState>(context, listen: false);
+    final messenger = ScaffoldMessenger.of(context);
     final currentUser = app.currentUser;
     if (currentUser == null) {
       _showMessage('Please login to create a post.', isError: true);
@@ -123,7 +130,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
           ? null
           : _descriptionController.text.trim(),
       street: _streetController.text.trim(),
-      city: _cityController.text.trim(),
+      city: _selectedCity!,
       imageUrls: List.from(_imagePaths),
       userName: currentUser.name,
       userPhone: currentUser.phone,
@@ -136,57 +143,41 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
     if (!mounted) return;
     setState(() => _isLoading = false);
     Navigator.of(context).pop();
-    _showMessage('Post created successfully.');
+    messenger.showSnackBar(
+      const SnackBar(
+        content: Text('Post created successfully.'),
+        backgroundColor: AppColors.primaryBlueDark,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Container(
-        padding: EdgeInsets.only(
-          left: 16,
-          right: 16,
-          top: 12,
-          bottom: MediaQuery.of(context).viewInsets.bottom + 12,
-        ),
-        decoration: BoxDecoration(
-          color: AppColors.cardWhite,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          border: const Border(top: BorderSide(color: AppColors.borderGray)),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.textPrimary.withAlpha(16),
-              blurRadius: 16,
-              offset: const Offset(0, -4),
-            ),
-          ],
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Create Post', style: GoogleFonts.inter()),
+        actions: [
+          IconButton(
+            onPressed: _goHome,
+            tooltip: 'Go Home',
+            icon: const Icon(Icons.home_rounded),
+          ),
+          const SizedBox(width: 6),
+        ],
+      ),
+      body: SafeArea(
         child: SingleChildScrollView(
+          padding: EdgeInsets.fromLTRB(
+            16,
+            12,
+            16,
+            MediaQuery.of(context).viewInsets.bottom + 20,
+          ),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Center(
-                  child: Container(
-                    width: 42,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: AppColors.borderGray,
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 14),
-                Text(
-                  'Create Post',
-                  style: GoogleFonts.inter(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 4),
                 Text(
                   'Share details to help the community identify the item.',
                   style: GoogleFonts.inter(
@@ -277,35 +268,25 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                TextFormField(
-                  controller: _cityController,
-                  textInputAction: TextInputAction.next,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'City is required';
-                    }
-                    return null;
-                  },
+                DropdownButtonFormField<String>(
+                  initialValue: _selectedCity,
+                  isExpanded: true,
                   decoration: const InputDecoration(labelText: 'City'),
-                ),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 6,
-                  children: _citySuggestions
+                  hint: Text(
+                    'Select city',
+                    style: GoogleFonts.inter(color: AppColors.placeholderGray),
+                  ),
+                  items: _cityOptions
                       .map(
-                        (city) => ActionChip(
-                          label: Text(
-                            city,
-                            style: GoogleFonts.inter(fontSize: 12),
-                          ),
-                          onPressed: () =>
-                              setState(() => _cityController.text = city),
-                          backgroundColor: AppColors.skyTop,
-                          side: const BorderSide(color: AppColors.borderGray),
+                        (city) => DropdownMenuItem<String>(
+                          value: city,
+                          child: Text(city, style: GoogleFonts.inter()),
                         ),
                       )
                       .toList(),
+                  onChanged: (value) => setState(() => _selectedCity = value),
+                  validator: (value) =>
+                      value == null ? 'Please select a city' : null,
                 ),
                 const SizedBox(height: 10),
                 TextFormField(

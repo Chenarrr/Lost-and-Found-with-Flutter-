@@ -10,11 +10,16 @@ The app currently runs fully client-side with local persistence (`shared_prefere
 - More resilient startup routing (`RootRouter` waits for state hydration)
 - Stronger input normalization for signup/login (trimmed phone/email handling)
 - Better error feedback for actions like report, comment, image pick, and WhatsApp launch
+- Smoother navigation and state retention in bottom tabs
+- Full-screen post creation flow with direct Home shortcut
 
 ## Features
 
 - Local signup/login session flow (with OTP simulation)
 - Create lost/found posts with category, location, and up to 3 images
+- City is selection-only in create post (dropdown, no free-text city input)
+- Tapping `Post` opens a dedicated full-screen create-post page
+- Create-post app bar includes a top-right Home button for quick return
 - Search and city filtering on Home
 - Post detail with comments, reporting, and WhatsApp contact
 - Activity tab for personal posts and comment history
@@ -107,6 +112,13 @@ flutter build web --release
 - `RootRouter` shows a loading indicator until hydration completes
 - Session is stored separately from registered user data
 - Posts, comments, and reports are persisted locally
+
+## Navigation and UX
+
+- Bottom-tab pages are kept alive with `IndexedStack` for smoother switching
+- Search input on Home uses lightweight debouncing for smoother typing/filtering
+- Activity and feed lists use tuned list rendering (`ListView.builder` + cache extent)
+- Post creation uses full-screen route navigation instead of a modal bottom sheet
 
 ## Testing
 

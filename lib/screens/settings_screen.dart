@@ -9,6 +9,7 @@ class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   Future<void> _logout(BuildContext context) async {
+    final app = Provider.of<AppState>(context, listen: false);
     final shouldLogout = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
@@ -40,7 +41,6 @@ class SettingsScreen extends StatelessWidget {
     );
 
     if (shouldLogout != true) return;
-    final app = Provider.of<AppState>(context, listen: false);
     await app.logout();
     if (context.mounted) {
       Navigator.of(context).pushAndRemoveUntil(

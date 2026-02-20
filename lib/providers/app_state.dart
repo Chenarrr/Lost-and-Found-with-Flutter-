@@ -18,6 +18,7 @@ class AppState extends ChangeNotifier {
 
   final SharedPreferences prefs;
 
+  bool _isInitialized = false;
   User? currentUser;
   List<Post> posts = [];
 
@@ -28,6 +29,8 @@ class AppState extends ChangeNotifier {
   AppState(this.prefs) {
     _loadFromPrefs();
   }
+
+  bool get isInitialized => _isInitialized;
 
   Future<void> _loadFromPrefs() async {
     // Restore session only if one was active
@@ -59,6 +62,7 @@ class AppState extends ChangeNotifier {
       await _savePosts();
     }
 
+    _isInitialized = true;
     notifyListeners();
   }
 
@@ -85,11 +89,14 @@ class AppState extends ChangeNotifier {
     required String password, // Note: not persisted — demo only
   }) async {
     await Future.delayed(const Duration(milliseconds: 800));
+    final cleanName = name.trim();
+    final cleanPhone = phone.trim().replaceAll(RegExp(r'\s+'), '');
+    final cleanEmail = email?.trim().toLowerCase();
     currentUser = User(
       id: _uuid.v4(),
-      name: name,
-      phone: phone,
-      email: email,
+      name: cleanName,
+      phone: cleanPhone,
+      email: cleanEmail?.isEmpty == true ? null : cleanEmail,
       createdAt: DateTime.now(),
     );
     // Persist credentials (for re-login) and start session
@@ -106,13 +113,17 @@ class AppState extends ChangeNotifier {
     required String password,
   }) async {
     await Future.delayed(const Duration(milliseconds: 800));
+    final normalizedIdentifier = identifier.trim().toLowerCase();
+    final normalizedPhone = normalizedIdentifier.replaceAll(RegExp(r'\s+'), '');
+
     final stored = prefs.getString(_kRegisteredUserKey);
     if (stored == null) return 'No account found. Please sign up first.';
 
     final user = User.fromJson(json.decode(stored) as Map<String, dynamic>);
     final identifierMatches =
-        user.phone == identifier ||
-        (user.email != null && user.email == identifier);
+        user.phone == normalizedPhone ||
+        (user.email != null &&
+            user.email!.toLowerCase() == normalizedIdentifier);
     if (!identifierMatches) return 'Invalid credentials.';
 
     currentUser = user;

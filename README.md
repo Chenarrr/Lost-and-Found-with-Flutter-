@@ -1,88 +1,79 @@
 # Find It — Lost & Found Flutter App
 
-Find It is a Flutter mobile application for the Kurdistan region that helps people report and discover lost and found items. The app is fully client-side — no backend required — using `shared_preferences` for local data persistence.
+Find It is a Flutter app that helps users report and discover lost and found items.
+The app currently runs fully client-side with local persistence (`shared_preferences`) and is optimized for clear UX, consistent design, and stable behavior.
 
----
+## What This Version Improves
+
+- Easier user flows on key screens (`Auth`, `Create Post`, `Post Details`, `Activity`)
+- Unified color and component styling across the app
+- More resilient startup routing (`RootRouter` waits for state hydration)
+- Stronger input normalization for signup/login (trimmed phone/email handling)
+- Better error feedback for actions like report, comment, image pick, and WhatsApp launch
 
 ## Features
 
-- **User authentication** — sign up and login with local storage; credentials persist across logout so users can log back in
-- **Post management** — create "lost" or "found" posts with item details, location, and up to 3 images
-- **Smart filtering** — browse all posts with city filter chips and a live search bar
-- **Comments** — community interaction with a per-post comment thread
-- **Activity dashboard** — track your own posts and comments in dedicated tabs
-- **User profile** — display name, phone, email, and your own posts at a glance
-- **WhatsApp integration** — deep-link directly to the poster's WhatsApp
-- **Report system** — community-driven flagging for fake or inappropriate posts
-- **Phone formatting** — auto-formats Kurdistan 11-digit numbers (`0750 222 34 44`)
-
----
+- Local signup/login session flow (with OTP simulation)
+- Create lost/found posts with category, location, and up to 3 images
+- Search and city filtering on Home
+- Post detail with comments, reporting, and WhatsApp contact
+- Activity tab for personal posts and comment history
+- Profile + settings with logout confirmation
 
 ## Tech Stack
 
-| Concern | Choice |
-|---|---|
-| Framework | Flutter (Material 3) |
-| State management | Provider + ChangeNotifier |
-| Local storage | shared_preferences |
-| Fonts | Google Fonts — Inter |
-| Images | cached_network_image + image_picker |
-| Navigation | Flutter MaterialPageRoute |
-| Timestamps | timeago |
-| IDs | uuid v4 |
-
----
+- Flutter (Material 3)
+- Provider (`ChangeNotifier`) for state management
+- `shared_preferences` for local storage
+- `cached_network_image`, `image_picker`, `url_launcher`
+- `google_fonts` (Inter), `timeago`, `uuid`
 
 ## Project Structure
 
-```
+```text
 lib/
-├── main.dart                      # App entry point, theme setup
+├── main.dart
 ├── config/
-│   └── app_colors.dart            # Centralized design-system color tokens
-├── models/                        # Immutable data models with copyWith + JSON
+│   └── app_colors.dart
+├── models/
 │   ├── comment.dart
-│   ├── post.dart                  # Includes PostType enum (lost | found)
+│   ├── post.dart
 │   └── user.dart
 ├── providers/
-│   └── app_state.dart             # All business logic via ChangeNotifier
+│   └── app_state.dart
 ├── routes/
-│   ├── main_page.dart             # Bottom-nav shell (Home / Activity / Profile)
-│   └── root_router.dart           # Auth-gate routing
+│   ├── main_page.dart
+│   └── root_router.dart
 ├── screens/
+│   ├── activity_screen.dart
+│   ├── create_post_sheet.dart
 │   ├── home_screen.dart
 │   ├── post_detail_screen.dart
-│   ├── activity_screen.dart
 │   ├── profile_screen.dart
 │   ├── settings_screen.dart
-│   ├── create_post_sheet.dart
 │   └── auth/
 │       ├── auth_screen.dart
+│       ├── otp_screen.dart
 │       └── welcome_screen.dart
 └── widgets/
-    ├── post_card.dart
-    └── phone_input_formatter.dart
+    ├── phone_input_formatter.dart
+    └── post_card.dart
 
 test/
-├── widget_test.dart               # App-level smoke tests
 ├── models/
-│   ├── post_test.dart
-│   ├── user_test.dart
-│   └── comment_test.dart
-└── providers/
-    └── app_state_test.dart
+├── providers/
+└── widget_test.dart
 ```
 
----
-
-## Getting Started
+## Setup
 
 ### Prerequisites
 
-- [Flutter SDK](https://flutter.dev/docs/get-started/install) ≥ 3.x (Dart ≥ 3.9.2)
-- Android Studio or VS Code with the Flutter extension
+- Flutter SDK `>=3.x`
+- Dart SDK `>=3.9.2`
+- Android Studio or VS Code with Flutter extension
 
-### Installation
+### Install and run
 
 ```bash
 git clone <repository-url>
@@ -91,105 +82,80 @@ flutter pub get
 flutter run
 ```
 
-### Common commands
+## Development Commands
 
 ```bash
-flutter pub get          # Install dependencies
-flutter run              # Run on connected device / emulator
-flutter test             # Run all tests (44 tests)
-flutter test --coverage  # Run tests and generate coverage/lcov.info
-flutter analyze          # Static analysis (0 issues expected)
-dart format .            # Auto-format all Dart files
-flutter build apk        # Build release APK
-flutter build web        # Build web release
+dart format .
+flutter analyze
+flutter test
+flutter test --coverage
+flutter build apk --release
+flutter build web --release
 ```
 
----
+## Design System Notes
 
-## Design System
+- Single font family: **Inter**
+- Color tokens are centralized in `lib/config/app_colors.dart`
+- Shared component style is defined in `ThemeData` (`lib/main.dart`)
+- Lost/found states use dedicated semantic colors (red/green)
+- Neutral surfaces and borders are consistent across cards, forms, and chips
 
-### Colors (`lib/config/app_colors.dart`)
+## State and Persistence
 
-| Token | Usage |
-|---|---|
-| `lostPrimary` | Red — lost item badges and accents |
-| `foundPrimary` | Green — found item badges and accents |
-| `primaryBlue` | Blue — primary actions, buttons, nav |
-| `accentIndigo` | Indigo — gradient accents |
-| Text, border, and card tokens | Neutral grays throughout |
+- `AppState` hydrates session + posts from local storage at startup
+- `RootRouter` shows a loading indicator until hydration completes
+- Session is stored separately from registered user data
+- Posts, comments, and reports are persisted locally
 
-### Typography
+## Testing
 
-Inter (via Google Fonts) is the single font family used across the entire app.
+Current test coverage includes:
 
-### UI conventions
+- Model serialization and immutability
+- `AppState` authentication/post/comment/report flows
+- Core widget smoke flow
 
-- Border radius: `12` (inputs), `16` (cards), `24` (buttons / bottom sheet)
-- Cards: white background with a subtle drop shadow
-- Images: maximum 3 per post; network URLs use `CachedNetworkImage`, local files use `Image.file`
+Run:
 
----
+```bash
+flutter test
+```
 
-## CI / CD
+## Production Readiness Checklist
 
-### Continuous Integration (`.github/workflows/ci.yml`)
+Completed in this repo:
 
-Runs on every push and pull request to `main`:
+- Consistent theming and UI feedback patterns
+- Startup hydration guard before routing
+- Safer async action handling and error feedback
+- Input validation and normalization on auth and post forms
+- Structured CI/CD workflows (`.github/workflows/ci.yml`, `.github/workflows/cd.yml`)
+- Automated tests passing
 
-1. Check formatting — `dart format --set-exit-if-changed .`
-2. Static analysis — `flutter analyze --fatal-infos`
-3. Run all tests with coverage — `flutter test --coverage`
-4. Upload coverage report to Codecov
+Required before real production deployment:
 
-### Continuous Deployment (`.github/workflows/cd.yml`)
+- Replace local auth with secure backend auth (token/session management)
+- Move posts/comments/reports to backend database
+- Add server-side moderation and anti-abuse controls
+- Add privacy policy, terms, and data-retention policy
+- Add analytics/crash reporting (e.g. Firebase Crashlytics)
+- Add secrets/config management per environment
+- Add offline/online sync conflict strategy
+- Add accessibility audit and localization coverage
+- Add integration/end-to-end tests on release pipeline
 
-Triggered on GitHub Release or manual dispatch:
+## CI/CD
 
-- **Android** — `flutter build apk --release`, uploaded as a workflow artifact
-- **Web** — `flutter build web --release`, uploaded as a workflow artifact
+- CI (`ci.yml`): format check, analyze, tests, coverage upload
+- CD (`cd.yml`): release build artifacts for Android and Web
 
----
+## Current Limitations
 
-## Refactor & Quality Improvements (Feb 2026)
+- Data is local to the device (no shared backend)
+- OTP is simulated for demo flow
+- Login credentials are not cryptographically secured (local demo behavior)
 
-The following production-readiness improvements were applied across the codebase.
+## License
 
-### Models
-
-- All model fields made `final` (immutable by default).
-- `Post.comments` and `Post.reports` are now `List.unmodifiable(...)` — accidental in-place mutation throws at runtime.
-- Added `copyWith()` to `Post`, `User`, and `Comment`.
-- Added `PostType` enum (`lost` / `found`) replacing the raw `String` type field. JSON serialisation uses `PostType.name`; deserialisation uses a Dart 3 switch expression with a safe fallback.
-- Renamed `user_model.dart` → `user.dart` and `UserModel` → `User` for consistency with the other model filenames.
-
-### State management (`app_state.dart`)
-
-- Replaced all `post.type == 'lost'` string comparisons with `post.type == PostType.lost`.
-- Replaced `firstWhere` (throws on miss) with `indexWhere` + early-return guard — eliminates crash risk when a post ID is not found.
-- `addComment` and `reportPost` now use `copyWith()` instead of mutating list fields in place.
-- **Auth bug fixed:** `logout()` previously deleted the user's credentials from `SharedPreferences`, making re-login impossible. Credentials are now stored under a separate key (`findit_registered_user`) that survives logout. The active session (`findit_session`) is the only thing cleared on logout.
-
-### Memory leaks fixed
-
-- `main_page.dart` — removed `TickerProviderStateMixin` and an `AnimationController` that was created inside `_openCreatePost` but never disposed.
-- `home_screen.dart` — added `dispose()` to call `_searchController.dispose()`.
-- `post_detail_screen.dart` — added `dispose()` for `_commentController`.
-
-### Code style
-
-- Font standardised: all `GoogleFonts.andika()` calls replaced with `GoogleFonts.inter()` to match the app theme.
-- All hardcoded `Color(0xFF...)` values replaced with `AppColors` constants.
-- Private fields renamed to follow the `_camelCase` convention (`searchCtrl` → `_searchController`, `_type` → `_postType`, `_selected` → `_selectedIndex`, etc.).
-- Typed record syntax `({Comment comment, Post post})` used in `activity_screen.dart` instead of `Map<String, dynamic>`.
-- All untyped function parameters given explicit types.
-- `analysis_options.yaml` extended with `avoid_print`, `prefer_single_quotes`, `prefer_const_constructors`, `prefer_final_fields`, `prefer_final_locals`, `require_trailing_commas`, and related rules.
-
-### Tests (44 passing, 0 failing)
-
-| File | What is tested |
-|---|---|
-| `test/models/post_test.dart` | `PostType` values, construction, unmodifiable lists, JSON round-trip, `copyWith` |
-| `test/models/user_test.dart` | Construction (with/without email), JSON round-trip, `copyWith` |
-| `test/models/comment_test.dart` | Construction, JSON round-trip, `copyWith` |
-| `test/providers/app_state_test.dart` | Init + seed data, signup, login (phone, email, wrong identifier), logout, addPost, deletePost, addComment, reportPost (including deduplication) |
-| `test/widget_test.dart` | App loads, welcome screen, Get Started navigation, auth screen fields, form validation |
+Use your project license here (MIT/Apache-2.0/etc.).

@@ -1,38 +1,39 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/providers/app_state.dart';
-import 'package:flutter_application/widgets/phone_input_formatter.dart';
 import 'package:flutter_application/routes/main_page.dart';
 import 'package:flutter_application/screens/auth/otp_screen.dart';
+import 'package:flutter_application/widgets/phone_input_formatter.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
+
   @override
   State<AuthScreen> createState() => _AuthScreenState();
 }
 
 class _AuthScreenState extends State<AuthScreen>
     with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+  late final TabController _tabController;
 
-  // signup
   final _sName = TextEditingController();
   final _sPhone = TextEditingController();
   final _sEmail = TextEditingController();
   final _sPassword = TextEditingController();
 
-  // login
   final _lIdentifier = TextEditingController();
   final _lPassword = TextEditingController();
 
   final _formKeySignup = GlobalKey<FormState>();
   final _formKeyLogin = GlobalKey<FormState>();
+
   bool _loading = false;
 
-  // Updated: Accept 11-digit format (0750 222 34 44)
-  final phoneReg = RegExp(r'^0\d{10}$');
-  final emailReg = RegExp(r'^[\w\.\-]+@([\w\-]+\.)+[\w\-]{2,4}$');
+  final _phoneReg = RegExp(r'^0\d{10}$');
+  final _emailReg = RegExp(r'^[\w\.\-]+@([\w\-]+\.)+[\w\-]{2,4}$');
 
   @override
   void initState() {
@@ -40,51 +41,69 @@ class _AuthScreenState extends State<AuthScreen>
     _tabController = TabController(length: 2, vsync: this);
   }
 
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _sName.dispose();
+    _sPhone.dispose();
+    _sEmail.dispose();
+    _sPassword.dispose();
+    _lIdentifier.dispose();
+    _lPassword.dispose();
+    super.dispose();
+  }
+
+  void _showMessage(String message, {bool isError = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError
+            ? AppColors.lostPrimary
+            : AppColors.primaryBlueDark,
+      ),
+    );
+  }
+
   Future<void> _doSignup() async {
     if (!_formKeySignup.currentState!.validate()) return;
     final app = Provider.of<AppState>(context, listen: false);
-    // Normalize phone — strip spaces inserted by PhoneInputFormatter
     final phone = _sPhone.text.trim().replaceAll(RegExp(r'\s'), '');
     final demoCode = app.initiateOtp(phone);
-    if (mounted) {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => OtpScreen(
-            phone: phone,
-            name: _sName.text.trim(),
-            email: _sEmail.text.trim().isEmpty ? null : _sEmail.text.trim(),
-            password: _sPassword.text,
-            demoCode: demoCode,
-          ),
+
+    if (!mounted) return;
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => OtpScreen(
+          phone: phone,
+          name: _sName.text.trim(),
+          email: _sEmail.text.trim().isEmpty ? null : _sEmail.text.trim(),
+          password: _sPassword.text,
+          demoCode: demoCode,
         ),
-      );
-    }
+      ),
+    );
   }
 
   Future<void> _doLogin() async {
     if (!_formKeyLogin.currentState!.validate()) return;
+
     setState(() => _loading = true);
     final app = Provider.of<AppState>(context, listen: false);
     final err = await app.login(
       identifier: _lIdentifier.text.trim(),
       password: _lPassword.text,
     );
+    if (!mounted) return;
     setState(() => _loading = false);
-    if (err == null) {
-      if (mounted) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const MainPage()),
-          (r) => false,
-        );
-      }
-    } else {
-      _showError(err);
-    }
-  }
 
-  void _showError(String m) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(m), backgroundColor: Colors.red[400]),
+    if (err != null) {
+      _showMessage(err, isError: true);
+      return;
+    }
+
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const MainPage()),
+      (route) => false,
     );
   }
 
@@ -94,172 +113,194 @@ class _AuthScreenState extends State<AuthScreen>
       appBar: AppBar(
         title: Text('Login or Signup', style: GoogleFonts.inter()),
       ),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  TabBar(
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: AppColors.borderGray),
+                  ),
+                  child: TabBar(
                     controller: _tabController,
                     labelColor: Colors.white,
-                    unselectedLabelColor: Colors.grey,
+                    unselectedLabelColor: AppColors.textSecondary,
                     indicator: BoxDecoration(
                       gradient: const LinearGradient(
-                        colors: [Color(0xFF2563EB), Color(0xFF4F46E5)],
+                        colors: [AppColors.primaryBlue, AppColors.accentIndigo],
                       ),
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: BorderRadius.circular(14),
                     ),
+                    dividerColor: Colors.transparent,
                     tabs: [
                       Tab(child: Text('Login', style: GoogleFonts.inter())),
                       Tab(child: Text('Signup', style: GoogleFonts.inter())),
                     ],
                   ),
-                  Expanded(
-                    child: TabBarView(
-                      controller: _tabController,
-                      children: [
-                        // Login
-                        SingleChildScrollView(
-                          padding: const EdgeInsets.only(top: 16),
-                          child: Form(
-                            key: _formKeyLogin,
-                            child: Column(
-                              children: [
-                                _buildTextField(
-                                  controller: _lIdentifier,
-                                  label: 'Phone (0750 222 34 44) or Email',
-                                  validator: (v) {
-                                    if (v == null || v.trim().isEmpty) {
-                                      return 'Required';
-                                    }
-                                    return null;
-                                  },
-                                ),
-                                const SizedBox(height: 12),
-                                _buildTextField(
-                                  controller: _lPassword,
-                                  label: 'Password',
-                                  obscure: true,
-                                  validator: (v) {
-                                    if (v == null || v.length < 6) {
-                                      return 'Minimum 6 chars';
-                                    }
-                                    return null;
-                                  },
-                                ),
-                                const SizedBox(height: 16),
-                                SizedBox(
-                                  width: double.infinity,
-                                  child: ElevatedButton(
-                                    onPressed: _doLogin,
-                                    style: ElevatedButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 14,
-                                      ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(24),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      'Login',
-                                      style: GoogleFonts.inter(fontSize: 16),
+                ),
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      SingleChildScrollView(
+                        padding: const EdgeInsets.only(top: 16),
+                        child: Form(
+                          key: _formKeyLogin,
+                          child: Column(
+                            children: [
+                              _buildTextField(
+                                controller: _lIdentifier,
+                                label: 'Phone (0750 222 34 44) or Email',
+                                textInputAction: TextInputAction.next,
+                                validator: (value) {
+                                  if (value == null || value.trim().isEmpty) {
+                                    return 'Required';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 12),
+                              _buildTextField(
+                                controller: _lPassword,
+                                label: 'Password',
+                                obscure: true,
+                                textInputAction: TextInputAction.done,
+                                onSubmitted: (_) => _doLogin(),
+                                validator: (value) {
+                                  if (value == null || value.length < 6) {
+                                    return 'Minimum 6 characters';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 18),
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: _doLogin,
+                                  style: ElevatedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 14,
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        // Signup
-                        SingleChildScrollView(
-                          padding: const EdgeInsets.only(top: 16),
-                          child: Form(
-                            key: _formKeySignup,
-                            child: Column(
-                              children: [
-                                _buildTextField(
-                                  controller: _sName,
-                                  label: 'Name',
-                                  validator: (v) {
-                                    if (v == null || v.trim().length < 2) {
-                                      return 'Enter at least 2 characters';
-                                    }
-                                    return null;
-                                  },
-                                ),
-                                const SizedBox(height: 12),
-                                _buildTextField(
-                                  controller: _sPhone,
-                                  label: 'Phone (0750 222 34 44)',
-                                  validator: (v) {
-                                    if (v == null || v.trim().isEmpty) {
-                                      return 'Phone is required';
-                                    }
-                                    final clean = v.replaceAll(
-                                      RegExp(r'\s'),
-                                      '',
-                                    );
-                                    if (!phoneReg.hasMatch(clean)) {
-                                      return 'Enter 11 digits: 0750 222 34 44';
-                                    }
-                                    return null;
-                                  },
-                                ),
-                                const SizedBox(height: 12),
-                                _buildTextField(
-                                  controller: _sEmail,
-                                  label: 'Email (optional)',
-                                  validator: (v) {
-                                    if (v != null &&
-                                        v.isNotEmpty &&
-                                        !emailReg.hasMatch(v)) {
-                                      return 'Invalid email';
-                                    }
-                                    return null;
-                                  },
-                                ),
-                                const SizedBox(height: 12),
-                                _buildTextField(
-                                  controller: _sPassword,
-                                  label: 'Password',
-                                  obscure: true,
-                                  validator: (v) {
-                                    if (v == null || v.length < 6) {
-                                      return 'Minimum 6 chars';
-                                    }
-                                    return null;
-                                  },
-                                ),
-                                const SizedBox(height: 16),
-                                SizedBox(
-                                  width: double.infinity,
-                                  child: ElevatedButton(
-                                    onPressed: _doSignup,
-                                    style: ElevatedButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 14,
-                                      ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(24),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      'Create account',
-                                      style: GoogleFonts.inter(fontSize: 16),
-                                    ),
+                                  child: Text(
+                                    'Login',
+                                    style: GoogleFonts.inter(fontSize: 16),
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                      SingleChildScrollView(
+                        padding: const EdgeInsets.only(top: 16),
+                        child: Form(
+                          key: _formKeySignup,
+                          child: Column(
+                            children: [
+                              _buildTextField(
+                                controller: _sName,
+                                label: 'Name',
+                                textInputAction: TextInputAction.next,
+                                validator: (value) {
+                                  if (value == null ||
+                                      value.trim().length < 2) {
+                                    return 'Enter at least 2 characters';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 12),
+                              _buildTextField(
+                                controller: _sPhone,
+                                label: 'Phone (0750 222 34 44)',
+                                keyboardType: TextInputType.phone,
+                                textInputAction: TextInputAction.next,
+                                inputFormatters: [PhoneInputFormatter()],
+                                validator: (value) {
+                                  if (value == null || value.trim().isEmpty) {
+                                    return 'Phone is required';
+                                  }
+                                  final clean = value.replaceAll(
+                                    RegExp(r'\s'),
+                                    '',
+                                  );
+                                  if (!_phoneReg.hasMatch(clean)) {
+                                    return 'Enter 11 digits: 0750 222 34 44';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 12),
+                              _buildTextField(
+                                controller: _sEmail,
+                                label: 'Email (optional)',
+                                keyboardType: TextInputType.emailAddress,
+                                textInputAction: TextInputAction.next,
+                                validator: (value) {
+                                  if (value != null &&
+                                      value.trim().isNotEmpty &&
+                                      !_emailReg.hasMatch(value.trim())) {
+                                    return 'Invalid email';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 12),
+                              _buildTextField(
+                                controller: _sPassword,
+                                label: 'Password',
+                                obscure: true,
+                                textInputAction: TextInputAction.done,
+                                onSubmitted: (_) => _doSignup(),
+                                validator: (value) {
+                                  if (value == null || value.length < 6) {
+                                    return 'Minimum 6 characters';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 18),
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: _doSignup,
+                                  style: ElevatedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 14,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    'Create account',
+                                    style: GoogleFonts.inter(fontSize: 16),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
+              ],
+            ),
+          ),
+          if (_loading)
+            ColoredBox(
+              color: Colors.black.withAlpha(35),
+              child: const Center(
+                child: CircularProgressIndicator(color: AppColors.primaryBlue),
               ),
             ),
+        ],
+      ),
     );
   }
 
@@ -267,25 +308,23 @@ class _AuthScreenState extends State<AuthScreen>
     required TextEditingController controller,
     required String label,
     bool obscure = false,
+    TextInputType keyboardType = TextInputType.text,
+    TextInputAction textInputAction = TextInputAction.next,
     String? Function(String?)? validator,
+    void Function(String)? onSubmitted,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return TextFormField(
       controller: controller,
       obscureText: obscure,
       validator: validator,
-      inputFormatters: label.contains('Phone') ? [PhoneInputFormatter()] : [],
-      keyboardType: label.contains('Phone')
-          ? TextInputType.phone
-          : TextInputType.text,
+      keyboardType: keyboardType,
+      textInputAction: textInputAction,
+      onFieldSubmitted: onSubmitted,
+      inputFormatters: inputFormatters,
       decoration: InputDecoration(
         labelText: label,
-        filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 12,
-        ),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        labelStyle: GoogleFonts.inter(color: AppColors.textSecondary),
       ),
     );
   }

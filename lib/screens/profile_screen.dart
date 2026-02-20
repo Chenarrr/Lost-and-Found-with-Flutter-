@@ -1,14 +1,11 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_application/config/app_colors.dart';
+import 'package:flutter_application/models/post.dart';
+import 'package:flutter_application/providers/app_state.dart';
+import 'package:flutter_application/screens/settings_screen.dart';
+import 'package:flutter_application/widgets/post_card.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:timeago/timeago.dart' as timeago;
-import 'package:flutter_application/providers/app_state.dart';
-import 'package:flutter_application/models/post.dart';
-import 'package:flutter_application/config/app_colors.dart';
-import 'package:flutter_application/screens/post_detail_screen.dart';
-import 'package:flutter_application/screens/settings_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -17,11 +14,37 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final app = Provider.of<AppState>(context);
     final user = app.currentUser;
+
     if (user == null) {
-      return Center(child: Text('Please log in', style: GoogleFonts.inter()));
+      return Center(
+        child: Container(
+          margin: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: AppColors.borderGray),
+          ),
+          child: Text(
+            'Please log in to view your profile.',
+            style: GoogleFonts.inter(
+              fontSize: 15,
+              color: AppColors.textSecondary,
+              fontWeight: FontWeight.w600,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
     }
 
-    final userPosts = app.posts.where((p) => p.userId == user.id).toList();
+    final userPosts = app.posts
+        .where((post) => post.userId == user.id)
+        .toList();
+    final lostCount = userPosts
+        .where((post) => post.type == PostType.lost)
+        .length;
+    final foundCount = userPosts.length - lostCount;
 
     return Scaffold(
       appBar: AppBar(
@@ -31,239 +54,211 @@ class ProfileScreen extends StatelessWidget {
             onPressed: () => Navigator.of(
               context,
             ).push(MaterialPageRoute(builder: (_) => const SettingsScreen())),
-            icon: const Icon(Icons.settings),
+            icon: Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppColors.borderGray),
+              ),
+              child: const Icon(Icons.settings, color: AppColors.primaryBlue),
+            ),
           ),
+          const SizedBox(width: 8),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Hello, ${user.name}',
-              style: GoogleFonts.inter(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
+        children: [
+          Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [AppColors.skyTop, Colors.white],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 40,
-                  backgroundColor: AppColors.primaryBlue,
-                  child: Text(
-                    user.name.substring(0, 1).toUpperCase(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        user.name,
-                        style: GoogleFonts.inter(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        user.phone,
-                        style: GoogleFonts.inter(
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                      if (user.email != null) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          user.email!,
-                          style: GoogleFonts.inter(
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: AppColors.borderGray),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primaryBlue.withAlpha(16),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
                 ),
               ],
             ),
-            const SizedBox(height: 32),
-            Text(
-              'Your Posts',
-              style: GoogleFonts.inter(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Expanded(
-              child: ListView.builder(
-                itemCount: userPosts.length,
-                itemBuilder: (context, index) {
-                  final post = userPosts[index];
-                  final badgeColor = post.type == PostType.lost
-                      ? AppColors.lostPrimary
-                      : AppColors.foundPrimary;
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.textPrimary.withAlpha(20),
-                          blurRadius: 6,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 68,
+                      height: 68,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [
+                            AppColors.primaryBlue,
+                            AppColors.primaryBlueDark,
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                      ],
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        user.name.substring(0, 1).toUpperCase(),
+                        style: GoogleFonts.inter(
+                          color: Colors.white,
+                          fontSize: 28,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                     ),
-                    child: Row(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: SizedBox(
-                            width: 96,
-                            height: 80,
-                            child: post.imageUrls.isNotEmpty
-                                ? (post.imageUrls.first.startsWith('http')
-                                      ? CachedNetworkImage(
-                                          imageUrl: post.imageUrls.first,
-                                          fit: BoxFit.cover,
-                                          placeholder: (_, __) => Container(
-                                            color: Colors.grey[200],
-                                          ),
-                                          errorWidget: (_, __, ___) =>
-                                              Container(
-                                                color: Colors.grey[200],
-                                              ),
-                                        )
-                                      : Image.file(
-                                          File(post.imageUrls.first),
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (_, __, ___) =>
-                                              Container(
-                                                color: Colors.grey[200],
-                                              ),
-                                        ))
-                                : Container(color: Colors.grey[200]),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: badgeColor,
-                                      borderRadius: BorderRadius.circular(12),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: badgeColor.withAlpha(40),
-                                          blurRadius: 8,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Text(
-                                      post.type.name.toUpperCase(),
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      post.itemName,
-                                      style: GoogleFonts.inter(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Icons.location_on,
-                                    size: 14,
-                                    color: AppColors.textTertiary,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Expanded(
-                                    child: Text(
-                                      '${post.city}, ${post.street}',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 12,
-                                        color: AppColors.textTertiary,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                timeago.format(post.createdAt),
-                                style: GoogleFonts.inter(
-                                  fontSize: 12,
-                                  color: AppColors.textTertiary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primaryBlue,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
-                          onPressed: () => Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => PostDetailScreen(postId: post.id),
-                            ),
-                          ),
-                          child: Text(
-                            'View',
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            user.name,
                             style: GoogleFonts.inter(
-                              fontSize: 14,
-                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textPrimary,
                             ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 4),
+                          Text(
+                            user.phone,
+                            style: GoogleFonts.inter(
+                              color: AppColors.textSecondary,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          if (user.email != null) ...[
+                            const SizedBox(height: 2),
+                            Text(
+                              user.email!,
+                              style: GoogleFonts.inter(
+                                color: AppColors.textSecondary,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
                     ),
-                  );
-                },
-              ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: [
+                    _StatPill(label: 'Posts', value: '${userPosts.length}'),
+                    _StatPill(label: 'Lost', value: '$lostCount'),
+                    _StatPill(label: 'Found', value: '$foundCount'),
+                  ],
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Text(
+                'Your Posts',
+                style: GoogleFonts.inter(
+                  fontSize: 19,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                '${userPosts.length} total',
+                style: GoogleFonts.inter(
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          if (userPosts.isEmpty)
+            Container(
+              margin: const EdgeInsets.only(top: 8),
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.borderGray),
+              ),
+              child: Column(
+                children: [
+                  const Icon(
+                    Icons.inventory_2_outlined,
+                    size: 34,
+                    color: AppColors.iconGray,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'You have not posted any items yet.',
+                    style: GoogleFonts.inter(
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else
+            ...userPosts.map((post) => PostCard(post: post)),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatPill extends StatelessWidget {
+  const _StatPill({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withAlpha(210),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.borderGray),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            '$label: ',
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              color: AppColors.textSecondary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          Text(
+            value,
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
       ),
     );
   }

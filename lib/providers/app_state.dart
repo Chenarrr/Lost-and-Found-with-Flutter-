@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
@@ -19,6 +20,10 @@ class AppState extends ChangeNotifier {
 
   User? currentUser;
   List<Post> posts = [];
+
+  // OTP state (in-memory only — not persisted across restarts)
+  String? _pendingOtpPhone;
+  String? _pendingOtpCode;
 
   AppState(this.prefs) {
     _loadFromPrefs();
@@ -122,6 +127,21 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ── OTP — FR2 ─────────────────────────────────────────────────────────────
+
+  /// Simulates sending an OTP to [phone]. Returns the generated code so the
+  /// demo UI can display it (no real SMS is sent).
+  String initiateOtp(String phone) {
+    final code = (100000 + Random().nextInt(900000)).toString();
+    _pendingOtpPhone = phone;
+    _pendingOtpCode = code;
+    return code;
+  }
+
+  /// Returns true if [code] matches the pending OTP for [phone].
+  bool verifyOtp(String phone, String code) =>
+      _pendingOtpPhone == phone && _pendingOtpCode == code;
+
   // ── Posts ─────────────────────────────────────────────────────────────────
 
   Future<void> addPost(Post post) async {
@@ -166,6 +186,7 @@ class AppState extends ChangeNotifier {
       Post(
         id: _uuid.v4(),
         type: PostType.lost,
+        category: PostCategory.personalItems,
         itemName: 'Black Wallet',
         description: 'Leather black wallet with ID card inside.',
         street: 'Main Street',
@@ -179,6 +200,7 @@ class AppState extends ChangeNotifier {
       Post(
         id: _uuid.v4(),
         type: PostType.found,
+        category: PostCategory.electronics,
         itemName: 'iPhone 13',
         description: 'Found near Park Avenue, screen cracked.',
         street: 'Park Avenue',
@@ -192,6 +214,7 @@ class AppState extends ChangeNotifier {
       Post(
         id: _uuid.v4(),
         type: PostType.lost,
+        category: PostCategory.personalItems,
         itemName: 'Blue Backpack',
         description: 'Contains books and a laptop sleeve.',
         street: 'University Road',
@@ -205,6 +228,7 @@ class AppState extends ChangeNotifier {
       Post(
         id: _uuid.v4(),
         type: PostType.found,
+        category: PostCategory.personalItems,
         itemName: 'Car Keys',
         description: 'With a blue keychain, Toyota logo.',
         street: 'Shopping Mall Area',
@@ -218,6 +242,7 @@ class AppState extends ChangeNotifier {
       Post(
         id: _uuid.v4(),
         type: PostType.lost,
+        category: PostCategory.personalItems,
         itemName: 'Gold Watch',
         description: 'Gold watch, engraving on back.',
         street: 'Fitness Center',
@@ -231,6 +256,7 @@ class AppState extends ChangeNotifier {
       Post(
         id: _uuid.v4(),
         type: PostType.found,
+        category: PostCategory.pets,
         itemName: 'White Cat',
         description: 'Friendly white cat, collar with tag.',
         street: 'Residential Area',

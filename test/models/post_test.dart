@@ -21,6 +21,7 @@ void main() {
     Post makePost({PostType type = PostType.lost}) => Post(
       id: 'post_1',
       type: type,
+      category: PostCategory.personalItems,
       itemName: 'Black Wallet',
       description: 'Leather wallet with ID inside.',
       street: 'Main Street',
@@ -66,6 +67,7 @@ void main() {
 
       expect(json['id'], 'post_1');
       expect(json['type'], 'lost');
+      expect(json['category'], 'personalItems');
       expect(json['itemName'], 'Black Wallet');
       expect(json['city'], 'Erbil');
       expect(json['imageUrls'], ['https://example.com/img.jpg']);
@@ -77,6 +79,7 @@ void main() {
       final json = {
         'id': 'post_2',
         'type': 'found',
+        'category': 'electronics',
         'itemName': 'iPhone 13',
         'description': 'Found near the park.',
         'street': 'Park Ave',
@@ -93,6 +96,7 @@ void main() {
       final post = Post.fromJson(json);
       expect(post.id, 'post_2');
       expect(post.type, PostType.found);
+      expect(post.category, PostCategory.electronics);
       expect(post.itemName, 'iPhone 13');
       expect(post.city, 'Sulaymaniyah');
     });
@@ -101,6 +105,7 @@ void main() {
       final json = {
         'id': 'post_x',
         'type': 'unknown_type',
+        'category': 'unknown_category',
         'itemName': 'Item',
         'description': null,
         'street': 'Road',
@@ -115,6 +120,7 @@ void main() {
       };
       final post = Post.fromJson(json);
       expect(post.type, PostType.lost);
+      expect(post.category, PostCategory.electronics);
     });
 
     test('toJson → fromJson round-trip preserves data', () {
@@ -129,6 +135,7 @@ void main() {
       final post = Post(
         id: 'post_1',
         type: PostType.found,
+        category: PostCategory.documents,
         itemName: 'Keys',
         street: 'Lane 5',
         city: 'Zakho',
@@ -144,6 +151,7 @@ void main() {
       final restored = Post.fromJson(post.toJson());
       expect(restored.id, post.id);
       expect(restored.type, post.type);
+      expect(restored.category, post.category);
       expect(restored.itemName, post.itemName);
       expect(restored.comments.length, 1);
       expect(restored.comments.first.text, 'Is this yours?');

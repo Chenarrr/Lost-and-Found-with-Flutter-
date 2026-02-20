@@ -2,10 +2,25 @@ import 'package:flutter_application/models/comment.dart';
 
 enum PostType { lost, found }
 
+enum PostCategory {
+  electronics,
+  documents,
+  personalItems,
+  pets;
+
+  String get displayName => switch (this) {
+    PostCategory.electronics => 'Electronics',
+    PostCategory.documents => 'Documents',
+    PostCategory.personalItems => 'Personal Items',
+    PostCategory.pets => 'Pets',
+  };
+}
+
 class Post {
   Post({
     required this.id,
     required this.type,
+    required this.category,
     required this.itemName,
     this.description,
     required this.street,
@@ -26,6 +41,12 @@ class Post {
       'found' => PostType.found,
       _ => PostType.lost,
     },
+    category: switch (json['category'] as String?) {
+      'documents' => PostCategory.documents,
+      'personalItems' => PostCategory.personalItems,
+      'pets' => PostCategory.pets,
+      _ => PostCategory.electronics,
+    },
     itemName: json['itemName'] as String,
     description: json['description'] as String?,
     street: json['street'] as String,
@@ -35,14 +56,16 @@ class Post {
     userPhone: json['userPhone'] as String,
     createdAt: DateTime.parse(json['createdAt'] as String),
     userId: json['userId'] as String,
-    comments: (json['comments'] as List<dynamic>? ?? [])
-        .map((c) => Comment.fromJson(c as Map<String, dynamic>))
-        .toList(),
+    comments:
+        (json['comments'] as List<dynamic>? ?? [])
+            .map((c) => Comment.fromJson(c as Map<String, dynamic>))
+            .toList(),
     reports: List<String>.from(json['reports'] as List? ?? []),
   );
 
   final String id;
   final PostType type;
+  final PostCategory category;
   final String itemName;
   final String? description;
   final String street;
@@ -58,6 +81,7 @@ class Post {
   Map<String, dynamic> toJson() => {
     'id': id,
     'type': type.name,
+    'category': category.name,
     'itemName': itemName,
     'description': description,
     'street': street,
@@ -74,6 +98,7 @@ class Post {
   Post copyWith({
     String? id,
     PostType? type,
+    PostCategory? category,
     String? itemName,
     String? description,
     String? street,
@@ -88,6 +113,7 @@ class Post {
   }) => Post(
     id: id ?? this.id,
     type: type ?? this.type,
+    category: category ?? this.category,
     itemName: itemName ?? this.itemName,
     description: description ?? this.description,
     street: street ?? this.street,

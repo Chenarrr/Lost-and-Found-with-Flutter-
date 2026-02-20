@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/widgets/phone_input_formatter.dart';
 import 'package:flutter_application/routes/main_page.dart';
+import 'package:flutter_application/screens/auth/otp_screen.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -41,24 +42,22 @@ class _AuthScreenState extends State<AuthScreen>
 
   Future<void> _doSignup() async {
     if (!_formKeySignup.currentState!.validate()) return;
-    setState(() => _loading = true);
     final app = Provider.of<AppState>(context, listen: false);
-    final err = await app.signup(
-      name: _sName.text.trim(),
-      phone: _sPhone.text.trim(),
-      email: _sEmail.text.trim().isEmpty ? null : _sEmail.text.trim(),
-      password: _sPassword.text,
-    );
-    setState(() => _loading = false);
-    if (err == null) {
-      if (mounted) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const MainPage()),
-          (r) => false,
-        );
-      }
-    } else {
-      _showError(err);
+    // Normalize phone — strip spaces inserted by PhoneInputFormatter
+    final phone = _sPhone.text.trim().replaceAll(RegExp(r'\s'), '');
+    final demoCode = app.initiateOtp(phone);
+    if (mounted) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => OtpScreen(
+            phone: phone,
+            name: _sName.text.trim(),
+            email: _sEmail.text.trim().isEmpty ? null : _sEmail.text.trim(),
+            password: _sPassword.text,
+            demoCode: demoCode,
+          ),
+        ),
+      );
     }
   }
 

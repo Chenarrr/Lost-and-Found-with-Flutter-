@@ -18,6 +18,7 @@ class CreatePostSheet extends StatefulWidget {
 
 class _CreatePostSheetState extends State<CreatePostSheet> {
   PostType _postType = PostType.lost;
+  PostCategory _category = PostCategory.electronics;
   final _itemNameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _streetController = TextEditingController();
@@ -81,6 +82,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
     final newPost = Post(
       id: _uuid.v4(),
       type: _postType,
+      category: _category,
       itemName: _itemNameController.text.trim(),
       description: _descriptionController.text.trim().isEmpty
           ? null
@@ -161,6 +163,32 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      children: PostCategory.values.map((cat) {
+                        final isSelected = _category == cat;
+                        return ChoiceChip(
+                          label: Text(
+                            cat.displayName,
+                            style: GoogleFonts.inter(
+                              color: isSelected
+                                  ? Colors.white
+                                  : AppColors.textPrimary,
+                            ),
+                          ),
+                          selected: isSelected,
+                          onSelected: (_) =>
+                              setState(() => _category = cat),
+                          selectedColor: AppColors.primaryBlue,
+                          backgroundColor: AppColors.borderGray,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        );
+                      }).toList(),
                     ),
                     const SizedBox(height: 16),
                     TextFormField(

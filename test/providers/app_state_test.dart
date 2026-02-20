@@ -127,6 +127,7 @@ void main() {
       final newPost = Post(
         id: 'new_post_1',
         type: PostType.lost,
+        category: PostCategory.documents,
         itemName: 'Test Item',
         street: 'Test St',
         city: 'Erbil',
@@ -142,6 +143,7 @@ void main() {
       expect(state.posts.length, initialCount + 1);
       expect(state.posts.first.id, 'new_post_1');
       expect(state.posts.first.itemName, 'Test Item');
+      expect(state.posts.first.category, PostCategory.documents);
     });
   });
 

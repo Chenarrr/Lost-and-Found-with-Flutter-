@@ -180,8 +180,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                             ),
                           ),
                           selected: isSelected,
-                          onSelected: (_) =>
-                              setState(() => _category = cat),
+                          onSelected: (_) => setState(() => _category = cat),
                           selectedColor: AppColors.primaryBlue,
                           backgroundColor: AppColors.borderGray,
                           shape: RoundedRectangleBorder(

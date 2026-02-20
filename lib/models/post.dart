@@ -56,10 +56,9 @@ class Post {
     userPhone: json['userPhone'] as String,
     createdAt: DateTime.parse(json['createdAt'] as String),
     userId: json['userId'] as String,
-    comments:
-        (json['comments'] as List<dynamic>? ?? [])
-            .map((c) => Comment.fromJson(c as Map<String, dynamic>))
-            .toList(),
+    comments: (json['comments'] as List<dynamic>? ?? [])
+        .map((c) => Comment.fromJson(c as Map<String, dynamic>))
+        .toList(),
     reports: List<String>.from(json['reports'] as List? ?? []),
   );
 

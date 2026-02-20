@@ -69,9 +69,7 @@ class _OtpScreenState extends State<OtpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Verify Phone', style: GoogleFonts.inter()),
-      ),
+      appBar: AppBar(title: Text('Verify Phone', style: GoogleFonts.inter())),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(

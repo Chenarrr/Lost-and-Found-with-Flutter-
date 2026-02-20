@@ -71,11 +71,12 @@ class ActivityScreen extends StatelessWidget {
                 message: 'Create your first post to get started.',
               )
             else
-              ListView(
+              ListView.builder(
+                cacheExtent: 1200,
                 padding: const EdgeInsets.all(12),
-                children: userPosts
-                    .map((post) => PostCard(post: post))
-                    .toList(),
+                itemCount: userPosts.length,
+                itemBuilder: (context, index) =>
+                    PostCard(post: userPosts[index]),
               ),
             if (userComments.isEmpty)
               const _ActivityEmpty(
@@ -85,6 +86,7 @@ class ActivityScreen extends StatelessWidget {
               )
             else
               ListView.builder(
+                cacheExtent: 1200,
                 padding: const EdgeInsets.all(12),
                 itemCount: userComments.length,
                 itemBuilder: (context, index) {

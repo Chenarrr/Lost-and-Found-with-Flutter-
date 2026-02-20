@@ -10,15 +10,21 @@ class RootRouter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final app = Provider.of<AppState>(context);
-    if (!app.isInitialized) {
+    final isInitialized = context.select<AppState, bool>(
+      (app) => app.isInitialized,
+    );
+    final currentUser = context.select<AppState, Object?>(
+      (app) => app.currentUser,
+    );
+
+    if (!isInitialized) {
       return const Scaffold(
         body: Center(
           child: CircularProgressIndicator(color: AppColors.primaryBlue),
         ),
       );
     }
-    if (app.currentUser == null) return const WelcomeScreen();
+    if (currentUser == null) return const WelcomeScreen();
     return const MainPage();
   }
 }

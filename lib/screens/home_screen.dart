@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -15,6 +17,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
+  Timer? _searchDebounce;
+  String _searchQuery = '';
   String _cityFilter = 'All Cities';
   final List<String> _cities = [
     'All Cities',
@@ -28,12 +32,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
+    _searchDebounce?.cancel();
     _searchController.dispose();
     super.dispose();
   }
 
   Future<void> _onRefresh() async {
     await Future.delayed(const Duration(milliseconds: 800));
+  }
+
+  void _onSearchChanged(String value) {
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 180), () {
+      if (!mounted) return;
+      setState(() => _searchQuery = value.trim().toLowerCase());
+    });
   }
 
   Widget _buildStatsChip({
@@ -77,16 +90,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final app = Provider.of<AppState>(context);
-    final query = _searchController.text.trim().toLowerCase();
-    final posts = app.posts.where((post) {
+    final postsSource = context.select<AppState, List<Post>>(
+      (app) => app.posts,
+    );
+    final posts = postsSource.where((post) {
       final matchesCity =
           _cityFilter == 'All Cities' || post.city == _cityFilter;
       final matchesSearch =
-          query.isEmpty ||
-          post.itemName.toLowerCase().contains(query) ||
-          post.city.toLowerCase().contains(query) ||
-          post.street.toLowerCase().contains(query);
+          _searchQuery.isEmpty ||
+          post.itemName.toLowerCase().contains(_searchQuery) ||
+          post.city.toLowerCase().contains(_searchQuery) ||
+          post.street.toLowerCase().contains(_searchQuery);
       return matchesCity && matchesSearch;
     }).toList();
     final lostCount = posts.where((post) => post.type == PostType.lost).length;
@@ -95,6 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return RefreshIndicator(
       onRefresh: _onRefresh,
       child: ListView(
+        cacheExtent: 1200,
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         children: [
@@ -151,7 +166,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         : IconButton(
                             onPressed: () {
                               _searchController.clear();
-                              setState(() {});
+                              _searchDebounce?.cancel();
+                              setState(() => _searchQuery = '');
                             },
                             icon: const Icon(
                               Icons.close_rounded,
@@ -164,7 +180,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       borderSide: BorderSide.none,
                     ),
                   ),
-                  onChanged: (_) => setState(() {}),
+                  onChanged: _onSearchChanged,
                 ),
                 const SizedBox(height: 12),
                 Wrap(
@@ -283,12 +299,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             )
           else
-            ...posts.map(
-              (post) => AnimatedSwitcher(
-                duration: const Duration(milliseconds: 350),
-                child: PostCard(key: ValueKey(post.id), post: post),
-              ),
-            ),
+            for (final post in posts)
+              PostCard(key: ValueKey(post.id), post: post),
           const SizedBox(height: 72),
         ],
       ),

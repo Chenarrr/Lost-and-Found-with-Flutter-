@@ -101,7 +101,7 @@ class _MainPageState extends State<MainPage> {
               ],
             )
           : null,
-      body: _tabs[_selectedIndex],
+      body: IndexedStack(index: _selectedIndex, children: _tabs),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           color: Colors.white,

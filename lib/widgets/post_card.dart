@@ -20,9 +20,7 @@ class PostCard extends StatelessWidget {
         ? AppColors.lostLight.withAlpha(220)
         : AppColors.foundLight.withAlpha(220);
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
+    return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -52,18 +50,15 @@ class PostCard extends StatelessWidget {
                               width: 98,
                               height: 98,
                               fit: BoxFit.cover,
-                              placeholder: (_, __) => Container(
-                                width: 98,
-                                height: 98,
-                                color: Colors.grey[200],
-                              ),
-                              errorWidget: (_, __, ___) => Container(
-                                width: 98,
-                                height: 98,
-                                color: Colors.grey[200],
-                                child: const Icon(
-                                  Icons.broken_image,
-                                  color: Colors.grey,
+                              placeholder: (_, __) =>
+                                  const ColoredBox(color: AppColors.borderGray),
+                              errorWidget: (_, __, ___) => const ColoredBox(
+                                color: AppColors.borderGray,
+                                child: Center(
+                                  child: Icon(
+                                    Icons.broken_image,
+                                    color: AppColors.iconGray,
+                                  ),
                                 ),
                               ),
                             )
@@ -72,21 +67,25 @@ class PostCard extends StatelessWidget {
                               width: 98,
                               height: 98,
                               fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Container(
-                                width: 98,
-                                height: 98,
-                                color: Colors.grey[200],
-                                child: const Icon(
-                                  Icons.broken_image,
-                                  color: Colors.grey,
+                              errorBuilder: (_, __, ___) => const ColoredBox(
+                                color: AppColors.borderGray,
+                                child: Center(
+                                  child: Icon(
+                                    Icons.broken_image,
+                                    color: AppColors.iconGray,
+                                  ),
                                 ),
                               ),
                             ))
-                    : Container(
+                    : const SizedBox(
                         width: 98,
                         height: 98,
-                        color: Colors.grey[100],
-                        child: const Icon(Icons.image, color: Colors.grey),
+                        child: ColoredBox(
+                          color: AppColors.bgGray,
+                          child: Center(
+                            child: Icon(Icons.image, color: AppColors.iconGray),
+                          ),
+                        ),
                       ),
               ),
               const SizedBox(width: 12),

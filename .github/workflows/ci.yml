@@ -1,46 +1,41 @@
-# ============================================================
-# CI Pipeline - Runs on every push and pull request
-# This ensures code quality before merging changes
-# ============================================================
+name: CI
 
-name: CI                                      # Name shown in GitHub Actions tab
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
 
-on:                                           # Triggers - when should this run?
-  push:                                       # Run when code is pushed
-    branches: [main, master]                  # Only on main/master branches
-  pull_request:                               # Run when PR is opened/updated
-    branches: [main, master]                  # Only for PRs targeting main/master
+jobs:
+  analyze-and-test:
+    name: Analyze & Test
+    runs-on: ubuntu-latest
 
-jobs:                                         # List of jobs to run
-  analyze-and-test:                           # Job name (can be anything)
-    name: Analyze & Test                      # Display name in GitHub UI
-    runs-on: ubuntu-latest                    # Use Ubuntu virtual machine (free)
-
-    steps:                                    # Sequential steps in this job
-      # Step 1: Download your code to the runner
+    steps:
       - name: Checkout code
-        uses: actions/checkout@v4             # Official GitHub action to clone repo
+        uses: actions/checkout@v4
 
-      # Step 2: Install Flutter SDK
       - name: Setup Flutter
-        uses: subosito/flutter-action@v2      # Community action for Flutter setup
+        uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.38.6'           # Flutter version (has Dart SDK 3.9.2+)
-          channel: 'stable'                   # Use stable channel (not beta/dev)
-          cache: true                         # Cache Flutter SDK for faster runs
+          flutter-version: '3.38.6'
+          channel: 'stable'
+          cache: true
 
-      # Step 3: Download project dependencies
       - name: Install dependencies
-        run: flutter pub get                  # Same as running locally
+        run: flutter pub get
 
-      # Step 4: Check for code issues (lints, errors)
+      - name: Verify formatting
+        run: dart format --set-exit-if-changed .
+
       - name: Analyze code
-        run: flutter analyze --fatal-infos    # Fail if any issues found
+        run: flutter analyze --fatal-infos
 
-      # Step 5: Check code formatting
-      - name: Check formatting
-        run: dart format --set-exit-if-changed .  # Fail if code not formatted
+      - name: Run tests with coverage
+        run: flutter test --coverage
 
-      # Step 6: Run unit/widget tests
-      - name: Run tests
-        run: flutter test                     # Runs all tests in test/ folder
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage/lcov.info
+          fail_ci_if_error: false

@@ -45,7 +45,7 @@ class FindItApp extends StatelessWidget {
               fontWeight: FontWeight.bold,
               fontSize: 20,
             ),
-            iconTheme: IconThemeData(color: AppColors.primaryBlue),
+            iconTheme: const IconThemeData(color: AppColors.primaryBlue),
           ),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(

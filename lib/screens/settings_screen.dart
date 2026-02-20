@@ -11,7 +11,7 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Settings', style: GoogleFonts.andika())),
+      appBar: AppBar(title: Text('Settings', style: GoogleFonts.inter())),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -19,7 +19,7 @@ class SettingsScreen extends StatelessWidget {
           children: [
             Text(
               'Settings',
-              style: GoogleFonts.andika(
+              style: GoogleFonts.inter(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
               ),
@@ -27,19 +27,18 @@ class SettingsScreen extends StatelessWidget {
             const SizedBox(height: 24),
             ListTile(
               leading: const Icon(Icons.logout, color: AppColors.lostPrimary),
-              title: Text('Logout', style: GoogleFonts.andika()),
+              title: Text('Logout', style: GoogleFonts.inter()),
               onTap: () async {
                 final app = Provider.of<AppState>(context, listen: false);
                 await app.logout();
                 if (context.mounted) {
                   Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(builder: (_) => const WelcomeScreen()),
-                    (r) => false,
+                    (route) => false,
                   );
                 }
               },
             ),
-            // Add more settings options here
           ],
         ),
       ),

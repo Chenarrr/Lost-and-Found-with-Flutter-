@@ -17,7 +17,7 @@ class WelcomeScreen extends StatelessWidget {
               const SizedBox(height: 24),
               Row(
                 children: [
-                  CircleAvatar(
+                  const CircleAvatar(
                     backgroundColor: AppColors.primaryBlue,
                     child: Text(
                       'F',

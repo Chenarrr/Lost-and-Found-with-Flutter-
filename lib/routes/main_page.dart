@@ -8,13 +8,28 @@ import 'package:flutter_application/screens/create_post_sheet.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
+
   @override
   State<MainPage> createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
-  int _selected = 0;
-  static const _tabs = [HomeScreen(), ActivityScreen(), ProfileScreen()];
+class _MainPageState extends State<MainPage> {
+  int _selectedIndex = 0;
+
+  static const List<Widget> _tabs = [
+    HomeScreen(),
+    ActivityScreen(),
+    ProfileScreen(),
+  ];
+
+  void _openCreatePost() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const CreatePostSheet(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,19 +47,19 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
         ),
         actions: [
           IconButton(
-            onPressed: () => _openCreatePost(context),
-            icon: Icon(Icons.add_circle, color: AppColors.primaryBlue),
-            tooltip: 'Post',
+            onPressed: _openCreatePost,
+            icon: const Icon(Icons.add_circle, color: AppColors.primaryBlue),
+            tooltip: 'Create post',
           ),
         ],
         elevation: 0,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
       ),
-      body: _tabs[_selected],
+      body: _tabs[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selected,
-        onTap: (i) => setState(() => _selected = i),
+        currentIndex: _selectedIndex,
+        onTap: (index) => setState(() => _selectedIndex = index),
         selectedItemColor: AppColors.primaryBlue,
         unselectedItemColor: Colors.grey,
         items: const [
@@ -57,25 +72,12 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _openCreatePost(context),
+        onPressed: _openCreatePost,
         label: Text('Post', style: GoogleFonts.inter()),
         icon: const Icon(Icons.add),
         backgroundColor: AppColors.primaryBlue,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-    );
-  }
-
-  void _openCreatePost(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      transitionAnimationController: AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 400),
-      ),
-      builder: (_) => const CreatePostSheet(),
     );
   }
 }

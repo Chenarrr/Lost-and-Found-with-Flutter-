@@ -17,55 +17,86 @@ class CreatePostSheet extends StatefulWidget {
 }
 
 class _CreatePostSheetState extends State<CreatePostSheet> {
-  String _type = 'lost';
-  final _itemName = TextEditingController();
-  final _description = TextEditingController();
-  final _street = TextEditingController();
-  final _city = TextEditingController();
-  final List<String> _imageUrls = [];
+  PostType _postType = PostType.lost;
+  final _itemNameController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  final _streetController = TextEditingController();
+  final _cityController = TextEditingController();
+  final List<String> _imagePaths = [];
   final _formKey = GlobalKey<FormState>();
-  bool _loading = false;
+  bool _isLoading = false;
+  static const _uuid = Uuid();
 
   @override
   void dispose() {
-    _itemName.dispose();
-    _description.dispose();
-    _street.dispose();
-    _city.dispose();
+    _itemNameController.dispose();
+    _descriptionController.dispose();
+    _streetController.dispose();
+    _cityController.dispose();
     super.dispose();
   }
 
-  Widget _imageWidget(String url) {
-    if (url.startsWith('http')) {
+  Widget _buildImagePreview(String path) {
+    if (path.startsWith('http')) {
       return CachedNetworkImage(
-        imageUrl: url,
+        imageUrl: path,
         width: double.infinity,
         height: 120,
         fit: BoxFit.cover,
         placeholder: (_, __) => Container(color: Colors.grey[200]),
         errorWidget: (_, __, ___) => Container(color: Colors.grey[200]),
       );
-    } else {
-      return Image.file(
-        File(url),
-        width: double.infinity,
-        height: 120,
-        fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) {
-          return Container(color: Colors.grey[200]);
-        },
-      );
     }
+    return Image.file(
+      File(path),
+      width: double.infinity,
+      height: 120,
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) => Container(color: Colors.grey[200]),
+    );
   }
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        if (_imageUrls.length < 3) _imageUrls.add(pickedFile.path);
-      });
+    final picked = await picker.pickImage(source: ImageSource.gallery);
+    if (picked != null && _imagePaths.length < 3) {
+      setState(() => _imagePaths.add(picked.path));
     }
+  }
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+    final app = Provider.of<AppState>(context, listen: false);
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+
+    if (app.currentUser == null) {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Please login to post')),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    final newPost = Post(
+      id: _uuid.v4(),
+      type: _postType,
+      itemName: _itemNameController.text.trim(),
+      description: _descriptionController.text.trim().isEmpty
+          ? null
+          : _descriptionController.text.trim(),
+      street: _streetController.text.trim(),
+      city: _cityController.text.trim(),
+      imageUrls: List.from(_imagePaths),
+      userName: app.currentUser!.name,
+      userPhone: app.currentUser!.phone,
+      createdAt: DateTime.now(),
+      userId: app.currentUser!.id,
+    );
+    await app.addPost(newPost);
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+    navigator.pop();
   }
 
   @override
@@ -80,7 +111,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
         ),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           boxShadow: [
             BoxShadow(
               color: AppColors.textPrimary.withAlpha(20),
@@ -94,7 +125,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
             children: [
               Text(
                 'Create Post',
-                style: GoogleFonts.andika(
+                style: GoogleFonts.inter(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
@@ -104,15 +135,14 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    // Type (Lost / Found)
                     Row(
                       children: [
                         ChoiceChip(
-                          label: Text('Lost', style: GoogleFonts.andika()),
-                          selected: _type == 'lost',
-                          onSelected: (selected) =>
-                              setState(() => _type = 'lost'),
-                          selectedColor: AppColors.primaryBlue,
+                          label: Text('Lost', style: GoogleFonts.inter()),
+                          selected: _postType == PostType.lost,
+                          onSelected: (_) =>
+                              setState(() => _postType = PostType.lost),
+                          selectedColor: AppColors.lostPrimary,
                           backgroundColor: AppColors.borderGray,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -120,10 +150,10 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                         ),
                         const SizedBox(width: 8),
                         ChoiceChip(
-                          label: Text('Found', style: GoogleFonts.andika()),
-                          selected: _type == 'found',
-                          onSelected: (selected) =>
-                              setState(() => _type = 'found'),
+                          label: Text('Found', style: GoogleFonts.inter()),
+                          selected: _postType == PostType.found,
+                          onSelected: (_) =>
+                              setState(() => _postType = PostType.found),
                           selectedColor: AppColors.foundPrimary,
                           backgroundColor: AppColors.borderGray,
                           shape: RoundedRectangleBorder(
@@ -133,13 +163,10 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    // Item name
                     TextFormField(
-                      controller: _itemName,
-                      validator: (v) {
-                        if (v == null || v.trim().isEmpty) return 'Required';
-                        return null;
-                      },
+                      controller: _itemNameController,
+                      validator: (v) =>
+                          (v == null || v.trim().isEmpty) ? 'Required' : null,
                       decoration: InputDecoration(
                         labelText: 'Item Name',
                         filled: true,
@@ -154,12 +181,11 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    // Description
                     TextFormField(
-                      controller: _description,
+                      controller: _descriptionController,
                       maxLines: 3,
                       decoration: InputDecoration(
-                        labelText: 'Description',
+                        labelText: 'Description (optional)',
                         filled: true,
                         fillColor: Colors.white,
                         contentPadding: const EdgeInsets.symmetric(
@@ -172,18 +198,14 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    // Location
                     Row(
                       children: [
                         Expanded(
                           child: TextFormField(
-                            controller: _city,
-                            validator: (v) {
-                              if (v == null || v.trim().isEmpty) {
-                                return 'Required';
-                              }
-                              return null;
-                            },
+                            controller: _cityController,
+                            validator: (v) => (v == null || v.trim().isEmpty)
+                                ? 'Required'
+                                : null,
                             decoration: InputDecoration(
                               labelText: 'City',
                               filled: true,
@@ -201,13 +223,10 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: TextFormField(
-                            controller: _street,
-                            validator: (v) {
-                              if (v == null || v.trim().isEmpty) {
-                                return 'Required';
-                              }
-                              return null;
-                            },
+                            controller: _streetController,
+                            validator: (v) => (v == null || v.trim().isEmpty)
+                                ? 'Required'
+                                : null,
                             decoration: InputDecoration(
                               labelText: 'Street',
                               filled: true,
@@ -225,10 +244,9 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    // Images
                     Column(
                       children: [
-                        for (var url in _imageUrls)
+                        for (final path in _imagePaths)
                           Container(
                             margin: const EdgeInsets.only(bottom: 8),
                             child: Stack(
@@ -236,21 +254,21 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                               children: [
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(12),
-                                  child: _imageWidget(url),
+                                  child: _buildImagePreview(path),
                                 ),
                                 IconButton(
                                   onPressed: () =>
-                                      setState(() => _imageUrls.remove(url)),
+                                      setState(() => _imagePaths.remove(path)),
                                   icon: const Icon(
                                     Icons.delete,
-                                    color: Colors.red,
+                                    color: AppColors.lostPrimary,
                                     size: 20,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                        if (_imageUrls.isEmpty)
+                        if (_imagePaths.isEmpty)
                           Container(
                             height: 120,
                             decoration: BoxDecoration(
@@ -261,78 +279,43 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                             child: Center(
                               child: Text(
                                 'No images selected',
-                                style: GoogleFonts.andika(color: Colors.grey),
+                                style: GoogleFonts.inter(
+                                  color: AppColors.placeholderGray,
+                                ),
                               ),
                             ),
                           ),
                         const SizedBox(height: 8),
-                        ElevatedButton(
-                          onPressed: _pickImage,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF2563EB),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                        if (_imagePaths.length < 3)
+                          ElevatedButton.icon(
+                            onPressed: _pickImage,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primaryBlue,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            icon: const Icon(Icons.add_photo_alternate),
+                            label: Text(
+                              'Add Image',
+                              style: GoogleFonts.inter(),
                             ),
                           ),
-                          child: Text(
-                            'Add Images',
-                            style: GoogleFonts.andika(),
-                          ),
-                        ),
                       ],
                     ),
                     const SizedBox(height: 16),
-                    // Submit button
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: _loading
-                            ? null
-                            : () async {
-                                if (!_formKey.currentState!.validate()) return;
-                                final app = Provider.of<AppState>(
-                                  context,
-                                  listen: false,
-                                );
-                                final messenger = ScaffoldMessenger.of(context);
-                                final navigator = Navigator.of(context);
-                                if (app.currentUser == null) {
-                                  messenger.showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Please login to post'),
-                                    ),
-                                  );
-                                  return;
-                                }
-                                setState(() => _loading = true);
-                                final newPost = Post(
-                                  id: const Uuid().v4(),
-                                  type: _type,
-                                  itemName: _itemName.text.trim(),
-                                  description: _description.text.trim().isEmpty
-                                      ? null
-                                      : _description.text.trim(),
-                                  street: _street.text.trim(),
-                                  city: _city.text.trim(),
-                                  imageUrls: List.from(_imageUrls),
-                                  userName: app.currentUser!.name,
-                                  userPhone: app.currentUser!.phone,
-                                  createdAt: DateTime.now(),
-                                  userId: app.currentUser!.id,
-                                );
-                                await app.addPost(newPost);
-                                if (!mounted) return;
-                                setState(() => _loading = false);
-                                navigator.pop();
-                              },
+                        onPressed: _isLoading ? null : _submit,
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: _loading
-                            ? SizedBox(
+                        child: _isLoading
+                            ? const SizedBox(
                                 height: 24,
                                 width: 24,
                                 child: CircularProgressIndicator(
@@ -342,7 +325,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                               )
                             : Text(
                                 'Submit',
-                                style: GoogleFonts.andika(fontSize: 16),
+                                style: GoogleFonts.inter(fontSize: 16),
                               ),
                       ),
                     ),

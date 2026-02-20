@@ -11,7 +11,7 @@ class PhoneInputFormatter extends TextInputFormatter {
     if (text.isEmpty) return newValue.copyWith(text: '');
     if (text.length > 11) return oldValue;
 
-    StringBuffer formatted = StringBuffer();
+    final formatted = StringBuffer();
     for (int i = 0; i < text.length; i++) {
       if (i == 4 || i == 7 || i == 9) {
         formatted.write(' ');

@@ -2,16 +2,22 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
-import 'package:flutter_application/models/user_model.dart';
+import 'package:flutter_application/models/user.dart';
 import 'package:flutter_application/models/post.dart';
 import 'package:flutter_application/models/comment.dart';
 
 class AppState extends ChangeNotifier {
-  static const _kUserKey = 'findit_user';
+  /// Stores registered user credentials — never deleted on logout.
+  static const _kRegisteredUserKey = 'findit_registered_user';
+
+  /// Stores the currently logged-in user — removed on logout.
+  static const _kSessionKey = 'findit_session';
   static const _kPostsKey = 'findit_posts';
+  static const _uuid = Uuid();
+
   final SharedPreferences prefs;
 
-  UserModel? currentUser;
+  User? currentUser;
   List<Post> posts = [];
 
   AppState(this.prefs) {
@@ -19,20 +25,25 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> _loadFromPrefs() async {
-    // load user
-    final u = prefs.getString(_kUserKey);
-    if (u != null) {
+    // Restore session only if one was active
+    final sessionJson = prefs.getString(_kSessionKey);
+    if (sessionJson != null) {
       try {
-        currentUser = UserModel.fromJson(json.decode(u));
-      } catch (_) {}
+        currentUser = User.fromJson(
+          json.decode(sessionJson) as Map<String, dynamic>,
+        );
+      } catch (_) {
+        await prefs.remove(_kSessionKey);
+      }
     }
 
-    // load posts, otherwise seed mock data
-    final p = prefs.getString(_kPostsKey);
-    if (p != null) {
+    final postsJson = prefs.getString(_kPostsKey);
+    if (postsJson != null) {
       try {
-        final list = json.decode(p) as List<dynamic>;
-        posts = list.map((j) => Post.fromJson(j)).toList();
+        final list = json.decode(postsJson) as List<dynamic>;
+        posts = list
+            .map((item) => Post.fromJson(item as Map<String, dynamic>))
+            .toList();
       } catch (_) {
         posts = [];
       }
@@ -46,171 +57,189 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _saveUser() async {
+  Future<void> _saveSession() async {
     if (currentUser == null) {
-      await prefs.remove(_kUserKey);
+      await prefs.remove(_kSessionKey);
     } else {
-      await prefs.setString(_kUserKey, json.encode(currentUser!.toJson()));
+      await prefs.setString(_kSessionKey, json.encode(currentUser!.toJson()));
     }
   }
 
   Future<void> _savePosts() async {
-    final encoded = json.encode(posts.map((p) => p.toJson()).toList());
+    final encoded = json.encode(posts.map((post) => post.toJson()).toList());
     await prefs.setString(_kPostsKey, encoded);
   }
 
-  // Authentication (frontend-only)
+  // ── Authentication (local-only demo) ─────────────────────────────────────
+
+  /// Returns an error message on failure, or null on success.
   Future<String?> signup({
     required String name,
     required String phone,
     String? email,
-    required String password, // not stored securely here (demo only)
+    required String password, // Note: not persisted — demo only
   }) async {
-    await Future.delayed(const Duration(milliseconds: 800)); // simulate loading
-    final user = UserModel(
-      id: const Uuid().v4(),
+    await Future.delayed(const Duration(milliseconds: 800));
+    currentUser = User(
+      id: _uuid.v4(),
       name: name,
       phone: phone,
       email: email,
       createdAt: DateTime.now(),
     );
-    currentUser = user;
-    await _saveUser();
+    // Persist credentials (for re-login) and start session
+    final encoded = json.encode(currentUser!.toJson());
+    await prefs.setString(_kRegisteredUserKey, encoded);
+    await _saveSession();
     notifyListeners();
     return null;
   }
 
+  /// Returns an error message on failure, or null on success.
   Future<String?> login({
     required String identifier, // phone or email
     required String password,
   }) async {
-    await Future.delayed(const Duration(milliseconds: 800)); // simulate loading
-    final u = prefs.getString(_kUserKey);
-    if (u == null) return 'No user found. Please signup first.';
-    final stored = UserModel.fromJson(json.decode(u));
-    if (stored.phone == identifier ||
-        (stored.email != null && stored.email == identifier)) {
-      currentUser = stored;
-      notifyListeners();
-      return null;
-    }
-    return 'Invalid credentials';
+    await Future.delayed(const Duration(milliseconds: 800));
+    final stored = prefs.getString(_kRegisteredUserKey);
+    if (stored == null) return 'No account found. Please sign up first.';
+
+    final user = User.fromJson(json.decode(stored) as Map<String, dynamic>);
+    final identifierMatches =
+        user.phone == identifier ||
+        (user.email != null && user.email == identifier);
+    if (!identifierMatches) return 'Invalid credentials.';
+
+    currentUser = user;
+    await _saveSession();
+    notifyListeners();
+    return null;
   }
 
   Future<void> logout() async {
     currentUser = null;
-    await _saveUser();
+    await _saveSession(); // Clears session but keeps registered user data
     notifyListeners();
   }
 
-  // Posts
+  // ── Posts ─────────────────────────────────────────────────────────────────
+
   Future<void> addPost(Post post) async {
-    posts.insert(0, post);
+    posts = [post, ...posts];
     await _savePosts();
     notifyListeners();
   }
 
   Future<void> deletePost(String postId) async {
-    posts.removeWhere((p) => p.id == postId);
+    posts = posts.where((post) => post.id != postId).toList();
     await _savePosts();
     notifyListeners();
   }
 
   Future<void> addComment(String postId, Comment comment) async {
-    final post = posts.firstWhere((p) => p.id == postId);
-    post.comments.insert(0, comment);
+    final index = posts.indexWhere((post) => post.id == postId);
+    if (index == -1) return;
+    final updated = posts[index].copyWith(
+      comments: [comment, ...posts[index].comments],
+    );
+    posts = List.from(posts)..[index] = updated;
     await _savePosts();
     notifyListeners();
   }
 
   Future<void> reportPost(String postId, String userId) async {
-    final post = posts.firstWhere((p) => p.id == postId);
-    if (!post.reports.contains(userId)) {
-      post.reports.add(userId);
-      await _savePosts();
-      notifyListeners();
-    }
+    final index = posts.indexWhere((post) => post.id == postId);
+    if (index == -1) return;
+    if (posts[index].reports.contains(userId)) return;
+    final updated = posts[index].copyWith(
+      reports: [...posts[index].reports, userId],
+    );
+    posts = List.from(posts)..[index] = updated;
+    await _savePosts();
+    notifyListeners();
   }
+
+  // ── Seed data ─────────────────────────────────────────────────────────────
 
   void _seedMockData() {
     posts = [
       Post(
-        id: const Uuid().v4(),
-        type: 'lost',
+        id: _uuid.v4(),
+        type: PostType.lost,
         itemName: 'Black Wallet',
         description: 'Leather black wallet with ID card inside.',
         street: 'Main Street',
         city: 'Erbil',
-        imageUrls: ['https://picsum.photos/id/100/400/300'],
+        imageUrls: const ['https://picsum.photos/id/100/400/300'],
         userName: 'Ahmed Ali',
         userPhone: '+9647500000001',
         createdAt: DateTime.now().subtract(const Duration(hours: 3)),
-        userId: 'user_1',
+        userId: 'seed_1',
       ),
       Post(
-        id: const Uuid().v4(),
-        type: 'found',
+        id: _uuid.v4(),
+        type: PostType.found,
         itemName: 'iPhone 13',
         description: 'Found near Park Avenue, screen cracked.',
         street: 'Park Avenue',
         city: 'Sulaymaniyah',
-        imageUrls: ['https://picsum.photos/id/101/400/300'],
+        imageUrls: const ['https://picsum.photos/id/101/400/300'],
         userName: 'Sara Mohammed',
         userPhone: '+9647500000002',
         createdAt: DateTime.now().subtract(const Duration(days: 1)),
-        userId: 'user_2',
+        userId: 'seed_2',
       ),
       Post(
-        id: const Uuid().v4(),
-        type: 'lost',
+        id: _uuid.v4(),
+        type: PostType.lost,
         itemName: 'Blue Backpack',
         description: 'Contains books and a laptop sleeve.',
         street: 'University Road',
         city: 'Duhok',
-        imageUrls: ['https://picsum.photos/id/102/400/300'],
+        imageUrls: const ['https://picsum.photos/id/102/400/300'],
         userName: 'Omar Hassan',
         userPhone: '+9647500000003',
         createdAt: DateTime.now().subtract(const Duration(days: 2)),
-        userId: 'user_3',
+        userId: 'seed_3',
       ),
       Post(
-        id: const Uuid().v4(),
-        type: 'found',
+        id: _uuid.v4(),
+        type: PostType.found,
         itemName: 'Car Keys',
         description: 'With a blue keychain, Toyota logo.',
         street: 'Shopping Mall Area',
         city: 'Erbil',
-        imageUrls: ['https://picsum.photos/id/103/400/300'],
+        imageUrls: const ['https://picsum.photos/id/103/400/300'],
         userName: 'Ameen',
         userPhone: '+9647500000004',
         createdAt: DateTime.now().subtract(const Duration(hours: 20)),
-        userId: 'user_4',
+        userId: 'seed_4',
       ),
       Post(
-        id: const Uuid().v4(),
-        type: 'lost',
+        id: _uuid.v4(),
+        type: PostType.lost,
         itemName: 'Gold Watch',
         description: 'Gold watch, engraving on back.',
         street: 'Fitness Center',
         city: 'Erbil',
-        imageUrls: ['https://picsum.photos/id/104/400/300'],
+        imageUrls: const ['https://picsum.photos/id/104/400/300'],
         userName: 'Salah',
         userPhone: '+9647500000005',
         createdAt: DateTime.now().subtract(const Duration(days: 5)),
-        userId: 'user_5',
+        userId: 'seed_5',
       ),
       Post(
-        id: const Uuid().v4(),
-        type: 'found',
+        id: _uuid.v4(),
+        type: PostType.found,
         itemName: 'White Cat',
         description: 'Friendly white cat, collar with tag.',
         street: 'Residential Area',
         city: 'Zakho',
-        imageUrls: ['https://picsum.photos/id/105/400/300'],
+        imageUrls: const ['https://picsum.photos/id/105/400/300'],
         userName: 'Nazar',
         userPhone: '+9647500000006',
         createdAt: DateTime.now().subtract(const Duration(hours: 8)),
-        userId: 'user_6',
+        userId: 'seed_6',
       ),
     ];
   }

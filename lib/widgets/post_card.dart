@@ -8,17 +8,18 @@ import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/screens/post_detail_screen.dart';
 
 class PostCard extends StatelessWidget {
-  final Post post;
   const PostCard({super.key, required this.post});
+
+  final Post post;
 
   @override
   Widget build(BuildContext context) {
-    final cardColor = post.type == 'lost'
-        ? AppColors.lostLight.withAlpha(217) // 0.85 * 255 ≈ 217
+    final isLost = post.type == PostType.lost;
+    final cardColor = isLost
+        ? AppColors.lostLight.withAlpha(217)
         : AppColors.foundLight.withAlpha(217);
-    final accentColor = post.type == 'lost'
-        ? AppColors.lostPrimary
-        : AppColors.foundPrimary;
+    final accentColor = isLost ? AppColors.lostPrimary : AppColors.foundPrimary;
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeOut,
@@ -28,7 +29,7 @@ class PostCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: accentColor.withAlpha(26), // 0.10 * 255 ≈ 26
+            color: accentColor.withAlpha(26),
             blurRadius: 18,
             offset: const Offset(0, 6),
           ),
@@ -37,7 +38,6 @@ class PostCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Image
           ClipRRect(
             borderRadius: BorderRadius.circular(18),
             child: post.imageUrls.isNotEmpty
@@ -85,7 +85,6 @@ class PostCard extends StatelessWidget {
                   ),
           ),
           const SizedBox(width: 18),
-          // Details
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -104,7 +103,7 @@ class PostCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text(
-                          post.type.toUpperCase(),
+                          post.type.name.toUpperCase(),
                           style: GoogleFonts.inter(
                             color: Colors.white,
                             fontSize: 12,
@@ -138,7 +137,7 @@ class PostCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.access_time,
                         size: 14,
                         color: AppColors.textTertiary,
@@ -171,7 +170,6 @@ class PostCard extends StatelessWidget {
               ),
             ),
           ),
-          // View button
           Padding(
             padding: const EdgeInsets.only(top: 8),
             child: ElevatedButton(
@@ -191,10 +189,8 @@ class PostCard extends StatelessWidget {
                 PageRouteBuilder(
                   pageBuilder: (_, __, ___) =>
                       PostDetailScreen(postId: post.id),
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) {
-                        return FadeTransition(opacity: animation, child: child);
-                      },
+                  transitionsBuilder: (_, animation, __, child) =>
+                      FadeTransition(opacity: animation, child: child),
                 ),
               ),
               child: Text(

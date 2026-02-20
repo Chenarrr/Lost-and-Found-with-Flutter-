@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/models/comment.dart';
+import 'package:flutter_application/models/post.dart';
 import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/screens/post_detail_screen.dart';
 
@@ -23,43 +24,37 @@ class ActivityScreen extends StatelessWidget {
       );
     }
 
-    // User's posts
     final userPosts = app.posts.where((p) => p.userId == user.id).toList();
 
-    // User's comments
-    final userComments = <Map<String, dynamic>>[];
-    for (var post in app.posts) {
-      for (var comment in post.comments) {
+    final userComments = <({Comment comment, Post post})>[];
+    for (final post in app.posts) {
+      for (final comment in post.comments) {
         if (comment.userId == user.id) {
-          userComments.add({'comment': comment, 'post': post});
+          userComments.add((comment: comment, post: post));
         }
       }
     }
-
-    // Sort by newest first
     userComments.sort(
-      (a, b) => (b['comment'] as Comment).createdAt.compareTo(
-        (a['comment'] as Comment).createdAt,
-      ),
+      (a, b) => b.comment.createdAt.compareTo(a.comment.createdAt),
     );
 
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Activity', style: GoogleFonts.andika()),
+          title: Text('Activity', style: GoogleFonts.inter()),
           bottom: TabBar(
             tabs: [
               Tab(
                 child: Text(
                   'My Posts (${userPosts.length})',
-                  style: GoogleFonts.andika(),
+                  style: GoogleFonts.inter(),
                 ),
               ),
               Tab(
                 child: Text(
                   'My Comments (${userComments.length})',
-                  style: GoogleFonts.andika(),
+                  style: GoogleFonts.inter(),
                 ),
               ),
             ],
@@ -81,7 +76,7 @@ class ActivityScreen extends StatelessWidget {
                         const SizedBox(height: 16),
                         Text(
                           'No posts yet',
-                          style: GoogleFonts.andika(
+                          style: GoogleFonts.inter(
                             fontSize: 18,
                             color: Colors.grey[700],
                           ),
@@ -89,7 +84,7 @@ class ActivityScreen extends StatelessWidget {
                         const SizedBox(height: 8),
                         Text(
                           'Create your first post to get started',
-                          style: GoogleFonts.andika(color: Colors.grey),
+                          style: GoogleFonts.inter(color: Colors.grey),
                         ),
                       ],
                     ),
@@ -99,16 +94,16 @@ class ActivityScreen extends StatelessWidget {
                     itemCount: userPosts.length,
                     itemBuilder: (context, index) {
                       final post = userPosts[index];
+                      final badgeColor = post.type == PostType.lost
+                          ? AppColors.lostPrimary
+                          : AppColors.foundPrimary;
                       return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  PostDetailScreen(postId: post.id),
-                            ),
-                          );
-                        },
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => PostDetailScreen(postId: post.id),
+                          ),
+                        ),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.easeOut,
@@ -131,7 +126,7 @@ class ActivityScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(14),
                                 child: post.imageUrls.isNotEmpty
                                     ? CachedNetworkImage(
-                                        imageUrl: post.imageUrls[0],
+                                        imageUrl: post.imageUrls.first,
                                         width: 80,
                                         height: 80,
                                         fit: BoxFit.cover,
@@ -159,29 +154,21 @@ class ActivityScreen extends StatelessWidget {
                                             vertical: 6,
                                           ),
                                           decoration: BoxDecoration(
-                                            color: post.type == 'lost'
-                                                ? AppColors.lostPrimary
-                                                : AppColors.foundPrimary,
+                                            color: badgeColor,
                                             borderRadius: BorderRadius.circular(
                                               10,
                                             ),
                                             boxShadow: [
                                               BoxShadow(
-                                                color:
-                                                    (post.type == 'lost'
-                                                            ? AppColors
-                                                                  .lostPrimary
-                                                            : AppColors
-                                                                  .foundPrimary)
-                                                        .withAlpha(40),
+                                                color: badgeColor.withAlpha(40),
                                                 blurRadius: 8,
                                                 offset: const Offset(0, 2),
                                               ),
                                             ],
                                           ),
                                           child: Text(
-                                            post.type.toUpperCase(),
-                                            style: GoogleFonts.andika(
+                                            post.type.name.toUpperCase(),
+                                            style: GoogleFonts.inter(
                                               color: Colors.white,
                                               fontSize: 12,
                                               fontWeight: FontWeight.bold,
@@ -192,7 +179,7 @@ class ActivityScreen extends StatelessWidget {
                                         Expanded(
                                           child: Text(
                                             post.itemName,
-                                            style: GoogleFonts.andika(
+                                            style: GoogleFonts.inter(
                                               fontSize: 15,
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -208,14 +195,14 @@ class ActivityScreen extends StatelessWidget {
                                         const Icon(
                                           Icons.location_on,
                                           size: 15,
-                                          color: Colors.grey,
+                                          color: AppColors.textTertiary,
                                         ),
                                         const SizedBox(width: 6),
                                         Text(
                                           post.city,
-                                          style: GoogleFonts.andika(
+                                          style: GoogleFonts.inter(
                                             fontSize: 13,
-                                            color: Colors.grey[700],
+                                            color: AppColors.textSecondary,
                                           ),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
@@ -225,9 +212,9 @@ class ActivityScreen extends StatelessWidget {
                                     const SizedBox(height: 6),
                                     Text(
                                       timeago.format(post.createdAt),
-                                      style: GoogleFonts.andika(
+                                      style: GoogleFonts.inter(
                                         fontSize: 12,
-                                        color: Colors.grey,
+                                        color: AppColors.textTertiary,
                                       ),
                                     ),
                                   ],
@@ -239,6 +226,7 @@ class ActivityScreen extends StatelessWidget {
                       );
                     },
                   ),
+
             // My Comments Tab
             userComments.isEmpty
                 ? Center(
@@ -249,15 +237,15 @@ class ActivityScreen extends StatelessWidget {
                         const SizedBox(height: 16),
                         Text(
                           'No comments yet',
-                          style: GoogleFonts.andika(
+                          style: GoogleFonts.inter(
                             fontSize: 18,
                             color: Colors.grey[700],
                           ),
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Comment on posts to engage with community',
-                          style: GoogleFonts.andika(color: Colors.grey),
+                          'Comment on posts to engage with the community',
+                          style: GoogleFonts.inter(color: Colors.grey),
                         ),
                       ],
                     ),
@@ -266,20 +254,15 @@ class ActivityScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(12),
                     itemCount: userComments.length,
                     itemBuilder: (context, index) {
-                      final commentData = userComments[index];
-                      final comment = commentData['comment'] as Comment;
-                      final post = commentData['post'];
-
+                      final entry = userComments[index];
                       return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  PostDetailScreen(postId: post.id),
-                            ),
-                          );
-                        },
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                PostDetailScreen(postId: entry.post.id),
+                          ),
+                        ),
                         child: Card(
                           margin: const EdgeInsets.symmetric(vertical: 8),
                           shape: RoundedRectangleBorder(
@@ -290,7 +273,6 @@ class ActivityScreen extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // Post Reference
                                 Container(
                                   padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(
@@ -302,7 +284,7 @@ class ActivityScreen extends StatelessWidget {
                                       const Icon(
                                         Icons.link,
                                         size: 14,
-                                        color: Colors.grey,
+                                        color: AppColors.textTertiary,
                                       ),
                                       const SizedBox(width: 8),
                                       Expanded(
@@ -311,8 +293,8 @@ class ActivityScreen extends StatelessWidget {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              'On: ${post.itemName}',
-                                              style: GoogleFonts.andika(
+                                              'On: ${entry.post.itemName}',
+                                              style: GoogleFonts.inter(
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w500,
                                               ),
@@ -320,12 +302,12 @@ class ActivityScreen extends StatelessWidget {
                                               overflow: TextOverflow.ellipsis,
                                             ),
                                             Text(
-                                              post.type == 'lost'
+                                              entry.post.type == PostType.lost
                                                   ? 'Lost Item'
                                                   : 'Found Item',
-                                              style: GoogleFonts.andika(
+                                              style: GoogleFonts.inter(
                                                 fontSize: 11,
-                                                color: Colors.grey,
+                                                color: AppColors.textTertiary,
                                               ),
                                             ),
                                           ],
@@ -335,18 +317,16 @@ class ActivityScreen extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(height: 8),
-                                // Comment Text
                                 Text(
-                                  comment.text,
-                                  style: GoogleFonts.andika(fontSize: 14),
+                                  entry.comment.text,
+                                  style: GoogleFonts.inter(fontSize: 14),
                                 ),
                                 const SizedBox(height: 8),
-                                // Timestamp
                                 Text(
-                                  timeago.format(comment.createdAt),
-                                  style: GoogleFonts.andika(
+                                  timeago.format(entry.comment.createdAt),
+                                  style: GoogleFonts.inter(
                                     fontSize: 11,
-                                    color: Colors.grey,
+                                    color: AppColors.textTertiary,
                                   ),
                                 ),
                               ],

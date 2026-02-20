@@ -8,29 +8,32 @@ import 'package:uuid/uuid.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/models/comment.dart';
+import 'package:flutter_application/models/post.dart';
 import 'package:flutter_application/config/app_colors.dart';
 
 class PostDetailScreen extends StatefulWidget {
-  final String postId;
   const PostDetailScreen({super.key, required this.postId});
+
+  final String postId;
 
   @override
   State<PostDetailScreen> createState() => _PostDetailScreenState();
 }
 
 class _PostDetailScreenState extends State<PostDetailScreen> {
-  final TextEditingController _commentCtrl = TextEditingController();
+  final TextEditingController _commentController = TextEditingController();
+  static const _uuid = Uuid();
 
   @override
   void dispose() {
-    _commentCtrl.dispose();
+    _commentController.dispose();
     super.dispose();
   }
 
-  Future<void> _contactWhatsApp(String phone, String itemName) async {
-    final msg = Uri.encodeComponent('Hi, I saw your post about: $itemName');
+  Future<void> _contactViaWhatsApp(String phone, String itemName) async {
+    final message = Uri.encodeComponent('Hi, I saw your post about: $itemName');
     final url = Uri.parse(
-      'https://wa.me/${phone.replaceAll('+', '')}?text=$msg',
+      'https://wa.me/${phone.replaceAll('+', '')}?text=$message',
     );
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
@@ -42,29 +45,32 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     }
   }
 
-  Future<void> _confirmReport(AppState app, post) async {
+  Future<void> _confirmReport(AppState app, Post post) async {
     final userId = app.currentUser?.id ?? 'anon';
-    final res = await showDialog<bool>(
+    final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text('Report Post', style: GoogleFonts.andika()),
+        title: Text('Report Post', style: GoogleFonts.inter()),
         content: Text(
           'Report this post as fake or inappropriate?',
-          style: GoogleFonts.andika(),
+          style: GoogleFonts.inter(),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text('Cancel', style: GoogleFonts.andika()),
+            child: Text('Cancel', style: GoogleFonts.inter()),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: Text('Report', style: GoogleFonts.andika(color: Colors.red)),
+            child: Text(
+              'Report',
+              style: GoogleFonts.inter(color: AppColors.lostPrimary),
+            ),
           ),
         ],
       ),
     );
-    if (res == true) {
+    if (confirmed == true) {
       await app.reportPost(post.id, userId);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -73,8 +79,8 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     }
   }
 
-  Future<void> _addComment(AppState app, post) async {
-    final text = _commentCtrl.text.trim();
+  Future<void> _addComment(AppState app, Post post) async {
+    final text = _commentController.text.trim();
     if (text.isEmpty) return;
     final user = app.currentUser;
     if (user == null) {
@@ -83,49 +89,50 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
       ).showSnackBar(const SnackBar(content: Text('Please login to comment')));
       return;
     }
-    final c = Comment(
-      id: const Uuid().v4(),
+    final comment = Comment(
+      id: _uuid.v4(),
       postId: post.id,
       userId: user.id,
       userName: user.name,
       text: text,
       createdAt: DateTime.now(),
     );
-    await app.addComment(post.id, c);
-    _commentCtrl.clear();
-    if (!mounted) return;
-    setState(() {}); // refresh comments
+    await app.addComment(post.id, comment);
+    _commentController.clear();
   }
 
-  Future<void> _deletePost(AppState app, post) async {
-    final res = await showDialog<bool>(
+  Future<void> _deletePost(AppState app, Post post) async {
+    final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text('Delete Post', style: GoogleFonts.andika()),
+        title: Text('Delete Post', style: GoogleFonts.inter()),
         content: Text(
           'Are you sure you want to delete this post?',
-          style: GoogleFonts.andika(),
+          style: GoogleFonts.inter(),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text('Cancel', style: GoogleFonts.andika()),
+            child: Text('Cancel', style: GoogleFonts.inter()),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: Text('Delete', style: GoogleFonts.andika(color: Colors.red)),
+            child: Text(
+              'Delete',
+              style: GoogleFonts.inter(color: AppColors.lostPrimary),
+            ),
           ),
         ],
       ),
     );
-    if (res == true) {
+    if (confirmed == true) {
       await app.deletePost(post.id);
       if (!mounted) return;
-      Navigator.of(context).pop(); // back to previous screen
+      Navigator.of(context).pop();
     }
   }
 
-  Widget _imageWidget(String url) {
+  Widget _buildImage(String url) {
     if (url.startsWith('http')) {
       return CachedNetworkImage(
         imageUrl: url,
@@ -133,40 +140,45 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
         placeholder: (_, __) => Container(color: Colors.grey[200]),
         errorWidget: (_, __, ___) => Container(color: Colors.grey[200]),
       );
-    } else {
-      return Image.file(
-        File(url),
-        fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) {
-          return Container(color: Colors.grey[200]);
-        },
-      );
     }
+    return Image.file(
+      File(url),
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) => Container(color: Colors.grey[200]),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final app = Provider.of<AppState>(context);
-    final post = app.posts.firstWhere((p) => p.id == widget.postId);
+    final postIndex = app.posts.indexWhere((p) => p.id == widget.postId);
+    if (postIndex == -1) {
+      return Scaffold(
+        appBar: AppBar(title: Text('Post Details', style: GoogleFonts.inter())),
+        body: const Center(child: Text('Post not found.')),
+      );
+    }
+    final post = app.posts[postIndex];
+    final typeBadgeColor = post.type == PostType.lost
+        ? AppColors.lostPrimary
+        : AppColors.foundPrimary;
 
     return Scaffold(
-      appBar: AppBar(title: Text('Post Details', style: GoogleFonts.andika())),
+      appBar: AppBar(title: Text('Post Details', style: GoogleFonts.inter())),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: ListView(
           children: [
-            // Post images (single image - placeholder for carousel)
             ClipRRect(
               borderRadius: BorderRadius.circular(16),
               child: SizedBox(
                 height: 240,
                 child: post.imageUrls.isNotEmpty
-                    ? _imageWidget(post.imageUrls.first)
+                    ? _buildImage(post.imageUrls.first)
                     : Container(color: Colors.grey[200]),
               ),
             ),
             const SizedBox(height: 16),
-            // Post info
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -190,13 +202,11 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: post.type == 'lost'
-                              ? const Color(0xFFEF4444)
-                              : const Color(0xFF10B981),
+                          color: typeBadgeColor,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          post.type.toUpperCase(),
+                          post.type.name.toUpperCase(),
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -209,7 +219,9 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                         onPressed: () => _confirmReport(app, post),
                         child: Text(
                           'Report',
-                          style: GoogleFonts.andika(color: Colors.red),
+                          style: GoogleFonts.inter(
+                            color: AppColors.lostPrimary,
+                          ),
                         ),
                       ),
                     ],
@@ -217,7 +229,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                   const SizedBox(height: 8),
                   Text(
                     post.itemName,
-                    style: GoogleFonts.andika(
+                    style: GoogleFonts.inter(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -225,7 +237,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                   const SizedBox(height: 4),
                   Text(
                     '${post.city}, ${post.street}',
-                    style: GoogleFonts.andika(color: Colors.grey[700]),
+                    style: GoogleFonts.inter(color: Colors.grey[700]),
                   ),
                   const SizedBox(height: 8),
                   Row(
@@ -233,24 +245,28 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                       const Icon(
                         Icons.access_time,
                         size: 14,
-                        color: Colors.grey,
+                        color: AppColors.textTertiary,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         timeago.format(post.createdAt),
-                        style: GoogleFonts.andika(
+                        style: GoogleFonts.inter(
                           fontSize: 12,
-                          color: Colors.grey,
+                          color: AppColors.textTertiary,
                         ),
                       ),
                       const SizedBox(width: 12),
-                      const Icon(Icons.person, size: 14, color: Colors.grey),
+                      const Icon(
+                        Icons.person,
+                        size: 14,
+                        color: AppColors.textTertiary,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         post.userName,
-                        style: GoogleFonts.andika(
+                        style: GoogleFonts.inter(
                           fontSize: 12,
-                          color: Colors.grey,
+                          color: AppColors.textTertiary,
                         ),
                       ),
                     ],
@@ -260,11 +276,11 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                     width: double.infinity,
                     child: ElevatedButton.icon(
                       onPressed: () =>
-                          _contactWhatsApp(post.userPhone, post.itemName),
+                          _contactViaWhatsApp(post.userPhone, post.itemName),
                       icon: const Icon(Icons.message),
                       label: Text(
                         'Contact via WhatsApp',
-                        style: GoogleFonts.andika(),
+                        style: GoogleFonts.inter(),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primaryBlue,
@@ -277,22 +293,21 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                   const SizedBox(height: 16),
                   Text(
                     'Description',
-                    style: GoogleFonts.andika(fontWeight: FontWeight.bold),
+                    style: GoogleFonts.inter(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     post.description ?? 'No description provided.',
-                    style: GoogleFonts.andika(),
+                    style: GoogleFonts.inter(),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     'Comments',
-                    style: GoogleFonts.andika(fontWeight: FontWeight.bold),
+                    style: GoogleFonts.inter(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  // Comments list
                   ...post.comments.map(
-                    (c) => Container(
+                    (comment) => Container(
                       margin: const EdgeInsets.only(bottom: 8),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
@@ -312,9 +327,11 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                             children: [
                               CircleAvatar(
                                 radius: 16,
-                                backgroundColor: const Color(0xFF2563EB),
+                                backgroundColor: AppColors.primaryBlue,
                                 child: Text(
-                                  c.userName.substring(0, 1).toUpperCase(),
+                                  comment.userName
+                                      .substring(0, 1)
+                                      .toUpperCase(),
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 14,
@@ -324,36 +341,35 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                c.userName,
-                                style: GoogleFonts.andika(
+                                comment.userName,
+                                style: GoogleFonts.inter(
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                               const Spacer(),
                               Text(
-                                timeago.format(c.createdAt),
-                                style: GoogleFonts.andika(
+                                timeago.format(comment.createdAt),
+                                style: GoogleFonts.inter(
                                   fontSize: 12,
-                                  color: Colors.grey,
+                                  color: AppColors.textTertiary,
                                 ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 8),
-                          Text(c.text, style: GoogleFonts.andika()),
+                          Text(comment.text, style: GoogleFonts.inter()),
                         ],
                       ),
                     ),
                   ),
-                  // Add comment field
                   const SizedBox(height: 16),
-                  Text('Add a comment', style: GoogleFonts.andika()),
+                  Text('Add a comment', style: GoogleFonts.inter()),
                   const SizedBox(height: 8),
                   Row(
                     children: [
                       Expanded(
                         child: TextField(
-                          controller: _commentCtrl,
+                          controller: _commentController,
                           decoration: InputDecoration(
                             hintText: 'Type your comment...',
                             filled: true,
@@ -368,12 +384,12 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                       ElevatedButton(
                         onPressed: () => _addComment(app, post),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF2563EB),
+                          backgroundColor: AppColors.primaryBlue,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: Text('Send', style: GoogleFonts.andika()),
+                        child: Text('Send', style: GoogleFonts.inter()),
                       ),
                     ],
                   ),
@@ -385,14 +401,16 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                       child: OutlinedButton(
                         onPressed: () => _deletePost(app, post),
                         style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Colors.red),
+                          side: const BorderSide(color: AppColors.lostPrimary),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
                         child: Text(
                           'Delete Post',
-                          style: GoogleFonts.andika(color: Colors.red),
+                          style: GoogleFonts.inter(
+                            color: AppColors.lostPrimary,
+                          ),
                         ),
                       ),
                     ),

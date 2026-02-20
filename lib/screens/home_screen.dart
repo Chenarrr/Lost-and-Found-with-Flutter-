@@ -13,9 +13,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final TextEditingController searchCtrl = TextEditingController();
-  String cityFilter = 'All Cities';
-  final cities = [
+  final TextEditingController _searchController = TextEditingController();
+  String _cityFilter = 'All Cities';
+  final List<String> _cities = [
     'All Cities',
     'Erbil',
     'Sulaymaniyah',
@@ -25,26 +25,33 @@ class _HomeScreenState extends State<HomeScreen> {
     'Koya',
   ];
 
-  Future<void> _refresh() async {
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _onRefresh() async {
     await Future.delayed(const Duration(milliseconds: 800));
   }
 
   @override
   Widget build(BuildContext context) {
     final app = Provider.of<AppState>(context);
-    final posts = app.posts.where((p) {
-      final matchesCity = cityFilter == 'All Cities' || p.city == cityFilter;
-      final q = searchCtrl.text.trim().toLowerCase();
+    final query = _searchController.text.trim().toLowerCase();
+    final posts = app.posts.where((post) {
+      final matchesCity =
+          _cityFilter == 'All Cities' || post.city == _cityFilter;
       final matchesSearch =
-          q.isEmpty ||
-          p.itemName.toLowerCase().contains(q) ||
-          p.city.toLowerCase().contains(q) ||
-          p.street.toLowerCase().contains(q);
+          query.isEmpty ||
+          post.itemName.toLowerCase().contains(query) ||
+          post.city.toLowerCase().contains(query) ||
+          post.street.toLowerCase().contains(query);
       return matchesCity && matchesSearch;
     }).toList();
 
     return RefreshIndicator(
-      onRefresh: _refresh,
+      onRefresh: _onRefresh,
       child: ListView(
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
@@ -52,18 +59,18 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(
             margin: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white.withAlpha(204), // 0.8 * 255 ≈ 204
+              color: Colors.white.withAlpha(204),
               borderRadius: BorderRadius.circular(28),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withAlpha(18), // 0.07 * 255 ≈ 18
+                  color: Colors.black.withAlpha(18),
                   blurRadius: 18,
                   offset: const Offset(0, 6),
                 ),
               ],
             ),
             child: TextField(
-              controller: searchCtrl,
+              controller: _searchController,
               style: GoogleFonts.inter(fontSize: 16),
               decoration: InputDecoration(
                 hintText: 'Search items or locations...',
@@ -91,11 +98,11 @@ class _HomeScreenState extends State<HomeScreen> {
             height: 48,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              itemCount: cities.length,
+              itemCount: _cities.length,
               separatorBuilder: (_, __) => const SizedBox(width: 10),
-              itemBuilder: (_, i) {
-                final c = cities[i];
-                final active = c == cityFilter;
+              itemBuilder: (_, index) {
+                final city = _cities[index];
+                final isActive = city == _cityFilter;
                 return AnimatedContainer(
                   duration: const Duration(milliseconds: 250),
                   curve: Curves.easeOut,
@@ -106,26 +113,28 @@ class _HomeScreenState extends State<HomeScreen> {
                         vertical: 4,
                       ),
                       child: Text(
-                        c,
+                        city,
                         style: GoogleFonts.inter(
-                          color: active ? Colors.white : AppColors.textPrimary,
-                          fontWeight: active
+                          color: isActive
+                              ? Colors.white
+                              : AppColors.textPrimary,
+                          fontWeight: isActive
                               ? FontWeight.w600
                               : FontWeight.normal,
                           fontSize: 15,
                         ),
                       ),
                     ),
-                    selected: active,
-                    onSelected: (_) => setState(() => cityFilter = c),
+                    selected: isActive,
+                    onSelected: (_) => setState(() => _cityFilter = city),
                     selectedColor: AppColors.primaryBlue,
                     backgroundColor: AppColors.cardWhite,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    elevation: active ? 4 : 0,
-                    shadowColor: active
-                        ? AppColors.primaryBlue.withAlpha(38) // 0.15 * 255 ≈ 38
+                    elevation: isActive ? 4 : 0,
+                    shadowColor: isActive
+                        ? AppColors.primaryBlue.withAlpha(38)
                         : Colors.transparent,
                   ),
                 );
@@ -159,9 +168,9 @@ class _HomeScreenState extends State<HomeScreen> {
             )
           else
             ...posts.map(
-              (p) => AnimatedSwitcher(
+              (post) => AnimatedSwitcher(
                 duration: const Duration(milliseconds: 350),
-                child: PostCard(key: ValueKey(p.id), post: p),
+                child: PostCard(key: ValueKey(post.id), post: post),
               ),
             ),
           const SizedBox(height: 72),

@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_application/main.dart';
 
 void main() {
-  setUp(() => SharedPreferences.setMockInitialValues({}));
-
   Future<void> pumpApp(WidgetTester tester) async {
-    SharedPreferences.setMockInitialValues({});
-    final prefs = await SharedPreferences.getInstance();
-    await tester.pumpWidget(FindItApp(prefs: prefs));
+    await tester.pumpWidget(const FindItApp());
     await tester.pumpAndSettle();
   }
 

@@ -138,7 +138,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
       userId: currentUser.id,
     );
 
-    await app.addPost(newPost);
+    await app.addPost(newPost, _imagePaths);
 
     if (!mounted) return;
     setState(() => _isLoading = false);

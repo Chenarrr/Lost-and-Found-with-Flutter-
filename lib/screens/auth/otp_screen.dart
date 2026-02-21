@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/config/app_colors.dart';
+import 'package:flutter_application/providers/app_state.dart';
+import 'package:flutter_application/routes/main_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_application/providers/app_state.dart';
-import 'package:flutter_application/config/app_colors.dart';
-import 'package:flutter_application/routes/main_page.dart';
 
 class OtpScreen extends StatefulWidget {
   const OtpScreen({
@@ -19,7 +19,7 @@ class OtpScreen extends StatefulWidget {
   final String name;
   final String? email;
   final String password;
-  final String demoCode;
+  final String demoCode; // kept for backwards compatibility but not used here
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
@@ -43,23 +43,24 @@ class _OtpScreenState extends State<OtpScreen> {
       return;
     }
 
-    final app = Provider.of<AppState>(context, listen: false);
-    if (!app.verifyOtp(widget.phone, code)) {
-      setState(() => _error = 'Invalid code. Please try again.');
-      return;
-    }
-
     setState(() {
       _loading = true;
       _error = null;
     });
-    await app.signup(
-      name: widget.name,
-      phone: widget.phone,
-      email: widget.email,
-      password: widget.password,
-    );
+
+    final app = Provider.of<AppState>(context, listen: false);
+    final errorMsg = await app.verifyOtpAndLogin(code);
+
     if (!mounted) return;
+
+    if (errorMsg != null) {
+      setState(() {
+        _error = errorMsg;
+        _loading = false;
+      });
+      return;
+    }
+
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const MainPage()),
       (r) => false,
@@ -75,48 +76,6 @@ class _OtpScreenState extends State<OtpScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Demo banner
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppColors.bannerBg,
-                border: Border.all(color: AppColors.bannerBorder),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Demo mode — no real SMS sent',
-                    style: GoogleFonts.inter(
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.bannerText,
-                      fontSize: 13,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    'Your OTP code:',
-                    style: GoogleFonts.inter(
-                      color: AppColors.bannerText,
-                      fontSize: 12,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    widget.demoCode,
-                    style: GoogleFonts.inter(
-                      color: AppColors.bannerText,
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 6,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 32),
             Text(
               'Enter the 6-digit code sent to',
               style: GoogleFonts.inter(
@@ -181,7 +140,7 @@ class _OtpScreenState extends State<OtpScreen> {
                         ),
                       )
                     : Text(
-                        'Verify & Create Account',
+                        'Verify Code',
                         style: GoogleFonts.inter(fontSize: 16),
                       ),
               ),

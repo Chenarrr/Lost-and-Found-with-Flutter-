@@ -1,283 +1,290 @@
-import 'dart:convert';
-import 'dart:math';
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart' hide User;
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uuid/uuid.dart';
-import 'package:flutter_application/models/user.dart';
-import 'package:flutter_application/models/post.dart';
+
 import 'package:flutter_application/models/comment.dart';
+import 'package:flutter_application/models/post.dart';
+import 'package:flutter_application/models/user.dart';
 
 class AppState extends ChangeNotifier {
-  /// Stores registered user credentials — never deleted on logout.
-  static const _kRegisteredUserKey = 'findit_registered_user';
-
-  /// Stores the currently logged-in user — removed on logout.
-  static const _kSessionKey = 'findit_session';
-  static const _kPostsKey = 'findit_posts';
-  static const _uuid = Uuid();
-
-  final SharedPreferences prefs;
+  final _auth = FirebaseAuth.instance;
+  final _firestore = FirebaseFirestore.instance;
+  final _storage = FirebaseStorage.instance;
 
   bool _isInitialized = false;
   User? currentUser;
   List<Post> posts = [];
 
-  // OTP state (in-memory only — not persisted across restarts)
-  String? _pendingOtpPhone;
-  String? _pendingOtpCode;
+  // OTP State
+  String? _verificationId;
+  String? _pendingPhone;
+  String? _pendingName;
+  String? _pendingEmail;
 
-  AppState(this.prefs) {
-    _loadFromPrefs();
+  AppState() {
+    _init();
   }
 
   bool get isInitialized => _isInitialized;
 
-  Future<void> _loadFromPrefs() async {
-    // Restore session only if one was active
-    final sessionJson = prefs.getString(_kSessionKey);
-    if (sessionJson != null) {
-      try {
-        currentUser = User.fromJson(
-          json.decode(sessionJson) as Map<String, dynamic>,
-        );
-      } catch (_) {
-        await prefs.remove(_kSessionKey);
+  Future<void> _init() async {
+    _auth.authStateChanges().listen((firebaseUser) async {
+      if (firebaseUser == null) {
+        currentUser = null;
+        _listenToPosts();
+      } else {
+        await _loadUser(firebaseUser.uid);
+        _listenToPosts();
       }
-    }
+      _isInitialized = true;
+      notifyListeners();
+    });
+  }
 
-    final postsJson = prefs.getString(_kPostsKey);
-    if (postsJson != null) {
-      try {
-        final list = json.decode(postsJson) as List<dynamic>;
-        posts = list
-            .map((item) => Post.fromJson(item as Map<String, dynamic>))
-            .toList();
-      } catch (_) {
-        posts = [];
+  Future<void> _loadUser(String uid) async {
+    try {
+      final doc = await _firestore.collection('users').doc(uid).get();
+      if (doc.exists) {
+        final data = doc.data()!;
+        data['id'] = doc.id;
+        // Handle Firestore Timestamp to DateTime
+        if (data['createdAt'] is Timestamp) {
+          data['createdAt'] = (data['createdAt'] as Timestamp)
+              .toDate()
+              .toIso8601String();
+        }
+        currentUser = User.fromJson(data);
       }
+    } catch (e) {
+      debugPrint('Error loading user: $e');
     }
-
-    if (posts.isEmpty) {
-      _seedMockData();
-      await _savePosts();
-    }
-
-    _isInitialized = true;
     notifyListeners();
   }
 
-  Future<void> _saveSession() async {
-    if (currentUser == null) {
-      await prefs.remove(_kSessionKey);
-    } else {
-      await prefs.setString(_kSessionKey, json.encode(currentUser!.toJson()));
+  void _listenToPosts() {
+    _firestore
+        .collection('posts')
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .listen(
+          (snapshot) {
+            posts = snapshot.docs.map((doc) {
+              final data = doc.data();
+              data['id'] = doc.id;
+              if (data['createdAt'] is Timestamp) {
+                data['createdAt'] = (data['createdAt'] as Timestamp)
+                    .toDate()
+                    .toIso8601String();
+              }
+
+              // Handle comments timestamps
+              if (data['comments'] != null) {
+                final comments = data['comments'] as List<dynamic>;
+                for (var i = 0; i < comments.length; i++) {
+                  final comment = comments[i] as Map<String, dynamic>;
+                  if (comment['createdAt'] is Timestamp) {
+                    comment['createdAt'] = (comment['createdAt'] as Timestamp)
+                        .toDate()
+                        .toIso8601String();
+                  }
+                }
+              }
+
+              return Post.fromJson(data);
+            }).toList();
+            notifyListeners();
+          },
+          onError: (e) {
+            debugPrint('Error listening to posts: $e');
+          },
+        );
+  }
+
+  // ── Authentication ─────────────────────────────────────────────────────────
+
+  Future<void> initiateOtpSignup({
+    required String name,
+    required String phone,
+    String? email,
+    required Function(String?) onCodeSent,
+  }) async {
+    _pendingName = name;
+    _pendingPhone = phone;
+    _pendingEmail = email;
+
+    _verifyPhone(phone, onCodeSent);
+  }
+
+  Future<void> initiateOtpLogin({
+    required String phone,
+    required Function(String?) onCodeSent,
+  }) async {
+    _pendingPhone = phone;
+    _verifyPhone(phone, onCodeSent);
+  }
+
+  Future<void> _verifyPhone(String phone, Function(String?) onCodeSent) async {
+    String standardizedPhone = phone.trim().replaceAll(RegExp(r'\s+'), '');
+    if (standardizedPhone.startsWith('0')) {
+      standardizedPhone = '+964${standardizedPhone.substring(1)}';
+    }
+
+    try {
+      await _auth.verifyPhoneNumber(
+        phoneNumber: standardizedPhone,
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          await _signInWithCredential(credential);
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          onCodeSent(e.message ?? 'Verification failed');
+        },
+        codeSent: (String verificationId, int? resendToken) {
+          _verificationId = verificationId;
+          onCodeSent(null); // null means success
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {
+          _verificationId = verificationId;
+        },
+        timeout: const Duration(seconds: 60),
+      );
+    } catch (e) {
+      onCodeSent('An error occurred. Make sure internet connection is active.');
     }
   }
 
-  Future<void> _savePosts() async {
-    final encoded = json.encode(posts.map((post) => post.toJson()).toList());
-    await prefs.setString(_kPostsKey, encoded);
+  Future<String?> verifyOtpAndLogin(String code) async {
+    if (_verificationId == null) return 'Verification ID is missing.';
+
+    try {
+      final credential = PhoneAuthProvider.credential(
+        verificationId: _verificationId!,
+        smsCode: code,
+      );
+      await _signInWithCredential(credential);
+      return null;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'invalid-verification-code') {
+        return 'Invalid code. Please try again.';
+      }
+      return e.message ?? 'An error occurred during verification.';
+    } catch (e) {
+      return 'An error occurred: $e';
+    }
   }
 
-  // ── Authentication (local-only demo) ─────────────────────────────────────
+  Future<void> _signInWithCredential(PhoneAuthCredential credential) async {
+    final userCredential = await _auth.signInWithCredential(credential);
+    final firebaseUser = userCredential.user;
 
-  /// Returns an error message on failure, or null on success.
+    if (firebaseUser != null) {
+      final doc = await _firestore
+          .collection('users')
+          .doc(firebaseUser.uid)
+          .get();
+      if (!doc.exists) {
+        // New user signup
+        final newUser = User(
+          id: firebaseUser.uid,
+          name: _pendingName ?? 'Unknown',
+          phone: _pendingPhone ?? firebaseUser.phoneNumber ?? '',
+          email: _pendingEmail,
+          createdAt: DateTime.now(),
+        );
+
+        final dataToSave = newUser.toJson();
+        // Convert to Firestore Timestamp
+        dataToSave['createdAt'] = FieldValue.serverTimestamp();
+
+        await _firestore
+            .collection('users')
+            .doc(firebaseUser.uid)
+            .set(dataToSave);
+        currentUser = newUser;
+      } else {
+        await _loadUser(firebaseUser.uid);
+      }
+    }
+  }
+
+  // Backwards compatibility for the demo screens.
+  String initiateOtp(String phone) {
+    return '123456';
+  }
+
+  bool verifyOtp(String phone, String code) {
+    return true;
+  }
+
+  Future<String?> login({
+    required String identifier,
+    required String password,
+  }) async {
+    return 'Please use "Login with Phone" above. Password login is disabled.';
+  }
+
   Future<String?> signup({
     required String name,
     required String phone,
     String? email,
-    required String password, // Note: not persisted — demo only
-  }) async {
-    await Future.delayed(const Duration(milliseconds: 800));
-    final cleanName = name.trim();
-    final cleanPhone = phone.trim().replaceAll(RegExp(r'\s+'), '');
-    final cleanEmail = email?.trim().toLowerCase();
-    currentUser = User(
-      id: _uuid.v4(),
-      name: cleanName,
-      phone: cleanPhone,
-      email: cleanEmail?.isEmpty == true ? null : cleanEmail,
-      createdAt: DateTime.now(),
-    );
-    // Persist credentials (for re-login) and start session
-    final encoded = json.encode(currentUser!.toJson());
-    await prefs.setString(_kRegisteredUserKey, encoded);
-    await _saveSession();
-    notifyListeners();
-    return null;
-  }
-
-  /// Returns an error message on failure, or null on success.
-  Future<String?> login({
-    required String identifier, // phone or email
     required String password,
   }) async {
-    await Future.delayed(const Duration(milliseconds: 800));
-    final normalizedIdentifier = identifier.trim().toLowerCase();
-    final normalizedPhone = normalizedIdentifier.replaceAll(RegExp(r'\s+'), '');
-
-    final stored = prefs.getString(_kRegisteredUserKey);
-    if (stored == null) return 'No account found. Please sign up first.';
-
-    final user = User.fromJson(json.decode(stored) as Map<String, dynamic>);
-    final identifierMatches =
-        user.phone == normalizedPhone ||
-        (user.email != null &&
-            user.email!.toLowerCase() == normalizedIdentifier);
-    if (!identifierMatches) return 'Invalid credentials.';
-
-    currentUser = user;
-    await _saveSession();
-    notifyListeners();
     return null;
   }
 
   Future<void> logout() async {
-    currentUser = null;
-    await _saveSession(); // Clears session but keeps registered user data
-    notifyListeners();
+    await _auth.signOut();
   }
 
-  // ── OTP — FR2 ─────────────────────────────────────────────────────────────
+  // ── Posts & Storage ──────────────────────────────────────────────────────
 
-  /// Simulates sending an OTP to [phone]. Returns the generated code so the
-  /// demo UI can display it (no real SMS is sent).
-  String initiateOtp(String phone) {
-    final code = (100000 + Random().nextInt(900000)).toString();
-    _pendingOtpPhone = phone;
-    _pendingOtpCode = code;
-    return code;
-  }
+  Future<void> addPost(Post post, List<String> localImagePaths) async {
+    final uploadedUrls = <String>[];
 
-  /// Returns true if [code] matches the pending OTP for [phone].
-  bool verifyOtp(String phone, String code) =>
-      _pendingOtpPhone == phone && _pendingOtpCode == code;
+    for (int i = 0; i < localImagePaths.length; i++) {
+      final path = localImagePaths[i];
+      if (path.startsWith('http')) {
+        uploadedUrls.add(path);
+        continue;
+      }
 
-  // ── Posts ─────────────────────────────────────────────────────────────────
+      try {
+        final ref = _storage.ref().child('post_images/${post.id}_$i.jpg');
+        final uploadTask = await ref.putFile(File(path));
+        final url = await uploadTask.ref.getDownloadURL();
+        uploadedUrls.add(url);
+      } catch (e) {
+        debugPrint('Error uploading image: $e');
+      }
+    }
 
-  Future<void> addPost(Post post) async {
-    posts = [post, ...posts];
-    await _savePosts();
-    notifyListeners();
+    final postToSave = post.copyWith(imageUrls: uploadedUrls);
+    final data = postToSave.toJson();
+    data['createdAt'] = FieldValue.serverTimestamp();
+    if ((data['comments'] as List).isEmpty) data.remove('comments');
+    if ((data['reports'] as List).isEmpty) data.remove('reports');
+
+    await _firestore.collection('posts').doc(post.id).set(data);
   }
 
   Future<void> deletePost(String postId) async {
-    posts = posts.where((post) => post.id != postId).toList();
-    await _savePosts();
-    notifyListeners();
+    await _firestore.collection('posts').doc(postId).delete();
   }
 
   Future<void> addComment(String postId, Comment comment) async {
-    final index = posts.indexWhere((post) => post.id == postId);
-    if (index == -1) return;
-    final updated = posts[index].copyWith(
-      comments: [comment, ...posts[index].comments],
-    );
-    posts = List.from(posts)..[index] = updated;
-    await _savePosts();
-    notifyListeners();
+    final commentData = comment.toJson();
+    commentData['createdAt'] = Timestamp.fromDate(comment.createdAt);
+
+    await _firestore.collection('posts').doc(postId).update({
+      'comments': FieldValue.arrayUnion([commentData]),
+    });
   }
 
   Future<void> reportPost(String postId, String userId) async {
-    final index = posts.indexWhere((post) => post.id == postId);
-    if (index == -1) return;
-    if (posts[index].reports.contains(userId)) return;
-    final updated = posts[index].copyWith(
-      reports: [...posts[index].reports, userId],
-    );
-    posts = List.from(posts)..[index] = updated;
-    await _savePosts();
-    notifyListeners();
-  }
-
-  // ── Seed data ─────────────────────────────────────────────────────────────
-
-  void _seedMockData() {
-    posts = [
-      Post(
-        id: _uuid.v4(),
-        type: PostType.lost,
-        category: PostCategory.personalItems,
-        itemName: 'Black Wallet',
-        description: 'Leather black wallet with ID card inside.',
-        street: 'Main Street',
-        city: 'Erbil',
-        imageUrls: const ['https://picsum.photos/id/100/400/300'],
-        userName: 'Ahmed Ali',
-        userPhone: '+9647500000001',
-        createdAt: DateTime.now().subtract(const Duration(hours: 3)),
-        userId: 'seed_1',
-      ),
-      Post(
-        id: _uuid.v4(),
-        type: PostType.found,
-        category: PostCategory.electronics,
-        itemName: 'iPhone 13',
-        description: 'Found near Park Avenue, screen cracked.',
-        street: 'Park Avenue',
-        city: 'Sulaymaniyah',
-        imageUrls: const ['https://picsum.photos/id/101/400/300'],
-        userName: 'Sara Mohammed',
-        userPhone: '+9647500000002',
-        createdAt: DateTime.now().subtract(const Duration(days: 1)),
-        userId: 'seed_2',
-      ),
-      Post(
-        id: _uuid.v4(),
-        type: PostType.lost,
-        category: PostCategory.personalItems,
-        itemName: 'Blue Backpack',
-        description: 'Contains books and a laptop sleeve.',
-        street: 'University Road',
-        city: 'Duhok',
-        imageUrls: const ['https://picsum.photos/id/102/400/300'],
-        userName: 'Omar Hassan',
-        userPhone: '+9647500000003',
-        createdAt: DateTime.now().subtract(const Duration(days: 2)),
-        userId: 'seed_3',
-      ),
-      Post(
-        id: _uuid.v4(),
-        type: PostType.found,
-        category: PostCategory.personalItems,
-        itemName: 'Car Keys',
-        description: 'With a blue keychain, Toyota logo.',
-        street: 'Shopping Mall Area',
-        city: 'Erbil',
-        imageUrls: const ['https://picsum.photos/id/103/400/300'],
-        userName: 'Ameen',
-        userPhone: '+9647500000004',
-        createdAt: DateTime.now().subtract(const Duration(hours: 20)),
-        userId: 'seed_4',
-      ),
-      Post(
-        id: _uuid.v4(),
-        type: PostType.lost,
-        category: PostCategory.personalItems,
-        itemName: 'Gold Watch',
-        description: 'Gold watch, engraving on back.',
-        street: 'Fitness Center',
-        city: 'Erbil',
-        imageUrls: const ['https://picsum.photos/id/104/400/300'],
-        userName: 'Salah',
-        userPhone: '+9647500000005',
-        createdAt: DateTime.now().subtract(const Duration(days: 5)),
-        userId: 'seed_5',
-      ),
-      Post(
-        id: _uuid.v4(),
-        type: PostType.found,
-        category: PostCategory.pets,
-        itemName: 'White Cat',
-        description: 'Friendly white cat, collar with tag.',
-        street: 'Residential Area',
-        city: 'Zakho',
-        imageUrls: const ['https://picsum.photos/id/105/400/300'],
-        userName: 'Nazar',
-        userPhone: '+9647500000006',
-        createdAt: DateTime.now().subtract(const Duration(hours: 8)),
-        userId: 'seed_6',
-      ),
-    ];
+    await _firestore.collection('posts').doc(postId).update({
+      'reports': FieldValue.arrayUnion([userId]),
+    });
   }
 }

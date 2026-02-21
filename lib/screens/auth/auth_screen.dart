@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/providers/app_state.dart';
-import 'package:flutter_application/routes/main_page.dart';
 import 'package:flutter_application/screens/auth/otp_screen.dart';
 import 'package:flutter_application/widgets/phone_input_formatter.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -22,10 +21,12 @@ class _AuthScreenState extends State<AuthScreen>
   final _sName = TextEditingController();
   final _sPhone = TextEditingController();
   final _sEmail = TextEditingController();
-  final _sPassword = TextEditingController();
+  final _sPassword =
+      TextEditingController(); // kept purely because of UI field, but ignored by backend
 
   final _lIdentifier = TextEditingController();
-  final _lPassword = TextEditingController();
+  final _lPassword =
+      TextEditingController(); // kept purely because of UI field, but ignored by backend
 
   final _formKeySignup = GlobalKey<FormState>();
   final _formKeyLogin = GlobalKey<FormState>();
@@ -68,42 +69,63 @@ class _AuthScreenState extends State<AuthScreen>
     if (!_formKeySignup.currentState!.validate()) return;
     final app = Provider.of<AppState>(context, listen: false);
     final phone = _sPhone.text.trim().replaceAll(RegExp(r'\s'), '');
-    final demoCode = app.initiateOtp(phone);
 
-    if (!mounted) return;
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => OtpScreen(
-          phone: phone,
-          name: _sName.text.trim(),
-          email: _sEmail.text.trim().isEmpty ? null : _sEmail.text.trim(),
-          password: _sPassword.text,
-          demoCode: demoCode,
-        ),
-      ),
+    setState(() => _loading = true);
+
+    await app.initiateOtpSignup(
+      name: _sName.text.trim(),
+      phone: phone,
+      email: _sEmail.text.trim().isEmpty ? null : _sEmail.text.trim(),
+      onCodeSent: (error) {
+        if (!mounted) return;
+        setState(() => _loading = false);
+        if (error != null) {
+          _showMessage(error, isError: true);
+        } else {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => OtpScreen(
+                phone: phone,
+                name: _sName.text.trim(),
+                email: _sEmail.text.trim().isEmpty ? null : _sEmail.text.trim(),
+                password: _sPassword.text,
+                demoCode: '', // no demo code anymore
+              ),
+            ),
+          );
+        }
+      },
     );
   }
 
   Future<void> _doLogin() async {
     if (!_formKeyLogin.currentState!.validate()) return;
 
-    setState(() => _loading = true);
     final app = Provider.of<AppState>(context, listen: false);
-    final err = await app.login(
-      identifier: _lIdentifier.text.trim(),
-      password: _lPassword.text,
-    );
-    if (!mounted) return;
-    setState(() => _loading = false);
+    final phone = _lIdentifier.text.trim();
 
-    if (err != null) {
-      _showMessage(err, isError: true);
-      return;
-    }
-
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const MainPage()),
-      (route) => false,
+    setState(() => _loading = true);
+    await app.initiateOtpLogin(
+      phone: phone,
+      onCodeSent: (error) {
+        if (!mounted) return;
+        setState(() => _loading = false);
+        if (error != null) {
+          _showMessage(error, isError: true);
+        } else {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => OtpScreen(
+                phone: phone,
+                name: '',
+                email: null,
+                password: '',
+                demoCode: '', // no demo code anymore
+              ),
+            ),
+          );
+        }
+      },
     );
   }
 
@@ -155,28 +177,17 @@ class _AuthScreenState extends State<AuthScreen>
                             children: [
                               _buildTextField(
                                 controller: _lIdentifier,
-                                label: 'Phone (0750 222 34 44) or Email',
-                                textInputAction: TextInputAction.next,
+                                label: 'Phone (0750 222 34 44)',
+                                keyboardType: TextInputType.phone,
+                                textInputAction: TextInputAction.done,
+                                inputFormatters: [PhoneInputFormatter()],
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
                                     return 'Required';
                                   }
                                   return null;
                                 },
-                              ),
-                              const SizedBox(height: 12),
-                              _buildTextField(
-                                controller: _lPassword,
-                                label: 'Password',
-                                obscure: true,
-                                textInputAction: TextInputAction.done,
                                 onSubmitted: (_) => _doLogin(),
-                                validator: (value) {
-                                  if (value == null || value.length < 6) {
-                                    return 'Minimum 6 characters';
-                                  }
-                                  return null;
-                                },
                               ),
                               const SizedBox(height: 18),
                               SizedBox(
@@ -189,7 +200,7 @@ class _AuthScreenState extends State<AuthScreen>
                                     ),
                                   ),
                                   child: Text(
-                                    'Login',
+                                    'Send OTP',
                                     style: GoogleFonts.inter(fontSize: 16),
                                   ),
                                 ),
@@ -242,26 +253,13 @@ class _AuthScreenState extends State<AuthScreen>
                                 controller: _sEmail,
                                 label: 'Email (optional)',
                                 keyboardType: TextInputType.emailAddress,
-                                textInputAction: TextInputAction.next,
+                                textInputAction: TextInputAction.done,
+                                onSubmitted: (_) => _doSignup(),
                                 validator: (value) {
                                   if (value != null &&
                                       value.trim().isNotEmpty &&
                                       !_emailReg.hasMatch(value.trim())) {
                                     return 'Invalid email';
-                                  }
-                                  return null;
-                                },
-                              ),
-                              const SizedBox(height: 12),
-                              _buildTextField(
-                                controller: _sPassword,
-                                label: 'Password',
-                                obscure: true,
-                                textInputAction: TextInputAction.done,
-                                onSubmitted: (_) => _doSignup(),
-                                validator: (value) {
-                                  if (value == null || value.length < 6) {
-                                    return 'Minimum 6 characters';
                                   }
                                   return null;
                                 },
@@ -277,7 +275,7 @@ class _AuthScreenState extends State<AuthScreen>
                                     ),
                                   ),
                                   child: Text(
-                                    'Create account',
+                                    'Send OTP',
                                     style: GoogleFonts.inter(fontSize: 16),
                                   ),
                                 ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -10,20 +9,18 @@ import 'package:flutter_application/routes/root_router.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  GoogleFonts.config.allowRuntimeFetching = false;
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  final prefs = await SharedPreferences.getInstance();
-  runApp(FindItApp(prefs: prefs));
+  runApp(const FindItApp());
 }
 
 class FindItApp extends StatelessWidget {
-  const FindItApp({super.key, required this.prefs});
-
-  final SharedPreferences prefs;
+  const FindItApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => AppState(prefs),
+      create: (_) => AppState(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Find It',

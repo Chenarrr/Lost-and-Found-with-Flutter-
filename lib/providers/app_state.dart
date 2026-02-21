@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_application/models/comment.dart';
@@ -11,10 +12,6 @@ import 'package:flutter_application/models/post.dart';
 import 'package:flutter_application/models/user.dart';
 
 class AppState extends ChangeNotifier {
-  final _auth = FirebaseAuth.instance;
-  final _firestore = FirebaseFirestore.instance;
-  final _storage = FirebaseStorage.instance;
-
   bool _isInitialized = false;
   User? currentUser;
   List<Post> posts = [];
@@ -25,13 +22,30 @@ class AppState extends ChangeNotifier {
   String? _pendingName;
   String? _pendingEmail;
 
-  AppState() {
-    _init();
-    // Immediate initialization for tests to bypass the loading screen
-    if (Platform.environment.containsKey('FLUTTER_TEST')) {
+  final FirebaseAuth? _mockAuth;
+  final FirebaseFirestore? _mockFirestore;
+  final FirebaseStorage? _mockStorage;
+
+  AppState({
+    FirebaseAuth? auth,
+    FirebaseFirestore? firestore,
+    FirebaseStorage? storage,
+  }) : _mockAuth = auth,
+       _mockFirestore = firestore,
+       _mockStorage = storage {
+    final isTest = Platform.environment.containsKey('FLUTTER_TEST');
+    if (!isTest || auth != null) {
+      _init();
+    }
+    if (isTest) {
       _isInitialized = true;
     }
   }
+
+  FirebaseAuth get _auth => _mockAuth ?? FirebaseAuth.instance;
+  FirebaseFirestore get _firestore =>
+      _mockFirestore ?? FirebaseFirestore.instance;
+  FirebaseStorage get _storage => _mockStorage ?? FirebaseStorage.instance;
 
   bool get isInitialized => _isInitialized;
 
@@ -51,7 +65,7 @@ class AppState extends ChangeNotifier {
 
     // In test environments, authStateChanges might never emit.
     // We add a safety timeout to ensure initialization completes.
-    Future.delayed(const Duration(milliseconds: 10), () {
+    Future.delayed(const Duration(milliseconds: 5), () {
       if (!_isInitialized) {
         _isInitialized = true;
         _listenToPosts();

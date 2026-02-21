@@ -15,12 +15,13 @@ Future<void> main() async {
 }
 
 class FindItApp extends StatelessWidget {
-  const FindItApp({super.key});
+  final AppState? appState;
+  const FindItApp({super.key, this.appState});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => AppState(),
+      create: (_) => appState ?? AppState(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Find It',

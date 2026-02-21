@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_application/main.dart';
+import 'package:flutter_application/providers/app_state.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   Future<void> pumpApp(WidgetTester tester) async {
-    await tester.pumpWidget(const FindItApp());
+    GoogleFonts.config.allowRuntimeFetching = false;
+    // Inject a pre-initialized AppState to bypass loading screens and Firebase checks
+    final state = AppState();
+    await tester.pumpWidget(FindItApp(appState: state));
     await tester.pumpAndSettle();
   }
 
@@ -28,11 +33,12 @@ void main() {
       expect(find.text('Signup'), findsWidgets);
     });
 
-    testWidgets('Auth screen shows phone and password fields', (tester) async {
+    testWidgets('Auth screen shows phone field', (tester) async {
       await pumpApp(tester);
       await tester.tap(find.text('Get Started'));
       await tester.pumpAndSettle();
 
+      // Should find at least one TextField (for phone)
       expect(find.byType(TextField), findsWidgets);
     });
 

@@ -43,5 +43,14 @@
     "location": "nam5",
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
+  },
+  "auth": {
+    "providers": {
+      "anonymous": false,
+      "emailPassword": false
+    }
+  },
+  "storage": {
+    "rules": "storage.rules"
   }
 }

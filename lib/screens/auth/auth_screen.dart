@@ -21,12 +21,8 @@ class _AuthScreenState extends State<AuthScreen>
   final _sName = TextEditingController();
   final _sPhone = TextEditingController();
   final _sEmail = TextEditingController();
-  final _sPassword =
-      TextEditingController(); // kept purely because of UI field, but ignored by backend
 
   final _lIdentifier = TextEditingController();
-  final _lPassword =
-      TextEditingController(); // kept purely because of UI field, but ignored by backend
 
   final _formKeySignup = GlobalKey<FormState>();
   final _formKeyLogin = GlobalKey<FormState>();
@@ -48,9 +44,7 @@ class _AuthScreenState extends State<AuthScreen>
     _sName.dispose();
     _sPhone.dispose();
     _sEmail.dispose();
-    _sPassword.dispose();
     _lIdentifier.dispose();
-    _lPassword.dispose();
     super.dispose();
   }
 
@@ -88,7 +82,7 @@ class _AuthScreenState extends State<AuthScreen>
                 phone: phone,
                 name: _sName.text.trim(),
                 email: _sEmail.text.trim().isEmpty ? null : _sEmail.text.trim(),
-                password: _sPassword.text,
+                password: '', // unused
                 demoCode: '', // no demo code anymore
               ),
             ),

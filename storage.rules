@@ -1,0 +1,15 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /post_images/{allPaths=**} {
+      // Anyone logged in can upload/read post images
+      allow read: if true;
+      allow write: if request.auth != null
+                   && request.resource.size < 10 * 1024 * 1024; // 10 MB max
+    }
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

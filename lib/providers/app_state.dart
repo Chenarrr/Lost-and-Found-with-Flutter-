@@ -132,16 +132,39 @@ class AppState extends ChangeNotifier {
       standardizedPhone = '+964${standardizedPhone.substring(1)}';
     }
 
+    debugPrint('[Auth] Verifying phone: $standardizedPhone');
+
     try {
       await _auth.verifyPhoneNumber(
         phoneNumber: standardizedPhone,
         verificationCompleted: (PhoneAuthCredential credential) async {
-          await _signInWithCredential(credential);
+          debugPrint('[Auth] Auto-verification completed');
+          try {
+            await _signInWithCredential(credential);
+          } catch (e) {
+            debugPrint('[Auth] Error signing in with auto-credential: $e');
+          }
         },
         verificationFailed: (FirebaseAuthException e) {
-          onCodeSent(e.message ?? 'Verification failed');
+          debugPrint('[Auth] Verification failed: ${e.code} - ${e.message}');
+          String errorMsg;
+          switch (e.code) {
+            case 'invalid-phone-number':
+              errorMsg = 'Invalid phone number format.';
+              break;
+            case 'too-many-requests':
+              errorMsg = 'Too many attempts. Try again later.';
+              break;
+            case 'app-not-authorized':
+              errorMsg = 'Phone auth is not enabled. Please contact support.';
+              break;
+            default:
+              errorMsg = e.message ?? 'Verification failed. Please try again.';
+          }
+          onCodeSent(errorMsg);
         },
         codeSent: (String verificationId, int? resendToken) {
+          debugPrint('[Auth] Code sent, verificationId received');
           _verificationId = verificationId;
           onCodeSent(null); // null means success
         },
@@ -151,7 +174,10 @@ class AppState extends ChangeNotifier {
         timeout: const Duration(seconds: 60),
       );
     } catch (e) {
-      onCodeSent('An error occurred. Make sure internet connection is active.');
+      debugPrint('[Auth] Unexpected error in verifyPhoneNumber: $e');
+      onCodeSent(
+        'An error occurred: ${e.toString().length > 100 ? e.toString().substring(0, 100) : e.toString()}',
+      );
     }
   }
 
@@ -207,31 +233,6 @@ class AppState extends ChangeNotifier {
         await _loadUser(firebaseUser.uid);
       }
     }
-  }
-
-  // Backwards compatibility for the demo screens.
-  String initiateOtp(String phone) {
-    return '123456';
-  }
-
-  bool verifyOtp(String phone, String code) {
-    return true;
-  }
-
-  Future<String?> login({
-    required String identifier,
-    required String password,
-  }) async {
-    return 'Please use "Login with Phone" above. Password login is disabled.';
-  }
-
-  Future<String?> signup({
-    required String name,
-    required String phone,
-    String? email,
-    required String password,
-  }) async {
-    return null;
   }
 
   Future<void> logout() async {

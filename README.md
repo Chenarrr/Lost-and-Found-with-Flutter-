@@ -1,173 +1,113 @@
-# Find It — Lost & Found Flutter App
+# Find It — Unified Lost & Found Infrastructure
 
-Find It is a Flutter app that helps users report and discover lost and found items.
-The app currently runs fully client-side with local persistence (`shared_preferences`) and is optimized for clear UX, consistent design, and stable behavior.
+[![Flutter](https://img.shields.io/badge/Flutter-v3.27-blue.svg)](https://flutter.dev)
+[![Firebase](https://img.shields.io/badge/Firebase-v11.0-orange.svg)](https://firebase.google.com)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-## What This Version Improves
+A production-grade, community-driven platform designed to reunite lost items with their owners across Kurdistan. Built with a focus on high-performance, security-first architecture, and a premium mobile user experience.
 
-- Easier user flows on key screens (`Auth`, `Create Post`, `Post Details`, `Activity`)
-- Unified color and component styling across the app
-- More resilient startup routing (`RootRouter` waits for state hydration)
-- Stronger input normalization for signup/login (trimmed phone/email handling)
-- Better error feedback for actions like report, comment, image pick, and WhatsApp launch
-- Smoother navigation and state retention in bottom tabs
-- Full-screen post creation flow with direct Home shortcut
+---
 
-## Features
+## 🏗 System Architecture
 
-- Local signup/login session flow (with OTP simulation)
-- Create lost/found posts with category, location, and up to 3 images
-- City is selection-only in create post (dropdown, no free-text city input)
-- Tapping `Post` opens a dedicated full-screen create-post page
-- Create-post app bar includes a top-right Home button for quick return
-- Search and city filtering on Home
-- Post detail with comments, reporting, and WhatsApp contact
-- Activity tab for personal posts and comment history
-- Profile + settings with logout confirmation
+The application follows a modular, reactive architecture leveraging **Provider** for state management and **Firebase** for a scalable, serverless backend.
 
-## Tech Stack
+### Core Tech Stack
 
-- Flutter (Material 3)
-- Provider (`ChangeNotifier`) for state management
-- `shared_preferences` for local storage
-- `cached_network_image`, `image_picker`, `url_launcher`
-- `google_fonts` (Inter), `timeago`, `uuid`
+- **Frontend**: Flutter (Material 3) with a custom design system.
+- **State Management**: Reactive `ChangeNotifier` patterns via Provider.
+- **Backend-as-a-Service**: Firebase Core.
+  - **Authentication**: Secure Phone-based OTP (No-password architecture).
+  - **Database**: Cloud Firestore (Real-time, NoSQL).
+  - **Storage**: Cloud Storage for heavy media assets.
+- **Design System**: Atomic design principles with centralized tokens in `app_colors.dart`.
 
-## Project Structure
+---
+
+## 🔐 Security & Data Governance
+
+This system is built with **Production-Ready Security Rules** to ensure data integrity and user privacy.
+
+### Firestore Security Layer
+
+- **Identity Enforcement**: Users can only modify their own profile documents (`/users/{userId}`).
+- **Content Governance**: Public read-access for listings, but write-access is restricted to authenticated owners.
+- **Data Validation**: Strict schema enforcement at the database level (e.g., name length validation, type checking).
+
+### Storage Governance
+
+- **Access Control**: Publicly readable post-media with authenticated-only write permissions.
+- **Payload Restrictions**: Hard limit of 10MB per image to prevent storage exhaustion.
+
+---
+
+## 🍎 iOS Implementation Guide (Apple-First)
+
+The system is optimized for the Apple ecosystem. Follow these critical steps to ensure seamless redirect handling on iOS devices.
+
+### 1. URL Scheme Configuration
+
+To handle the reCAPTCHA redirect during Phone Auth, the `REVERSED_CLIENT_ID` must be registered as a URL Type in Xcode.
+
+- **File**: `ios/Runner/Info.plist`
+- **Key**: `CFBundleURLTypes` -> `CFBundleURLSchemes`
+- **ID**: `com.googleusercontent.apps.400649966615-gk79sn6p96r4fre6ssqrs5nt1cnp7ov3`
+
+### 2. Firebase Identity
+
+The iOS application is registered with the bundle ID `com.example.flutterApplication`. Ensure the `GoogleService-Info.plist` is synchronized across all build targets.
+
+---
+
+## 📋 Production Launch Checklist
+
+Before making the system live, ensure the following DevOps tasks are performed in the [Firebase Console](https://console.firebase.google.com):
+
+1. **[REQUIRED] Upgrade to Blaze Plan**: Firebase Storage requires the Pay-As-You-Go plan to handle production image uploads.
+2. **[REQUIRED] Support Email**: Verify that a support email is configured in Project Settings to prevent OAuth verification failures.
+3. **[OPTIONAL] Android Integration**: If expanding to Android, register the SHA-1/SHA-256 fingerprints in the Firebase Console.
+
+---
+
+## 🛠 Maintenance & Deployment
+
+### Deployment Commands
+
+Deploy security rules updates:
+
+```bash
+firebase deploy --only firestore:rules,storage
+```
+
+### Local Development
+
+```bash
+# Sync dependencies
+flutter pub get
+
+# Execute Unit & Widget tests
+flutter test
+
+# Generate iOS Build
+flutter build ios --release
+```
+
+---
+
+## 📂 Project Structure
 
 ```text
 lib/
-├── main.dart
-├── config/
-│   └── app_colors.dart
-├── models/
-│   ├── comment.dart
-│   ├── post.dart
-│   └── user.dart
-├── providers/
-│   └── app_state.dart
-├── routes/
-│   ├── main_page.dart
-│   └── root_router.dart
-├── screens/
-│   ├── activity_screen.dart
-│   ├── create_post_sheet.dart
-│   ├── home_screen.dart
-│   ├── post_detail_screen.dart
-│   ├── profile_screen.dart
-│   ├── settings_screen.dart
-│   └── auth/
-│       ├── auth_screen.dart
-│       ├── otp_screen.dart
-│       └── welcome_screen.dart
-└── widgets/
-    ├── phone_input_formatter.dart
-    └── post_card.dart
-
-test/
-├── models/
-├── providers/
-└── widget_test.dart
+├── config/             # Static configurations & Color Tokens
+├── models/             # Immutable data structures (User, Post, Comment)
+├── providers/          # Global Business Logic (AppState)
+├── routes/             # Navigation Logic & Guards
+├── screens/            # UI Layer (Auth, Home, Profile, etc.)
+└── widgets/            # Reusable Atomic UI Components
 ```
 
-## Setup
+---
 
-### Prerequisites
+## 📜 License
 
-- Flutter SDK `>=3.x`
-- Dart SDK `>=3.9.2`
-- Android Studio or VS Code with Flutter extension
-
-### Install and run
-
-```bash
-git clone <repository-url>
-cd Lost-and-Found-with-Flutter-
-flutter pub get
-flutter run
-```
-
-## Development Commands
-
-```bash
-dart format .
-flutter analyze
-flutter test
-flutter test --coverage
-flutter build apk --release
-flutter build web --release
-```
-
-## Design System Notes
-
-- Single font family: **Inter**
-- Color tokens are centralized in `lib/config/app_colors.dart`
-- Shared component style is defined in `ThemeData` (`lib/main.dart`)
-- Lost/found states use dedicated semantic colors (red/green)
-- Neutral surfaces and borders are consistent across cards, forms, and chips
-
-## State and Persistence
-
-- `AppState` hydrates session + posts from local storage at startup
-- `RootRouter` shows a loading indicator until hydration completes
-- Session is stored separately from registered user data
-- Posts, comments, and reports are persisted locally
-
-## Navigation and UX
-
-- Bottom-tab pages are kept alive with `IndexedStack` for smoother switching
-- Search input on Home uses lightweight debouncing for smoother typing/filtering
-- Activity and feed lists use tuned list rendering (`ListView.builder` + cache extent)
-- Post creation uses full-screen route navigation instead of a modal bottom sheet
-
-## Testing
-
-Current test coverage includes:
-
-- Model serialization and immutability
-- `AppState` authentication/post/comment/report flows
-- Core widget smoke flow
-
-Run:
-
-```bash
-flutter test
-```
-
-## Production Readiness Checklist
-
-Completed in this repo:
-
-- Consistent theming and UI feedback patterns
-- Startup hydration guard before routing
-- Safer async action handling and error feedback
-- Input validation and normalization on auth and post forms
-- Structured CI/CD workflows (`.github/workflows/ci.yml`, `.github/workflows/cd.yml`)
-- Automated tests passing
-
-Required before real production deployment:
-
-- Replace local auth with secure backend auth (token/session management)
-- Move posts/comments/reports to backend database
-- Add server-side moderation and anti-abuse controls
-- Add privacy policy, terms, and data-retention policy
-- Add analytics/crash reporting (e.g. Firebase Crashlytics)
-- Add secrets/config management per environment
-- Add offline/online sync conflict strategy
-- Add accessibility audit and localization coverage
-- Add integration/end-to-end tests on release pipeline
-
-## CI/CD
-
-- CI (`ci.yml`): format check, analyze, tests, coverage upload
-- CD (`cd.yml`): release build artifacts for Android and Web
-
-## Current Limitations
-
-- Data is local to the device (no shared backend)
-- OTP is simulated for demo flow
-- Login credentials are not cryptographically secured (local demo behavior)
-
-## License
-
-Use your project license here (MIT/Apache-2.0/etc.).
+This project is licensed under the **MIT License**.

@@ -20,6 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Timer? _searchDebounce;
   String _searchQuery = '';
   String _cityFilter = 'All Cities';
+  PostType? _typeFilter;
   final List<String> _cities = [
     'All Cities',
     'Erbil',
@@ -47,6 +48,41 @@ class _HomeScreenState extends State<HomeScreen> {
       if (!mounted) return;
       setState(() => _searchQuery = value.trim().toLowerCase());
     });
+  }
+
+  Widget _typeChip(String label, PostType? type) {
+    final isActive = _typeFilter == type;
+    final Color activeColor;
+    if (type == PostType.lost) {
+      activeColor = AppColors.lostPrimary;
+    } else if (type == PostType.found) {
+      activeColor = AppColors.foundPrimary;
+    } else {
+      activeColor = AppColors.primaryBlue;
+    }
+    return ChoiceChip(
+      label: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        child: Text(
+          label,
+          style: GoogleFonts.inter(
+            color: isActive ? Colors.white : AppColors.textPrimary,
+            fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+            fontSize: 14,
+          ),
+        ),
+      ),
+      selected: isActive,
+      onSelected: (_) => setState(() => _typeFilter = type),
+      selectedColor: activeColor,
+      backgroundColor: AppColors.cardWhite,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+      ),
+      side: const BorderSide(color: AppColors.borderGray),
+      elevation: isActive ? 2 : 0,
+      shadowColor: isActive ? activeColor.withAlpha(50) : Colors.transparent,
+    );
   }
 
   Widget _buildStatsChip({
@@ -101,7 +137,9 @@ class _HomeScreenState extends State<HomeScreen> {
           post.itemName.toLowerCase().contains(_searchQuery) ||
           post.city.toLowerCase().contains(_searchQuery) ||
           post.street.toLowerCase().contains(_searchQuery);
-      return matchesCity && matchesSearch;
+      final matchesType =
+          _typeFilter == null || post.type == _typeFilter;
+      return matchesCity && matchesSearch && matchesType;
     }).toList();
     final lostCount = posts.where((post) => post.type == PostType.lost).length;
     final foundCount = posts.length - lostCount;
@@ -258,6 +296,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               },
             ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              _typeChip('All', null),
+              const SizedBox(width: 8),
+              _typeChip('Lost', PostType.lost),
+              const SizedBox(width: 8),
+              _typeChip('Found', PostType.found),
+            ],
           ),
           const SizedBox(height: 14),
           if (posts.isEmpty)

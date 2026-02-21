@@ -3,6 +3,19 @@ import 'package:flutter_application/models/post.dart';
 import 'package:flutter_application/models/comment.dart';
 
 void main() {
+  group('PostCategory', () {
+    test('has all four values', () {
+      expect(PostCategory.values.length, 4);
+    });
+
+    test('displayName returns human-readable strings', () {
+      expect(PostCategory.electronics.displayName, 'Electronics');
+      expect(PostCategory.documents.displayName, 'Documents');
+      expect(PostCategory.personalItems.displayName, 'Personal Items');
+      expect(PostCategory.pets.displayName, 'Pets');
+    });
+  });
+
   group('PostType', () {
     test('has lost and found values', () {
       expect(PostType.values, contains(PostType.lost));

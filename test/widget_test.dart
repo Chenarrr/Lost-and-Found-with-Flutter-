@@ -41,8 +41,8 @@ void main() {
       await tester.tap(find.text('Get Started'));
       await tester.pumpAndSettle();
 
-      // Tap Login button
-      await tester.tap(find.widgetWithText(ElevatedButton, 'Login').first);
+      // Tap Send OTP button
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Send OTP').first);
       await tester.pumpAndSettle();
 
       // Form validation triggers — no crash

@@ -15,6 +15,7 @@ class AppState extends ChangeNotifier {
   bool _isInitialized = false;
   User? currentUser;
   List<Post> posts = [];
+  StreamSubscription<QuerySnapshot>? _postsSubscription;
 
   // OTP State
   String? _verificationId;
@@ -62,16 +63,6 @@ class AppState extends ChangeNotifier {
       _isInitialized = true;
       notifyListeners();
     });
-
-    // In test environments, authStateChanges might never emit.
-    // We add a safety timeout to ensure initialization completes.
-    Future.delayed(const Duration(milliseconds: 5), () {
-      if (!_isInitialized) {
-        _isInitialized = true;
-        _listenToPosts();
-        notifyListeners();
-      }
-    });
   }
 
   Future<void> _loadUser(String uid) async {
@@ -95,7 +86,8 @@ class AppState extends ChangeNotifier {
   }
 
   void _listenToPosts() {
-    _firestore
+    _postsSubscription?.cancel();
+    _postsSubscription = _firestore
         .collection('posts')
         .orderBy('createdAt', descending: true)
         .snapshots()

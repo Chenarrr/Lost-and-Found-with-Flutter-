@@ -179,6 +179,13 @@ class _AuthScreenState extends State<AuthScreen>
                                   if (value == null || value.trim().isEmpty) {
                                     return 'Required';
                                   }
+                                  final clean = value.replaceAll(
+                                    RegExp(r'\s'),
+                                    '',
+                                  );
+                                  if (!_phoneReg.hasMatch(clean)) {
+                                    return 'Enter 11 digits: 0750 222 34 44';
+                                  }
                                   return null;
                                 },
                                 onSubmitted: (_) => _doLogin(),

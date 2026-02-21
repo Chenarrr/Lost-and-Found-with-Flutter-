@@ -76,9 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
       onSelected: (_) => setState(() => _typeFilter = type),
       selectedColor: activeColor,
       backgroundColor: AppColors.cardWhite,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       side: const BorderSide(color: AppColors.borderGray),
       elevation: isActive ? 2 : 0,
       shadowColor: isActive ? activeColor.withAlpha(50) : Colors.transparent,
@@ -137,8 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
           post.itemName.toLowerCase().contains(_searchQuery) ||
           post.city.toLowerCase().contains(_searchQuery) ||
           post.street.toLowerCase().contains(_searchQuery);
-      final matchesType =
-          _typeFilter == null || post.type == _typeFilter;
+      final matchesType = _typeFilter == null || post.type == _typeFilter;
       return matchesCity && matchesSearch && matchesType;
     }).toList();
     final lostCount = posts.where((post) => post.type == PostType.lost).length;

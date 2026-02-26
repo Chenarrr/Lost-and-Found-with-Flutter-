@@ -430,10 +430,15 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                   child: ElevatedButton.icon(
                     onPressed: () =>
                         _contactViaWhatsApp(post.userPhone, post.itemName),
-                    icon: const Icon(Icons.message_outlined),
+                    icon: const Icon(Icons.chat_rounded),
                     label: Text(
                       'Contact via WhatsApp',
                       style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.whatsappGreen,
+                      foregroundColor: Colors.white,
+                      shadowColor: AppColors.whatsappDark.withAlpha(80),
                     ),
                   ),
                 ),

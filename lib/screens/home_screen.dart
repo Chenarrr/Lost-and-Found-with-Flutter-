@@ -61,25 +61,21 @@ class _HomeScreenState extends State<HomeScreen> {
       activeColor = AppColors.primaryBlue;
     }
     return ChoiceChip(
-      label: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-        child: Text(
-          label,
-          style: GoogleFonts.inter(
-            color: isActive ? Colors.white : AppColors.textPrimary,
-            fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-            fontSize: 14,
-          ),
+      label: Text(
+        label,
+        style: GoogleFonts.inter(
+          color: isActive ? Colors.white : AppColors.textPrimary,
+          fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+          fontSize: 14,
         ),
       ),
       selected: isActive,
+      showCheckmark: false,
       onSelected: (_) => setState(() => _typeFilter = type),
       selectedColor: activeColor,
       backgroundColor: AppColors.cardWhite,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
       side: const BorderSide(color: AppColors.borderGray),
-      elevation: isActive ? 2 : 0,
-      shadowColor: isActive ? activeColor.withAlpha(50) : Colors.transparent,
     );
   }
 
@@ -255,41 +251,24 @@ class _HomeScreenState extends State<HomeScreen> {
               itemBuilder: (_, index) {
                 final city = _cities[index];
                 final isActive = city == _cityFilter;
-                return AnimatedContainer(
-                  duration: const Duration(milliseconds: 250),
-                  curve: Curves.easeOut,
-                  child: ChoiceChip(
-                    label: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      child: Text(
-                        city,
-                        style: GoogleFonts.inter(
-                          color: isActive
-                              ? Colors.white
-                              : AppColors.textPrimary,
-                          fontWeight: isActive
-                              ? FontWeight.w600
-                              : FontWeight.w500,
-                          fontSize: 14,
-                        ),
-                      ),
+                return ChoiceChip(
+                  label: Text(
+                    city,
+                    style: GoogleFonts.inter(
+                      color: isActive ? Colors.white : AppColors.textPrimary,
+                      fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+                      fontSize: 14,
                     ),
-                    selected: isActive,
-                    onSelected: (_) => setState(() => _cityFilter = city),
-                    selectedColor: AppColors.primaryBlue,
-                    backgroundColor: AppColors.cardWhite,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    side: const BorderSide(color: AppColors.borderGray),
-                    elevation: isActive ? 2 : 0,
-                    shadowColor: isActive
-                        ? AppColors.primaryBlue.withAlpha(45)
-                        : Colors.transparent,
                   ),
+                  selected: isActive,
+                  showCheckmark: false,
+                  onSelected: (_) => setState(() => _cityFilter = city),
+                  selectedColor: AppColors.primaryBlue,
+                  backgroundColor: AppColors.cardWhite,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  side: const BorderSide(color: AppColors.borderGray),
                 );
               },
             ),

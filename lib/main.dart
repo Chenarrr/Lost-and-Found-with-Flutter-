@@ -103,9 +103,10 @@ class FindItApp extends StatelessWidget {
             backgroundColor: Colors.white,
             selectedColor: AppColors.primaryBlue,
             disabledColor: AppColors.borderGray,
+            showCheckmark: false,
             side: const BorderSide(color: AppColors.borderGray),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(999),
             ),
             labelStyle: GoogleFonts.inter(color: AppColors.textPrimary),
             secondaryLabelStyle: GoogleFonts.inter(color: Colors.white),

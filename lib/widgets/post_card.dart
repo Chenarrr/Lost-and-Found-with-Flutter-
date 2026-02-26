@@ -104,7 +104,7 @@ class PostCard extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color: accentColor,
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(999),
                           ),
                           child: Text(
                             post.type.name.toUpperCase(),
@@ -122,7 +122,7 @@ class PostCard extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color: softColor,
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(999),
                           ),
                           child: Text(
                             post.category.displayName,
@@ -141,7 +141,7 @@ class PostCard extends StatelessWidget {
                             ),
                             decoration: BoxDecoration(
                               color: AppColors.foundLight,
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(999),
                             ),
                             child: Text(
                               '✓ RESOLVED',

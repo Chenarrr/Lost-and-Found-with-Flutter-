@@ -16,6 +16,8 @@ class AppColors {
   static const Color foundPrimary = Color(0xFF1FA66A);
   static const Color foundLight = Color(0xFFEAF9F1);
   static const Color foundDark = Color(0xFF117A4A);
+  static const Color whatsappGreen = Color(0xFF25D366);
+  static const Color whatsappDark = Color(0xFF128C7E);
 
   // Extras
   static const Color bannerBg = Color(0xFFF0F7FF);

@@ -30,11 +30,9 @@ class AppState extends ChangeNotifier {
 
   StreamSubscription<dynamic>? _authSubscription;
 
-  AppState({
-    FirebaseAuth? auth,
-    FirebaseFirestore? firestore,
-  }) : _mockAuth = auth,
-       _mockFirestore = firestore {
+  AppState({FirebaseAuth? auth, FirebaseFirestore? firestore})
+    : _mockAuth = auth,
+      _mockFirestore = firestore {
     final isTest = Platform.environment.containsKey('FLUTTER_TEST');
     if (!isTest || auth != null) {
       _init();
@@ -269,12 +267,17 @@ class AppState extends ChangeNotifier {
 
   // ── Posts & Storage ──────────────────────────────────────────────────────
 
-  Future<String?> _uploadToImgBB(String filePath, {required String name}) async {
+  Future<String?> _uploadToImgBB(
+    String filePath, {
+    required String name,
+  }) async {
     try {
       final bytes = await File(filePath).readAsBytes();
       final base64Image = base64Encode(bytes);
       final response = await http.post(
-        Uri.parse('https://api.imgbb.com/1/upload?key=${dotenv.env['IMGBB_API_KEY']}'),
+        Uri.parse(
+          'https://api.imgbb.com/1/upload?key=${dotenv.env['IMGBB_API_KEY']}',
+        ),
         body: {'image': base64Image, 'name': name},
       );
       if (response.statusCode == 200) {

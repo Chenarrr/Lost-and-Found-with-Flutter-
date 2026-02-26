@@ -217,7 +217,9 @@ class ProfileScreen extends StatelessWidget {
               ),
             )
           else
-            ...userPosts.map((post) => PostCard(key: ValueKey(post.id), post: post)),
+            ...userPosts.map(
+              (post) => PostCard(key: ValueKey(post.id), post: post),
+            ),
         ],
       ),
     );

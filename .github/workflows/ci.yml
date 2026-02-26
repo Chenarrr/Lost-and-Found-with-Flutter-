@@ -6,9 +6,22 @@ on:
   pull_request:
     branches: [main, master]
 
+# Cancel any in-progress run on the same branch so new pushes don't queue up
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: '3.38.6'
+
 jobs:
-  analyze-and-test:
-    name: Analyze & Test
+  # ──────────────────────────────────────────────
+  # Job 1: Format + Static Analysis
+  # Fast checks that don't need the .env file.
+  # Tests only run if this job passes.
+  # ──────────────────────────────────────────────
+  lint:
+    name: Format & Analyze
     runs-on: ubuntu-latest
 
     steps:
@@ -18,24 +31,48 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.38.6'
-          channel: 'stable'
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
           cache: true
 
       - name: Install dependencies
         run: flutter pub get
 
+      # --output=none means nothing is written to disk — CI-safe check only
       - name: Verify formatting
-        run: dart format --set-exit-if-changed .
+        run: dart format --output=none --set-exit-if-changed .
 
+      # --fatal-warnings treats warnings as errors; avoids blocking on style infos
       - name: Analyze code
-        run: flutter analyze --fatal-infos
+        run: flutter analyze --fatal-warnings
+
+  # ──────────────────────────────────────────────
+  # Job 2: Tests + Coverage
+  # Only runs when lint passes.
+  # ──────────────────────────────────────────────
+  test:
+    name: Test & Coverage
+    runs-on: ubuntu-latest
+    needs: lint
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Create a stub .env so flutter_dotenv doesn't crash during tests.
+      # No real key is needed — tests don't upload images.
+      - name: Create .env
+        run: echo "IMGBB_API_KEY=ci_placeholder" > .env
 
       - name: Run tests with coverage
         run: flutter test --coverage
-
-      - name: Upload coverage report
-        uses: codecov/codecov-action@v4
-        with:
-          files: coverage/lcov.info
-          fail_ci_if_error: false

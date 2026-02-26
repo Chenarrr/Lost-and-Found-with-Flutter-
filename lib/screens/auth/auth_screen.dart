@@ -107,11 +107,7 @@ class _AuthScreenState extends State<AuthScreen>
         } else {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (_) => OtpScreen(
-                phone: phone,
-                name: '',
-                email: null,
-              ),
+              builder: (_) => OtpScreen(phone: phone, name: '', email: null),
             ),
           );
         }

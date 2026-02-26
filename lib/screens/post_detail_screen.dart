@@ -46,7 +46,9 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   Future<void> _contactViaWhatsApp(String phone, String itemName) async {
     final message = Uri.encodeComponent('Hi, I saw your post about: $itemName');
     final cleanPhone = phone.trim().replaceAll(RegExp(r'[\s+]'), '');
-    final whatsappUrl = Uri.parse('whatsapp://send?phone=$cleanPhone&text=$message');
+    final whatsappUrl = Uri.parse(
+      'whatsapp://send?phone=$cleanPhone&text=$message',
+    );
     final webUrl = Uri.parse('https://wa.me/$cleanPhone?text=$message');
 
     try {
@@ -426,7 +428,9 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                 radius: 14,
                                 backgroundColor: AppColors.primaryBlue,
                                 child: Text(
-                                  comment.userName.isNotEmpty ? comment.userName[0].toUpperCase() : '?',
+                                  comment.userName.isNotEmpty
+                                      ? comment.userName[0].toUpperCase()
+                                      : '?',
                                   style: GoogleFonts.inter(
                                     color: Colors.white,
                                     fontSize: 12,

@@ -45,18 +45,16 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
   Future<void> _contactViaWhatsApp(String phone, String itemName) async {
     final message = Uri.encodeComponent('Hi, I saw your post about: $itemName');
-    final url = Uri.parse(
-      'https://wa.me/${phone.replaceAll('+', '')}?text=$message',
-    );
+    final cleanPhone = phone.trim().replaceAll(RegExp(r'[\s+]'), '');
+    final whatsappUrl = Uri.parse('whatsapp://send?phone=$cleanPhone&text=$message');
+    final webUrl = Uri.parse('https://wa.me/$cleanPhone?text=$message');
 
     try {
-      final canLaunch = await canLaunchUrl(url);
-      if (!canLaunch) {
-        if (!mounted) return;
-        _showMessage('Could not open WhatsApp.', isError: true);
-        return;
+      if (await canLaunchUrl(whatsappUrl)) {
+        await launchUrl(whatsappUrl);
+      } else {
+        await launchUrl(webUrl, mode: LaunchMode.externalApplication);
       }
-      await launchUrl(url, mode: LaunchMode.externalApplication);
     } catch (_) {
       if (!mounted) return;
       _showMessage('Could not open WhatsApp.', isError: true);

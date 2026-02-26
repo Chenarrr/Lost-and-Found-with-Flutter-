@@ -234,7 +234,14 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.select<AppState, dynamic>((app) => app.currentUser);
+    // Use typed primitives — avoids the _dependents.isEmpty assertion that
+    // fires when `dynamic` is used and auth state changes during navigation.
+    final userName = context.select<AppState, String>(
+      (app) => app.currentUser?.name ?? '',
+    );
+    final userPhone = context.select<AppState, String>(
+      (app) => app.currentUser?.phone ?? '',
+    );
 
     return Scaffold(
       appBar: AppBar(title: Text('Settings', style: GoogleFonts.inter())),
@@ -259,9 +266,7 @@ class SettingsScreen extends StatelessWidget {
                   radius: 26,
                   backgroundColor: AppColors.primaryBlue,
                   child: Text(
-                    user?.name?.isNotEmpty == true
-                        ? user.name[0].toUpperCase()
-                        : '?',
+                    userName.isNotEmpty ? userName[0].toUpperCase() : '?',
                     style: GoogleFonts.inter(
                       color: Colors.white,
                       fontSize: 20,
@@ -274,7 +279,7 @@ class SettingsScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      user?.name ?? 'Unknown',
+                      userName.isNotEmpty ? userName : 'Unknown',
                       style: GoogleFonts.inter(
                         fontSize: 17,
                         fontWeight: FontWeight.w700,
@@ -283,7 +288,7 @@ class SettingsScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      user?.phone ?? '',
+                      userPhone,
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         color: AppColors.textSecondary,

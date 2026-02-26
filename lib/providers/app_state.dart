@@ -261,13 +261,13 @@ class AppState extends ChangeNotifier {
 
   // ── Posts & Storage ──────────────────────────────────────────────────────
 
-  Future<String?> _uploadToImgBB(String filePath) async {
+  Future<String?> _uploadToImgBB(String filePath, {required String name}) async {
     try {
       final bytes = await File(filePath).readAsBytes();
       final base64Image = base64Encode(bytes);
       final response = await http.post(
         Uri.parse('https://api.imgbb.com/1/upload?key=${dotenv.env['IMGBB_API_KEY']}'),
-        body: {'image': base64Image},
+        body: {'image': base64Image, 'name': name},
       );
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -288,7 +288,10 @@ class AppState extends ChangeNotifier {
         uploadedUrls.add(path);
         continue;
       }
-      final url = await _uploadToImgBB(path);
+      final url = await _uploadToImgBB(
+        path,
+        name: '${post.itemName}_${post.userPhone}',
+      );
       if (url != null) uploadedUrls.add(url);
     }
 

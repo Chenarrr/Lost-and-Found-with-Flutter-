@@ -265,6 +265,59 @@ class AppState extends ChangeNotifier {
     await _auth.signOut();
   }
 
+  Future<void> markPostResolved(String postId) async {
+    await _firestore.collection('posts').doc(postId).update({
+      'isResolved': true,
+    });
+  }
+
+  Future<void> resendOtp(Function(String?) onCodeSent) async {
+    if (_pendingPhone == null) {
+      onCodeSent('No phone number. Please go back and try again.');
+      return;
+    }
+    _verifyPhone(_pendingPhone!, onCodeSent);
+  }
+
+  Future<String?> deleteAccount() async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return 'Not logged in.';
+    try {
+      final snap = await _firestore
+          .collection('posts')
+          .where('userId', isEqualTo: uid)
+          .get();
+      for (final doc in snap.docs) {
+        await doc.reference.delete();
+      }
+      await _firestore.collection('users').doc(uid).delete();
+      await _auth.currentUser!.delete();
+      return null;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'requires-recent-login') {
+        return 'Please log out and log back in before deleting your account.';
+      }
+      return e.message ?? 'Failed to delete account.';
+    } catch (e) {
+      debugPrint('Error deleting account: $e');
+      return 'Failed to delete account.';
+    }
+  }
+
+  Future<String?> updateUserName(String newName) async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null || currentUser == null) return 'Not logged in.';
+    try {
+      await _firestore.collection('users').doc(uid).update({'name': newName});
+      currentUser = currentUser!.copyWith(name: newName);
+      notifyListeners();
+      return null;
+    } catch (e) {
+      debugPrint('Error updating name: $e');
+      return 'Failed to update name.';
+    }
+  }
+
   // ── Posts & Storage ──────────────────────────────────────────────────────
 
   Future<String?> _uploadToImgBB(

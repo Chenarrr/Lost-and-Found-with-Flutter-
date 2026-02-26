@@ -8,6 +8,7 @@ import 'package:flutter_application/models/post.dart';
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
@@ -63,6 +64,20 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     }
   }
 
+  void _sharePost(Post post) {
+    final type = post.type.name.toUpperCase();
+    final desc = post.description?.isNotEmpty == true
+        ? '\n\n${post.description}'
+        : '';
+    Share.share(
+      '$type: ${post.itemName}\n'
+      '📍 ${post.city}, ${post.street}\n'
+      '👤 ${post.userName}  📞 ${post.userPhone}'
+      '$desc\n\n'
+      'Shared via Find It app',
+    );
+  }
+
   Future<void> _confirmReport(AppState app, Post post) async {
     final currentUser = app.currentUser;
     if (currentUser == null) {
@@ -109,6 +124,40 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     await app.reportPost(post.id, currentUser.id);
     if (!mounted) return;
     _showMessage('Post reported. Thank you.');
+  }
+
+  Future<void> _markResolved(AppState app, Post post) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('Mark as Resolved', style: GoogleFonts.inter()),
+        content: Text(
+          'Mark this post as resolved? Others will see it has been closed.',
+          style: GoogleFonts.inter(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text('Cancel', style: GoogleFonts.inter()),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(
+              'Mark Resolved',
+              style: GoogleFonts.inter(
+                color: AppColors.foundPrimary,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+    await app.markPostResolved(post.id);
+    if (!mounted) return;
+    _showMessage('Post marked as resolved.');
   }
 
   Future<void> _addComment(AppState app, Post post) async {
@@ -212,7 +261,16 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     final typeColor = isLost ? AppColors.lostPrimary : AppColors.foundPrimary;
 
     return Scaffold(
-      appBar: AppBar(title: Text('Post Details', style: GoogleFonts.inter())),
+      appBar: AppBar(
+        title: Text('Post Details', style: GoogleFonts.inter()),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.share_outlined),
+            tooltip: 'Share',
+            onPressed: () => _sharePost(post),
+          ),
+        ],
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -282,6 +340,27 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                         ),
                       ),
                     ),
+                    if (post.isResolved) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.foundLight,
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Text(
+                          '✓ RESOLVED',
+                          style: GoogleFonts.inter(
+                            color: AppColors.foundDark,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
                     const Spacer(),
                     TextButton(
                       onPressed: () => _confirmReport(app, post),
@@ -485,6 +564,61 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                   ),
                 ),
                 if (isOwner) ...[
+                  const SizedBox(height: 8),
+                  // Mark as resolved — only show if not yet resolved
+                  if (!post.isResolved)
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () => _markResolved(app, post),
+                        icon: const Icon(
+                          Icons.check_circle_outline,
+                          color: AppColors.foundPrimary,
+                        ),
+                        label: Text(
+                          'Mark as Resolved',
+                          style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.foundPrimary,
+                          side: const BorderSide(color: AppColors.foundPrimary),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    )
+                  else
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 16,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.foundLight,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.foundPrimary),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.check_circle,
+                            color: AppColors.foundPrimary,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Item Resolved',
+                            style: GoogleFonts.inter(
+                              color: AppColors.foundDark,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   const SizedBox(height: 8),
                   SizedBox(
                     width: double.infinity,

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/providers/app_state.dart';
@@ -26,9 +28,36 @@ class _OtpScreenState extends State<OtpScreen> {
   bool _loading = false;
   String? _error;
 
+  // Resend countdown
+  int _secondsLeft = 60;
+  bool _resendLoading = false;
+  Timer? _resendTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _startCountdown();
+  }
+
+  void _startCountdown() {
+    _resendTimer?.cancel();
+    setState(() => _secondsLeft = 60);
+    _resendTimer = Timer.periodic(const Duration(seconds: 1), (t) {
+      if (!mounted) {
+        t.cancel();
+        return;
+      }
+      setState(() {
+        _secondsLeft--;
+        if (_secondsLeft <= 0) t.cancel();
+      });
+    });
+  }
+
   @override
   void dispose() {
     _otpController.dispose();
+    _resendTimer?.cancel();
     super.dispose();
   }
 
@@ -61,6 +90,32 @@ class _OtpScreenState extends State<OtpScreen> {
       MaterialPageRoute(builder: (_) => const MainPage()),
       (r) => false,
     );
+  }
+
+  Future<void> _resend() async {
+    setState(() {
+      _resendLoading = true;
+      _error = null;
+    });
+
+    final app = Provider.of<AppState>(context, listen: false);
+
+    await app.resendOtp((error) {
+      if (!mounted) return;
+      setState(() => _resendLoading = false);
+      if (error != null) {
+        setState(() => _error = error);
+      } else {
+        _startCountdown();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('New code sent!', style: GoogleFonts.inter()),
+            backgroundColor: AppColors.primaryBlueDark,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    });
   }
 
   @override
@@ -140,6 +195,34 @@ class _OtpScreenState extends State<OtpScreen> {
                         style: GoogleFonts.inter(fontSize: 16),
                       ),
               ),
+            ),
+            const SizedBox(height: 20),
+            Center(
+              child: _resendLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : _secondsLeft > 0
+                  ? Text(
+                      'Resend code in ${_secondsLeft}s',
+                      style: GoogleFonts.inter(
+                        color: AppColors.textTertiary,
+                        fontSize: 14,
+                      ),
+                    )
+                  : TextButton(
+                      onPressed: _resend,
+                      child: Text(
+                        'Resend Code',
+                        style: GoogleFonts.inter(
+                          color: AppColors.primaryBlue,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
             ),
           ],
         ),

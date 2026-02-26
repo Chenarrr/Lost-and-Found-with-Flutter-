@@ -133,6 +133,25 @@ class PostCard extends StatelessWidget {
                             ),
                           ),
                         ),
+                        if (post.isResolved)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.foundLight,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              '✓ RESOLVED',
+                              style: GoogleFonts.inter(
+                                color: AppColors.foundDark,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                     const SizedBox(height: 8),

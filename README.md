@@ -3,89 +3,258 @@
 [![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?logo=flutter)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?logo=dart)](https://dart.dev)
 [![Firebase](https://img.shields.io/badge/Firebase-Auth%20%2B%20Firestore-FFCA28?logo=firebase)](https://firebase.google.com)
+[![CI](https://github.com/Chenarrr/Lost-and-Found-with-Flutter-/actions/workflows/ci.yml/badge.svg)](https://github.com/Chenarrr/Lost-and-Found-with-Flutter-/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-A community-driven mobile app that helps people in Kurdistan report and recover lost and found items. Users post items they've lost or found, browse listings by category, and contact each other directly via WhatsApp — all without passwords.
+**Find It** is a community-driven mobile app that helps people in Kurdistan, Iraq report and recover lost and found items. No passwords, no hassle — sign in with your phone number, post in seconds, and connect with others directly through WhatsApp.
+
+---
+
+## Table of Contents
+
+- [About the App](#about-the-app)
+- [Features](#features)
+- [How to Use](#how-to-use)
+- [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
+- [Getting Started](#getting-started)
+- [Running the App](#running-the-app)
+- [Firebase Setup](#firebase-setup)
+- [Image Uploads — ImgBB](#image-uploads--imgbb)
+- [Testing](#testing)
+- [CI/CD](#cicd)
+- [Environment Variables](#environment-variables)
+- [Project Conventions](#project-conventions)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
+
+## About the App
+
+Find It was built to solve a simple but common problem in Kurdish communities: when someone loses something — a wallet, a phone, a pet, a document — there is no central, easy-to-use platform to report it or search for it. Find It fills that gap.
+
+- Anyone can **browse posts without an account**.
+- Registered users can **post**, **comment**, **contact** owners, and **manage** their own listings.
+- Phone OTP authentication means zero password management — just enter your Iraqi phone number and verify the code.
+- All communication happens through **WhatsApp**, the dominant messaging app in the region.
 
 ---
 
 ## Features
 
-- **Phone-only authentication** — sign up and log in using SMS OTP. No passwords ever stored.
-- **Post listings** — create Lost or Found posts with photos, category, location (city + street), and a description.
-- **Browse & filter** — view all posts on the home feed; filter by Lost/Found and by category.
-- **Post detail** — full post view with image gallery, location, and a comment section.
-- **WhatsApp contact** — one-tap button to open a WhatsApp chat with the post owner.
-- **Activity feed** — see comments and interactions on your own posts.
-- **Profile** — view and manage all posts you've created.
-- **Image upload** — photos are hosted on ImgBB (no Firebase Storage billing required).
-- **Real-time updates** — Firestore live listeners keep posts and comments in sync.
+### Authentication
+- **Phone-only sign-up / login** via SMS OTP — no email, no password
+- **Resend OTP** with a 60-second countdown timer
+- Iraqi phone numbers standardized to `+964` format automatically
+
+### Posts
+- **Create a post** — choose Lost or Found, pick a category, add photos, city, street, and an optional description
+- **Photo upload** — pick from gallery or camera; images are uploaded to ImgBB and stored as URLs
+- **Categories** — Electronics, Documents, Personal Items, Pets
+- **Mark as Resolved** — post owner can close their listing once the item is recovered; a "RESOLVED" badge appears on the card and detail page
+- **Delete a post** — owner can permanently remove their listing
+
+### Home Feed
+- **Real-time updates** — Firestore listeners keep the feed live without manual refresh
+- **Pull-to-refresh** support
+- **Search** by item name, city, or street (debounced)
+- **Filter by city** — Erbil, Sulaymaniyah, Duhok, Halabja, Zakho, Koya
+- **Filter by type** — All / Lost / Found
+- Live stats chip showing count of Lost, Found, and total results
+
+### Post Detail
+- Full description, location, and timestamp
+- Image viewer
+- **Contact via WhatsApp** — opens WhatsApp directly to a pre-filled message; falls back to the web if WhatsApp is not installed
+- **Comments** — any logged-in user can comment; submitted via the in-app text field or keyboard send action
+- **Report** — flag a post as fake or inappropriate (one report per user)
+- **Share** — native share sheet with post summary (text)
+
+### Activity
+- **My Posts** — all posts created by the logged-in user
+- **My Comments** — a chronological list of every comment the user has left, with the post it belongs to
+
+### Profile
+- Avatar with name initial, phone number, and optional email
+- Post stats: total, lost count, found count
+- Quick link to Settings
+
+### Settings
+- **Change Name** — update display name stored in Firestore
+- **Logout** — sign out from the current device
+- **Delete Account** — permanently deletes the account, all posts, and the Firebase Auth record (with re-auth prompt if session is stale)
+- **App version** shown at the bottom
+
+---
+
+## How to Use
+
+### First Time — Sign Up
+
+1. Open the app and tap **Get Started**.
+2. Choose the **Sign Up** tab.
+3. Enter your **full name**, **Iraqi phone number** (e.g. `07501234567`), and optionally your email.
+4. Tap **Send Code** — you will receive an SMS OTP.
+5. Enter the **6-digit code** on the next screen. Tap **Resend Code** if the code doesn't arrive within 60 seconds.
+6. You are now logged in and taken to the home feed.
+
+### Returning User — Log In
+
+1. Open the app and tap **Get Started**.
+2. Choose the **Log In** tab.
+3. Enter your registered phone number and tap **Send Code**.
+4. Enter the OTP to log in.
+
+### Creating a Post
+
+1. Tap the **Post** button (floating action button at the bottom of the home screen) or the **+** icon in the top-right.
+2. Select **Lost** or **Found**.
+3. Choose a **category**: Electronics, Documents, Personal Items, or Pets.
+4. Enter the **item name**, **city**, and **street**.
+5. Add an optional **description**.
+6. Tap the camera/gallery area to attach **photos** (optional).
+7. Tap **Submit** — the post appears on the feed immediately.
+
+### Finding an Item
+
+1. Browse the home feed or use the **search bar** to search by item name or location.
+2. Use the **city chips** to narrow results to your city.
+3. Switch between **All / Lost / Found** using the filter chips.
+4. Tap **View** on a card to open the full post detail.
+5. Tap **Contact via WhatsApp** to open WhatsApp and message the poster directly.
+
+### Managing Your Posts
+
+1. Go to the **Activity** tab to see all your posts and comments.
+2. Go to **Profile** for a summary view of your listings.
+3. Open a post you own to:
+   - **Mark as Resolved** — closes the listing (the item was found/returned).
+   - **Delete Post** — permanently removes the listing.
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| UI Framework | Flutter (Material 3) |
-| State Management | Provider (`ChangeNotifier`) |
-| Authentication | Firebase Auth — Phone / OTP |
-| Database | Cloud Firestore |
-| Image Hosting | ImgBB API (free tier) |
-| HTTP Client | `http` package |
-| Environment Variables | `flutter_dotenv` |
-| Fonts | Google Fonts — Inter |
-| Deep Links | `url_launcher` (`whatsapp://`) |
-| Image Picking | `image_picker` |
-| Image Caching | `cached_network_image` |
+| Layer | Technology | Purpose |
+|---|---|---|
+| UI Framework | Flutter (Material 3) | Cross-platform mobile UI |
+| Language | Dart 3 | Full null safety |
+| State Management | Provider (`ChangeNotifier`) | App-wide reactive state |
+| Authentication | Firebase Authentication (Phone / OTP) | Passwordless SMS login |
+| Database | Cloud Firestore | Real-time NoSQL database |
+| Image Hosting | ImgBB REST API | Free image CDN (no billing required) |
+| HTTP Client | `http` package | ImgBB upload requests |
+| Environment Variables | `flutter_dotenv` | Keeps API keys out of source code |
+| Fonts | Google Fonts — Inter | Clean, modern typography |
+| Deep Links | `url_launcher` | WhatsApp deep link + web fallback |
+| Image Picking | `image_picker` | Gallery and camera access |
+| Image Caching | `cached_network_image` | Smooth network image loading |
+| Share | `share_plus` | Native OS share sheet |
+| App Info | `package_info_plus` | Display app version in Settings |
+| ID Generation | `uuid` | Unique IDs for posts and comments |
+| Time Display | `timeago` | Human-friendly timestamps ("2 hours ago") |
 
 ---
 
 ## Architecture
 
+### Directory structure
+
 ```
 lib/
+├── main.dart                    # App entry point, theme, Firebase init
+├── firebase_options.dart        # Generated Firebase config (do not edit manually)
+│
 ├── config/
-│   └── app_colors.dart        # Centralized color tokens (Material 3)
+│   └── app_colors.dart          # Centralized color tokens (brand, status, neutrals)
+│
 ├── models/
-│   ├── post.dart              # Post, PostType enum, PostCategory enum
-│   ├── user.dart              # AppUser with Firestore serialization
-│   └── comment.dart           # Comment with Firestore serialization
+│   ├── post.dart                # Post model — PostType & PostCategory enums, toJson/fromJson
+│   ├── user.dart                # AppUser model
+│   └── comment.dart             # Comment model
+│
 ├── providers/
-│   └── app_state.dart         # Single ChangeNotifier — auth, posts, OTP flow
-├── routes/
-│   ├── root_router.dart       # Auth guard: shows WelcomeScreen or MainPage
-│   └── main_page.dart         # Bottom nav shell (Home, Activity, Profile)
+│   └── app_state.dart           # Single ChangeNotifier — auth, posts, OTP, mutations
+│
+├── navigation/
+│   ├── root_router.dart         # Auth guard: WelcomeScreen ↔ MainPage
+│   └── main_page.dart           # Bottom nav shell (Home, Activity, Profile tabs)
+│
 ├── screens/
 │   ├── auth/
-│   │   ├── welcome_screen.dart
-│   │   ├── auth_screen.dart   # Login / Signup tabs
-│   │   └── otp_screen.dart    # 6-digit OTP entry
-│   ├── home_screen.dart       # Feed with filters
-│   ├── post_detail_screen.dart
-│   ├── create_post_sheet.dart # Bottom sheet for new posts
-│   ├── activity_screen.dart
-│   ├── profile_screen.dart
-│   └── settings_screen.dart
-└── widgets/
-    ├── post_card.dart          # Reusable feed card
-    └── phone_input_formatter.dart
+│   │   ├── welcome_screen.dart  # Landing — routes to Login or Sign Up
+│   │   ├── auth_screen.dart     # Login / Sign Up tabs with phone input
+│   │   └── otp_screen.dart      # 6-digit OTP entry with 60s resend countdown
+│   ├── post/
+│   │   ├── post_detail_screen.dart  # Full post view, comments, WhatsApp, share
+│   │   └── create_post_sheet.dart   # New post form (type, category, photos, location)
+│   ├── home_screen.dart         # Feed with search, city filter, type filter
+│   ├── activity_screen.dart     # My Posts + My Comments tabs
+│   ├── profile_screen.dart      # User profile and post list
+│   └── settings_screen.dart     # Name, logout, delete account, app version
+│
+├── widgets/
+│   └── post_card.dart           # Reusable feed card with type/category/resolved badges
+│
+└── utils/
+    └── phone_input_formatter.dart  # TextInputFormatter for Iraqi phone numbers
 ```
 
 ### Data flow
 
 ```
-Firebase Auth ──► AppState (ChangeNotifier)
-Firestore     ──►     │
-                      ▼
-                 Provider.of<AppState>
-                      │
-             ┌────────┼────────┐
-             ▼        ▼        ▼
-         HomeScreen  Profile  Activity
+Firebase Auth ──► AppState._init() ──► authStateChanges()
+                        │
+                        ├──► _loadUser(uid) ──► currentUser (User model)
+                        │
+                        └──► _listenToPosts() ──► posts (List<Post>, live)
+                                    │
+                              Firestore snapshots
+                              converted + notified
+                                    │
+                         Provider.of<AppState> / context.select
+                                    │
+                    ┌───────────────┼───────────────┐
+                    ▼               ▼               ▼
+              HomeScreen      ActivityScreen    ProfileScreen
 ```
 
-`AppState` holds a single real-time listener on the Firestore `posts` collection and exposes `currentUser`, `posts`, and all mutation methods. All screens read from it via `Provider.of` or `context.select`.
+`AppState` is the single source of truth. It:
+- Listens to `authStateChanges()` and stores the subscription.
+- Holds a live Firestore `snapshots()` listener on the `posts` collection.
+- Exposes all write operations: `addPost`, `deletePost`, `addComment`, `reportPost`, `markPostResolved`, `updateUserName`, `deleteAccount`.
+- All subscriptions are cancelled in `dispose()` to prevent memory leaks.
+
+### Firestore data model
+
+```
+users/
+  {uid}/
+    id        String
+    name      String
+    phone     String
+    email     String?
+    createdAt Timestamp
+
+posts/
+  {postId}/
+    id          String
+    type        "lost" | "found"
+    category    "electronics" | "documents" | "personalItems" | "pets"
+    itemName    String
+    description String?
+    city        String
+    street      String
+    imageUrls   String[]
+    userName    String
+    userPhone   String
+    userId      String
+    createdAt   Timestamp
+    isResolved  Boolean
+    comments    { id, postId, userId, userName, text, createdAt }[]
+    reports     String[]  (array of userIds who reported)
+```
 
 ---
 
@@ -93,40 +262,54 @@ Firestore     ──►     │
 
 ### Prerequisites
 
-- [Flutter SDK](https://docs.flutter.dev/get-started/install) ≥ 3.0
-- A Firebase project with **Authentication** (Phone) and **Cloud Firestore** enabled
-- An [ImgBB](https://imgbb.com) account and API key (free)
-- Xcode (for iOS builds)
+| Tool | Version |
+|---|---|
+| Flutter SDK | ≥ 3.0 (run `flutter doctor` to verify) |
+| Dart SDK | ≥ 3.0 (bundled with Flutter) |
+| Xcode | ≥ 14 (for iOS builds on macOS) |
+| Firebase CLI | latest (`npm i -g firebase-tools`) |
+| A Firebase project | with Phone Auth + Firestore enabled |
+| An ImgBB account | free at [imgbb.com](https://imgbb.com) |
 
-### 1. Clone and install dependencies
+### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/Lost-and-Found-with-Flutter-.git
+git clone https://github.com/Chenarrr/Lost-and-Found-with-Flutter-.git
 cd Lost-and-Found-with-Flutter-
+```
+
+### 2. Install dependencies
+
+```bash
 flutter pub get
 ```
 
-### 2. Configure environment variables
+### 3. Create the environment file
 
-Create a `.env` file in the project root (this file is git-ignored):
+Create a `.env` file in the project root (this file is git-ignored and must never be committed):
 
 ```env
 IMGBB_API_KEY=your_imgbb_api_key_here
 ```
 
-> Get your free API key at [api.imgbb.com](https://api.imgbb.com).
+> Get your free API key at [api.imgbb.com](https://api.imgbb.com). The free plan supports thousands of uploads per month.
 
-### 3. Connect Firebase
+### 4. Connect Firebase
 
-1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com).
-2. Enable **Phone** authentication under *Authentication → Sign-in method*.
-3. Enable **Cloud Firestore** and deploy the security rules (see below).
-4. Download `GoogleService-Info.plist` (iOS) and place it in `ios/Runner/`.
-5. Run `flutterfire configure` or manually update `lib/firebase_options.dart`.
+1. Go to [console.firebase.google.com](https://console.firebase.google.com) and create a project.
+2. Enable **Phone** sign-in: *Authentication → Sign-in method → Phone → Enable*.
+3. Enable **Cloud Firestore**: *Firestore Database → Create database → Start in test mode* (then add security rules).
+4. Register your iOS app with the bundle ID `com.example.flutterApplication`.
+5. Download `GoogleService-Info.plist` and place it in `ios/Runner/`.
+6. The `lib/firebase_options.dart` file is already generated — update it for your project if needed:
+   ```bash
+   dart pub global activate flutterfire_cli
+   flutterfire configure
+   ```
 
-### 4. iOS — URL scheme (required for Phone Auth)
+### 5. iOS URL scheme (required for Phone Auth)
 
-Open `ios/Runner/Info.plist` and confirm the `REVERSED_CLIENT_ID` from your `GoogleService-Info.plist` is registered as a URL scheme:
+Phone Auth on iOS uses a web-based reCAPTCHA flow that redirects back to the app. The `REVERSED_CLIENT_ID` from your `GoogleService-Info.plist` must be registered as a URL scheme in `ios/Runner/Info.plist`:
 
 ```xml
 <key>CFBundleURLTypes</key>
@@ -134,23 +317,39 @@ Open `ios/Runner/Info.plist` and confirm the `REVERSED_CLIENT_ID` from your `Goo
   <dict>
     <key>CFBundleURLSchemes</key>
     <array>
-      <string>com.googleusercontent.apps.YOUR_CLIENT_ID</string>
+      <string>com.googleusercontent.apps.YOUR_REVERSED_CLIENT_ID</string>
     </array>
   </dict>
 </array>
 ```
 
-This allows Firebase to redirect back to the app after the reCAPTCHA web flow.
+Replace `YOUR_REVERSED_CLIENT_ID` with the value from your `GoogleService-Info.plist`.
 
-### 5. Run the app
+---
+
+## Running the App
 
 ```bash
-# iOS simulator
+# List available devices
+flutter devices
+
+# Run on iOS simulator (debug)
 flutter run
 
-# Physical device
+# Run on a connected physical device (debug)
+flutter run -d <device-id>
+
+# Run in release mode (better performance, closer to production)
 flutter run --release
+
+# Build a release IPA (iOS)
+flutter build ipa
+
+# Build a release APK (Android)
+flutter build apk --release
 ```
+
+> **Simulator note:** OTP SMS does not work on iOS simulators (APNs is unavailable). Use Firebase test phone numbers — see [Firebase Setup](#firebase-setup) below.
 
 ---
 
@@ -158,80 +357,181 @@ flutter run --release
 
 ### Firestore security rules
 
-Deploy the rules from `firestore.rules`:
+The Firestore rules enforce that:
+- **Anyone** (even unauthenticated) can **read** posts — useful for browsing without logging in.
+- Only **authenticated users** can **create** posts and comments.
+- Only the **owner** can **update or delete** their own post.
+- Only the **owner** can **update** their own user profile.
 
-```bash
-firebase deploy --only firestore:rules
+Example rules (adapt to your needs):
+
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /users/{userId} {
+      allow read: if true;
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null && request.auth.uid == userId;
+      allow delete: if request.auth != null && request.auth.uid == userId;
+    }
+
+    match /posts/{postId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null
+                    && (request.auth.uid == resource.data.userId
+                        || request.resource.data.diff(resource.data).affectedKeys()
+                           .hasOnly(['comments', 'reports']));
+      allow delete: if request.auth != null
+                    && request.auth.uid == resource.data.userId;
+    }
+  }
+}
 ```
 
-Key rules:
-- **Users** — only the authenticated owner can write to their own document.
-- **Posts** — anyone authenticated can create; only the post owner can update/delete.
-- **Comments** — anyone authenticated can add; only the comment author can delete.
+### Firestore indexes
+
+The app queries posts ordered by `createdAt` (descending). Firestore creates this index automatically on first query, but you can also add it manually in the Firebase Console.
 
 ### Testing Phone Auth on a simulator
 
-APNs (push notifications) don't work on simulators, so SMS OTP won't arrive. Use **test phone numbers** instead:
+APNs (push notifications) are not available on simulators, so real SMS won't arrive. Use **test phone numbers** instead:
 
-1. Firebase Console → Authentication → Sign-in method → Phone → Test phone numbers.
-2. Add a number (e.g. `+9647501234567`) with a fixed code (e.g. `123456`).
-3. Use that number in the app — Firebase bypasses reCAPTCHA and accepts the fixed code.
+1. Firebase Console → **Authentication** → **Sign-in method** → **Phone** → scroll to **Phone numbers for testing**.
+2. Add a test number, e.g. `+9647501234567`, with a fixed verification code, e.g. `123456`.
+3. Use that number in the app — Firebase skips reCAPTCHA and accepts the fixed code instantly.
 
 ---
 
-## Image Uploads
+## Image Uploads — ImgBB
 
-Images are uploaded to ImgBB using the REST API. Each image is named `{itemName}_{userPhone}` for traceability. The `IMGBB_API_KEY` is loaded at runtime from `.env` via `flutter_dotenv` and is never committed to source control.
+The app does **not** use Firebase Storage. Firebase Storage requires a billing account, which is unavailable in Iraq. Instead, images are uploaded to [ImgBB](https://imgbb.com), a free image hosting service with a public REST API.
+
+**Upload flow:**
 
 ```
-User picks image
-      │
-      ▼
-_uploadToImgBB()  ─── POST https://api.imgbb.com/1/upload
-      │                    body: { image: base64, name: "{itemName}_{phone}" }
-      ▼
-Returns CDN URL  ─► stored in Firestore post document
+User selects image from gallery / camera
+          │
+          ▼
+  File bytes read → base64 encoded
+          │
+          ▼
+  POST https://api.imgbb.com/1/upload
+  body: { image: <base64>, name: "<itemName>_<userPhone>" }
+          │
+          ▼
+  Response: { data: { url: "https://i.ibb.co/..." } }
+          │
+          ▼
+  CDN URL saved in Firestore post document under imageUrls[]
 ```
+
+Images are named `{itemName}_{userPhone}` for traceability. The API key is loaded from `.env` at runtime and is **never** compiled into the binary or committed to source control.
 
 ---
 
 ## WhatsApp Integration
 
-The post detail screen has a **Contact via WhatsApp** button that:
+Every post detail screen has a **Contact via WhatsApp** button (styled with WhatsApp green `#25D366`). It:
 
-1. Tries the native `whatsapp://send?phone=...&text=...` deep link.
-2. Falls back to `https://wa.me/...` in the browser if WhatsApp is not installed.
+1. Builds a pre-filled message: `"Hi, I saw your post about: {itemName}"`.
+2. Strips all spaces from the phone number.
+3. Tries the native deep link: `whatsapp://send?phone={number}&text={message}`.
+4. Falls back to the web URL `https://wa.me/{number}?text={message}` if WhatsApp is not installed.
 
-The phone number is stripped of spaces before being passed to the URL.
+Iraqi phone numbers stored in Firestore use the `+964` country code prefix, which is the format expected by WhatsApp.
+
+---
+
+## Testing
+
+The project has unit tests covering models and the `AppState` provider.
+
+```bash
+# Run all tests
+flutter test
+
+# Run tests with coverage report
+flutter test --coverage
+genhtml coverage/lcov.info -o coverage/html
+open coverage/html/index.html
+```
+
+Test files live in `test/`:
+
+```
+test/
+├── widget_test.dart              # Smoke test — app loads without crashing
+├── models/
+│   ├── post_test.dart            # Post.fromJson / toJson / copyWith
+│   ├── user_test.dart            # User.fromJson / toJson
+│   └── comment_test.dart         # Comment.fromJson / toJson
+└── providers/
+    └── app_state_test.dart       # AppState with mocked Firebase Auth + Firestore
+```
+
+`AppState` is dependency-injectable — pass mock `FirebaseAuth` and `FirebaseFirestore` instances to the constructor:
+
+```dart
+final app = AppState(auth: mockAuth, firestore: mockFirestore);
+```
+
+The `FLUTTER_TEST` environment variable is detected at startup to skip the real Firebase initialization in tests.
+
+---
+
+## CI/CD
+
+GitHub Actions runs on every push and pull request to `main`. The workflow has two sequential jobs:
+
+| Job | Steps |
+|---|---|
+| **lint** | `dart format --check`, `flutter analyze --fatal-warnings` |
+| **test** | `flutter test` (requires lint to pass first) |
+
+The CI pipeline creates a stub `.env` file (`IMGBB_API_KEY=ci_placeholder`) so that `flutter analyze` can resolve the asset without real credentials.
+
+No secrets are required in the GitHub repository settings.
+
+---
+
+## Environment Variables
+
+| Variable | Required | Description |
+|---|---|---|
+| `IMGBB_API_KEY` | **Yes** | ImgBB API key for image uploads |
+
+The `.env` file is listed as a Flutter asset in `pubspec.yaml` so it is bundled into the app at build time. It is git-ignored and must never be committed.
 
 ---
 
 ## Project Conventions
 
-- **Null safety** — all models are null-safe; `fromJson` uses safe casts (`as String? ?? ''`).
-- **Disposal** — `AppState` cancels both `_authSubscription` and `_postsSubscription` in `dispose()` to prevent memory leaks.
-- **No hardcoded secrets** — API keys live in `.env`, never in source files.
-- **ValueKey on list items** — `PostCard` widgets are keyed by `post.id` to help Flutter diff the list efficiently.
-- **Type-safe selectors** — `context.select<AppState, bool>` is used instead of `Object?` to prevent unnecessary rebuilds.
-
----
-
-## Environment Variables Reference
-
-| Variable | Required | Description |
-|---|---|---|
-| `IMGBB_API_KEY` | Yes | ImgBB API key for image uploads |
+- **Null safety** — all models use strict null-safe casts (`as String? ?? ''`); no `dynamic` in selectors.
+- **Typed selectors** — `context.select<AppState, T>` with an explicit type parameter prevents the `_dependents.isEmpty` assertion that fires with `dynamic` during navigation.
+- **Immutable models** — `Post`, `User`, and `Comment` are immutable value types with `copyWith` methods.
+- **ChangeNotifier disposal** — `AppState.dispose()` cancels both `_authSubscription` and `_postsSubscription` to prevent memory leaks.
+- **ValueKey on list items** — `PostCard` widgets use `ValueKey(post.id)` so Flutter can diff the list efficiently without re-building unchanged cards.
+- **No secrets in source** — API keys live in `.env`, Firebase config is in `firebase_options.dart` (not sensitive, generated by FlutterFire CLI).
+- **Consistent styling** — all chips use pill border radius (`999`), `showCheckmark: false` globally in `ChipThemeData`, and status colors are centralized in `AppColors`.
 
 ---
 
 ## Contributing
 
 1. Fork the repository.
-2. Create a branch: `git checkout -b feature/your-feature`.
-3. Commit your changes: `git commit -m "Add your feature"`.
-4. Push and open a pull request.
+2. Create a feature branch: `git checkout -b feature/your-feature`.
+3. Make your changes and run `dart format lib/` before committing.
+4. Run `flutter analyze --fatal-warnings` and `flutter test` to ensure everything passes.
+5. Commit: `git commit -m "Add your feature"`.
+6. Push and open a pull request against `main`.
 
-Please do not commit `.env` or any file containing API keys or credentials.
+**Please do not commit:**
+- `.env` or any file containing API keys or credentials
+- `GoogleService-Info.plist` or `google-services.json`
+- Build outputs (`build/`, `*.ipa`, `*.apk`)
 
 ---
 

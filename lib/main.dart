@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'firebase_options.dart';
 import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/providers/app_state.dart';
@@ -9,6 +10,7 @@ import 'package:flutter_application/routes/root_router.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: '.env');
   GoogleFonts.config.allowRuntimeFetching = false;
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const FindItApp());

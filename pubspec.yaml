@@ -22,7 +22,8 @@ dependencies:
   firebase_core: ^4.4.0
   firebase_auth: ^6.1.4
   cloud_firestore: ^6.1.2
-  firebase_storage: ^13.0.6
+  http: ^1.2.2
+  flutter_dotenv: ^5.2.1
 
 dev_dependencies:
   flutter_test:
@@ -33,6 +34,7 @@ flutter:
   uses-material-design: true
 
   assets:
+    - .env
     - assets/fonts/Inter-Regular.ttf
     - assets/fonts/Inter-Bold.ttf
     - assets/fonts/Inter-SemiBold.ttf

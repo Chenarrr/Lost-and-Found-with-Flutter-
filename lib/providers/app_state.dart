@@ -1,11 +1,13 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide User;
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:flutter_application/models/comment.dart';
 import 'package:flutter_application/models/post.dart';
@@ -25,15 +27,12 @@ class AppState extends ChangeNotifier {
 
   final FirebaseAuth? _mockAuth;
   final FirebaseFirestore? _mockFirestore;
-  final FirebaseStorage? _mockStorage;
 
   AppState({
     FirebaseAuth? auth,
     FirebaseFirestore? firestore,
-    FirebaseStorage? storage,
   }) : _mockAuth = auth,
-       _mockFirestore = firestore,
-       _mockStorage = storage {
+       _mockFirestore = firestore {
     final isTest = Platform.environment.containsKey('FLUTTER_TEST');
     if (!isTest || auth != null) {
       _init();
@@ -46,7 +45,6 @@ class AppState extends ChangeNotifier {
   FirebaseAuth get _auth => _mockAuth ?? FirebaseAuth.instance;
   FirebaseFirestore get _firestore =>
       _mockFirestore ?? FirebaseFirestore.instance;
-  FirebaseStorage get _storage => _mockStorage ?? FirebaseStorage.instance;
 
   bool get isInitialized => _isInitialized;
 
@@ -263,24 +261,35 @@ class AppState extends ChangeNotifier {
 
   // ── Posts & Storage ──────────────────────────────────────────────────────
 
+  Future<String?> _uploadToImgBB(String filePath) async {
+    try {
+      final bytes = await File(filePath).readAsBytes();
+      final base64Image = base64Encode(bytes);
+      final response = await http.post(
+        Uri.parse('https://api.imgbb.com/1/upload?key=${dotenv.env['IMGBB_API_KEY']}'),
+        body: {'image': base64Image},
+      );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['data']['url'] as String;
+      }
+      debugPrint('ImgBB upload failed: ${response.body}');
+    } catch (e) {
+      debugPrint('Error uploading image: $e');
+    }
+    return null;
+  }
+
   Future<void> addPost(Post post, List<String> localImagePaths) async {
     final uploadedUrls = <String>[];
 
-    for (int i = 0; i < localImagePaths.length; i++) {
-      final path = localImagePaths[i];
+    for (final path in localImagePaths) {
       if (path.startsWith('http')) {
         uploadedUrls.add(path);
         continue;
       }
-
-      try {
-        final ref = _storage.ref().child('post_images/${post.id}_$i.jpg');
-        final uploadTask = await ref.putFile(File(path));
-        final url = await uploadTask.ref.getDownloadURL();
-        uploadedUrls.add(url);
-      } catch (e) {
-        debugPrint('Error uploading image: $e');
-      }
+      final url = await _uploadToImgBB(path);
+      if (url != null) uploadedUrls.add(url);
     }
 
     final postToSave = post.copyWith(imageUrls: uploadedUrls);

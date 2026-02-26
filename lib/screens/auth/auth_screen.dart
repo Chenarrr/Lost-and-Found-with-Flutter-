@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/screens/auth/otp_screen.dart';
-import 'package:flutter_application/widgets/phone_input_formatter.dart';
+import 'package:flutter_application/utils/phone_input_formatter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 

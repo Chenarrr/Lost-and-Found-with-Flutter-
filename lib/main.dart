@@ -6,7 +6,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'firebase_options.dart';
 import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/providers/app_state.dart';
-import 'package:flutter_application/routes/root_router.dart';
+import 'package:flutter_application/navigation/root_router.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

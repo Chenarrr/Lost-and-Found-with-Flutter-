@@ -4,7 +4,7 @@ import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/screens/home_screen.dart';
 import 'package:flutter_application/screens/activity_screen.dart';
 import 'package:flutter_application/screens/profile_screen.dart';
-import 'package:flutter_application/screens/create_post_sheet.dart';
+import 'package:flutter_application/screens/post/create_post_sheet.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});

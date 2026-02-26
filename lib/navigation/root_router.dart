@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/screens/auth/welcome_screen.dart';
-import 'package:flutter_application/routes/main_page.dart';
+import 'package:flutter_application/navigation/main_page.dart';
 
 class RootRouter extends StatelessWidget {
   const RootRouter({super.key});

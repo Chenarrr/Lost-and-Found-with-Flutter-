@@ -3,7 +3,7 @@ import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/models/comment.dart';
 import 'package:flutter_application/models/post.dart';
 import 'package:flutter_application/providers/app_state.dart';
-import 'package:flutter_application/screens/post_detail_screen.dart';
+import 'package:flutter_application/screens/post/post_detail_screen.dart';
 import 'package:flutter_application/widgets/post_card.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';

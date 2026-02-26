@@ -38,6 +38,11 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      # .env is declared as a Flutter asset in pubspec.yaml so it must exist,
+      # even in the lint job. No real key needed here.
+      - name: Create .env
+        run: echo "IMGBB_API_KEY=ci_placeholder" > .env
+
       # --output=none means nothing is written to disk — CI-safe check only
       - name: Verify formatting
         run: dart format --output=none --set-exit-if-changed .

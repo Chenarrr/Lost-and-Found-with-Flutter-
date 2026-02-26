@@ -110,7 +110,7 @@ class ProfileScreen extends StatelessWidget {
                       ),
                       alignment: Alignment.center,
                       child: Text(
-                        user.name.substring(0, 1).toUpperCase(),
+                        user.name.isNotEmpty ? user.name[0].toUpperCase() : '?',
                         style: GoogleFonts.inter(
                           color: Colors.white,
                           fontSize: 28,
@@ -217,7 +217,7 @@ class ProfileScreen extends StatelessWidget {
               ),
             )
           else
-            ...userPosts.map((post) => PostCard(post: post)),
+            ...userPosts.map((post) => PostCard(key: ValueKey(post.id), post: post)),
         ],
       ),
     );

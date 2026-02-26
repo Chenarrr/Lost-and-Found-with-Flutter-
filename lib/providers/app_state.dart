@@ -28,6 +28,8 @@ class AppState extends ChangeNotifier {
   final FirebaseAuth? _mockAuth;
   final FirebaseFirestore? _mockFirestore;
 
+  StreamSubscription<dynamic>? _authSubscription;
+
   AppState({
     FirebaseAuth? auth,
     FirebaseFirestore? firestore,
@@ -48,9 +50,15 @@ class AppState extends ChangeNotifier {
 
   bool get isInitialized => _isInitialized;
 
+  @override
+  void dispose() {
+    _authSubscription?.cancel();
+    _postsSubscription?.cancel();
+    super.dispose();
+  }
+
   Future<void> _init() async {
-    // Listen to auth changes
-    _auth.authStateChanges().listen((firebaseUser) async {
+    _authSubscription = _auth.authStateChanges().listen((firebaseUser) async {
       if (firebaseUser == null) {
         currentUser = null;
         _listenToPosts();
@@ -298,8 +306,8 @@ class AppState extends ChangeNotifier {
     final postToSave = post.copyWith(imageUrls: uploadedUrls);
     final data = postToSave.toJson();
     data['createdAt'] = FieldValue.serverTimestamp();
-    if ((data['comments'] as List).isEmpty) data.remove('comments');
-    if ((data['reports'] as List).isEmpty) data.remove('reports');
+    if ((data['comments'] as List?)?.isEmpty ?? true) data.remove('comments');
+    if ((data['reports'] as List?)?.isEmpty ?? true) data.remove('reports');
 
     await _firestore.collection('posts').doc(post.id).set(data);
   }

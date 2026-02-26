@@ -426,7 +426,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                 radius: 14,
                                 backgroundColor: AppColors.primaryBlue,
                                 child: Text(
-                                  comment.userName[0].toUpperCase(),
+                                  comment.userName.isNotEmpty ? comment.userName[0].toUpperCase() : '?',
                                   style: GoogleFonts.inter(
                                     color: Colors.white,
                                     fontSize: 12,

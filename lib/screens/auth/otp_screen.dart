@@ -11,15 +11,11 @@ class OtpScreen extends StatefulWidget {
     required this.phone,
     required this.name,
     this.email,
-    required this.password,
-    required this.demoCode,
   });
 
   final String phone;
   final String name;
   final String? email;
-  final String password;
-  final String demoCode; // kept for backwards compatibility but not used here
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();

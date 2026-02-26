@@ -82,8 +82,6 @@ class _AuthScreenState extends State<AuthScreen>
                 phone: phone,
                 name: _sName.text.trim(),
                 email: _sEmail.text.trim().isEmpty ? null : _sEmail.text.trim(),
-                password: '', // unused
-                demoCode: '', // no demo code anymore
               ),
             ),
           );
@@ -113,8 +111,6 @@ class _AuthScreenState extends State<AuthScreen>
                 phone: phone,
                 name: '',
                 email: null,
-                password: '',
-                demoCode: '', // no demo code anymore
               ),
             ),
           );

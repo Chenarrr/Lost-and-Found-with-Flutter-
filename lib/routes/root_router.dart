@@ -13,8 +13,8 @@ class RootRouter extends StatelessWidget {
     final isInitialized = context.select<AppState, bool>(
       (app) => app.isInitialized,
     );
-    final currentUser = context.select<AppState, Object?>(
-      (app) => app.currentUser,
+    final isLoggedIn = context.select<AppState, bool>(
+      (app) => app.currentUser != null,
     );
 
     if (!isInitialized) {
@@ -24,7 +24,7 @@ class RootRouter extends StatelessWidget {
         ),
       );
     }
-    if (currentUser == null) return const WelcomeScreen();
+    if (!isLoggedIn) return const WelcomeScreen();
     return const MainPage();
   }
 }

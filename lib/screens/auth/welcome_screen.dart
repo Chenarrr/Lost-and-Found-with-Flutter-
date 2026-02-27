@@ -18,11 +18,6 @@ class WelcomeScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 24),
-              const Align(
-                alignment: Alignment.centerRight,
-                child: LangToggle(),
-              ),
-              const SizedBox(height: 20),
               Row(
                 children: [
                   const CircleAvatar(
@@ -47,8 +42,9 @@ class WelcomeScreen extends StatelessWidget {
               ),
               const SizedBox(height: 48),
               Text(l10n.tagline, style: GoogleFonts.inter(fontSize: 18)),
-              const SizedBox(height: 24),
               const Spacer(),
+              const Center(child: LangToggle()),
+              const SizedBox(height: 32),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -87,7 +83,7 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
             ],
           ),
         ),

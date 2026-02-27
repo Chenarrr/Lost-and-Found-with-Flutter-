@@ -4,7 +4,7 @@ import 'package:flutter_application/providers/app_state.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-/// Compact EN / ع toggle — safe to use before login.
+/// Language toggle — safe to use before login.
 class LangToggle extends StatelessWidget {
   const LangToggle({super.key});
 
@@ -16,19 +16,15 @@ class LangToggle extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         _Chip(
-          label: 'EN',
+          label: 'English',
           selected: !isAr,
-          onTap: () => context
-              .read<AppState>()
-              .setLocale(const Locale('en')),
+          onTap: () => context.read<AppState>().setLocale(const Locale('en')),
         ),
-        const SizedBox(width: 6),
+        const SizedBox(width: 10),
         _Chip(
-          label: 'ع',
+          label: 'العربية',
           selected: isAr,
-          onTap: () => context
-              .read<AppState>()
-              .setLocale(const Locale('ar')),
+          onTap: () => context.read<AppState>().setLocale(const Locale('ar')),
         ),
       ],
     );
@@ -52,18 +48,19 @@ class _Chip extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         decoration: BoxDecoration(
           color: selected ? AppColors.primaryBlue : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(28),
           border: Border.all(
             color: selected ? AppColors.primaryBlue : AppColors.borderGray,
+            width: 1.5,
           ),
         ),
         child: Text(
           label,
           style: GoogleFonts.inter(
-            fontSize: 13,
+            fontSize: 16,
             fontWeight: FontWeight.w600,
             color: selected ? Colors.white : AppColors.textSecondary,
           ),

@@ -27,7 +27,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get signupTab => 'حساب جديد';
 
   @override
-  String get phonePlaceholder => '750 222 34 44';
+  String get phonePlaceholder => 'رقم الهاتف';
 
   @override
   String get requiredField => 'مطلوب';

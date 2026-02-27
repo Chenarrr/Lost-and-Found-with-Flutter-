@@ -137,7 +137,7 @@ abstract class AppLocalizations {
   /// No description provided for @phonePlaceholder.
   ///
   /// In en, this message translates to:
-  /// **'750 222 34 44'**
+  /// **'Phone number'**
   String get phonePlaceholder;
 
   /// No description provided for @requiredField.

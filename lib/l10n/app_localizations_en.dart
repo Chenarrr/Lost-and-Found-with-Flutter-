@@ -27,7 +27,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get signupTab => 'Signup';
 
   @override
-  String get phonePlaceholder => '750 222 34 44';
+  String get phonePlaceholder => 'Phone number';
 
   @override
   String get requiredField => 'Required';

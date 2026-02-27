@@ -79,41 +79,20 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildStatsChip({
-    required IconData icon,
-    required String label,
-    required String value,
-    required Color color,
-  }) {
+  Widget _statBadge(String label, Color textColor, Color bgColor) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: Colors.white.withAlpha(220),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.borderGray),
+        color: bgColor,
+        borderRadius: BorderRadius.circular(8),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 16, color: color),
-          const SizedBox(width: 8),
-          Text(
-            '$label: ',
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              color: AppColors.textSecondary,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          Text(
-            value,
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              color: AppColors.textPrimary,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
+      child: Text(
+        label,
+        style: GoogleFonts.inter(
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+          color: textColor,
+        ),
       ),
     );
   }
@@ -144,102 +123,63 @@ class _HomeScreenState extends State<HomeScreen> {
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         children: [
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 8),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [AppColors.skyTop, Colors.white],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+          const SizedBox(height: 4),
+          // ── Search bar ───────────────────────────────────────────
+          TextField(
+            controller: _searchController,
+            style: GoogleFonts.inter(fontSize: 15),
+            decoration: InputDecoration(
+              hintText: 'Search items, city, street...',
+              prefixIcon: const Icon(
+                Icons.search_rounded,
+                color: AppColors.primaryBlue,
               ),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: AppColors.borderGray),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primaryBlue.withAlpha(18),
-                  blurRadius: 22,
-                  offset: const Offset(0, 10),
-                ),
-              ],
+              suffixIcon: _searchController.text.isEmpty
+                  ? null
+                  : IconButton(
+                      onPressed: () {
+                        _searchController.clear();
+                        _searchDebounce?.cancel();
+                        setState(() => _searchQuery = '');
+                      },
+                      icon: const Icon(
+                        Icons.close_rounded,
+                        color: AppColors.iconGray,
+                      ),
+                    ),
+              fillColor: Colors.white,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide.none,
+              ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Discover lost and found posts',
-                  style: GoogleFonts.inter(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                  ),
+            onChanged: _onSearchChanged,
+          ),
+          const SizedBox(height: 10),
+          // ── Stats row ────────────────────────────────────────────
+          Row(
+            children: [
+              _statBadge(
+                '$lostCount Lost',
+                AppColors.lostPrimary,
+                AppColors.lostLight,
+              ),
+              const SizedBox(width: 8),
+              _statBadge(
+                '$foundCount Found',
+                AppColors.foundPrimary,
+                AppColors.foundLight,
+              ),
+              const Spacer(),
+              Text(
+                '${posts.length} results',
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  color: AppColors.textTertiary,
+                  fontWeight: FontWeight.w500,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  'Filter by city or search by item name and location.',
-                  style: GoogleFonts.inter(
-                    fontSize: 13,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-                const SizedBox(height: 14),
-                TextField(
-                  controller: _searchController,
-                  style: GoogleFonts.inter(fontSize: 16),
-                  decoration: InputDecoration(
-                    hintText: 'Search items or locations...',
-                    prefixIcon: const Icon(
-                      Icons.search,
-                      color: AppColors.primaryBlue,
-                    ),
-                    suffixIcon: _searchController.text.isEmpty
-                        ? null
-                        : IconButton(
-                            onPressed: () {
-                              _searchController.clear();
-                              _searchDebounce?.cancel();
-                              setState(() => _searchQuery = '');
-                            },
-                            icon: const Icon(
-                              Icons.close_rounded,
-                              color: AppColors.iconGray,
-                            ),
-                          ),
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                  onChanged: _onSearchChanged,
-                ),
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: [
-                    _buildStatsChip(
-                      icon: Icons.error_outline_rounded,
-                      label: 'Lost',
-                      value: '$lostCount',
-                      color: AppColors.lostPrimary,
-                    ),
-                    _buildStatsChip(
-                      icon: Icons.check_circle_outline_rounded,
-                      label: 'Found',
-                      value: '$foundCount',
-                      color: AppColors.foundPrimary,
-                    ),
-                    _buildStatsChip(
-                      icon: Icons.grid_view_rounded,
-                      label: 'Results',
-                      value: '${posts.length}',
-                      color: AppColors.primaryBlue,
-                    ),
-                  ],
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
           const SizedBox(height: 14),
           GestureDetector(

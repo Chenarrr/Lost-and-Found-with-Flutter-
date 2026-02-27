@@ -148,14 +148,13 @@ class _AuthScreenState extends State<AuthScreen>
                       ),
                       borderRadius: BorderRadius.circular(14),
                     ),
+                    indicatorSize: TabBarIndicatorSize.tab,
                     dividerColor: Colors.transparent,
+                    labelStyle: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                    unselectedLabelStyle: GoogleFonts.inter(),
                     tabs: [
-                      Tab(
-                        child: Text(l10n.loginTab, style: GoogleFonts.inter()),
-                      ),
-                      Tab(
-                        child: Text(l10n.signupTab, style: GoogleFonts.inter()),
-                      ),
+                      Tab(text: l10n.loginTab),
+                      Tab(text: l10n.signupTab),
                     ],
                   ),
                 ),

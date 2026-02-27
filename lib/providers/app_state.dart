@@ -120,7 +120,7 @@ class AppState extends ChangeNotifier {
               }
 
               return Post.fromJson(data);
-            }).toList();
+            }).where((p) => !p.isHidden).toList();
             notifyListeners();
           },
           onError: (e) {
@@ -382,8 +382,16 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> reportPost(String postId, String userId) async {
-    await _firestore.collection('posts').doc(postId).update({
-      'reports': FieldValue.arrayUnion([userId]),
+    final ref = _firestore.collection('posts').doc(postId);
+    await _firestore.runTransaction((tx) async {
+      final snap = await tx.get(ref);
+      if (!snap.exists) return;
+      final reports = List<String>.from(snap.data()?['reports'] as List? ?? []);
+      if (reports.contains(userId)) return; // already reported
+      reports.add(userId);
+      final updates = <String, dynamic>{'reports': reports};
+      if (reports.length >= 10) updates['isHidden'] = true;
+      tx.update(ref, updates);
     });
   }
 }

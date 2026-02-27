@@ -252,6 +252,7 @@ posts/
     userId      String
     createdAt   Timestamp
     isResolved  Boolean
+    isHidden    Boolean   (set to true automatically when reports ≥ 10)
     comments    { id, postId, userId, userName, text, createdAt }[]
     reports     String[]  (array of userIds who reported)
 ```
@@ -355,38 +356,61 @@ flutter build apk --release
 
 ## Firebase Setup
 
+### Firebase services used
+
+| Service | What it does in this app |
+|---|---|
+| **Authentication** | Phone OTP login — verifies Iraqi numbers, assigns each user a unique UID |
+| **Cloud Firestore** | Stores all posts, users, and comments — live real-time feed |
+| **Security Rules** | Enforces who can read/write on Firebase servers — deployed via `firestore.rules` |
+| **Firestore Index** | Composite index on `isResolved + createdAt` — required for efficient queries |
+
 ### Firestore security rules
 
-The Firestore rules enforce that:
-- **Anyone** (even unauthenticated) can **read** posts — useful for browsing without logging in.
-- Only **authenticated users** can **create** posts and comments.
-- Only the **owner** can **update or delete** their own post.
-- Only the **owner** can **update** their own user profile.
+The rules are in `firestore.rules` and are deployed with `firebase deploy --only firestore`.
 
-Example rules (adapt to your needs):
+| Who | Can do what |
+|---|---|
+| Anyone (unauthenticated) | Read all posts |
+| Authenticated user | Create a post (must set `userId` = their own UID) |
+| Authenticated user | Update only the `comments` or `reports` field on any post |
+| Post owner | Update or delete their own post (any field) |
+| User | Read, create, update, delete their own profile only |
 
 ```javascript
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    function isAuthenticated() { return request.auth != null; }
+    function isOwner(userId) { return isAuthenticated() && request.auth.uid == userId; }
+
     match /users/{userId} {
-      allow read: if true;
-      allow create: if request.auth != null && request.auth.uid == userId;
-      allow update: if request.auth != null && request.auth.uid == userId;
-      allow delete: if request.auth != null && request.auth.uid == userId;
+      allow read: if isAuthenticated();
+      allow create: if isOwner(userId)
+                    && request.resource.data.name is string
+                    && request.resource.data.name.size() >= 2;
+      allow update: if isOwner(userId)
+                    && request.resource.data.name is string
+                    && request.resource.data.name.size() >= 2;
+      allow delete: if isOwner(userId);
     }
 
     match /posts/{postId} {
       allow read: if true;
-      allow create: if request.auth != null;
-      allow update: if request.auth != null
-                    && (request.auth.uid == resource.data.userId
-                        || request.resource.data.diff(resource.data).affectedKeys()
-                           .hasOnly(['comments', 'reports']));
-      allow delete: if request.auth != null
-                    && request.auth.uid == resource.data.userId;
+      allow create: if isAuthenticated()
+                    && request.resource.data.userId == request.auth.uid
+                    && request.resource.data.itemName is string
+                    && request.resource.data.itemName.size() >= 2;
+      allow update: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid
+        || request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['comments', 'reports'])
+      );
+      allow delete: if isOwner(resource.data.userId);
     }
+
+    match /{document=**} { allow read, write: if false; }
   }
 }
 ```

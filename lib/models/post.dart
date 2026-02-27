@@ -33,6 +33,7 @@ class Post {
     List<Comment>? comments,
     List<String>? reports,
     this.isResolved = false,
+    this.isHidden = false,
   }) : comments = List.unmodifiable(comments ?? []),
        reports = List.unmodifiable(reports ?? []);
 
@@ -62,6 +63,7 @@ class Post {
         .toList(),
     reports: List<String>.from(json['reports'] as List? ?? []),
     isResolved: json['isResolved'] as bool? ?? false,
+    isHidden: json['isHidden'] as bool? ?? false,
   );
 
   final String id;
@@ -79,6 +81,7 @@ class Post {
   final List<Comment> comments;
   final List<String> reports;
   final bool isResolved;
+  final bool isHidden;
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -96,6 +99,7 @@ class Post {
     'comments': comments.map((c) => c.toJson()).toList(),
     'reports': reports,
     'isResolved': isResolved,
+    'isHidden': isHidden,
   };
 
   Post copyWith({
@@ -114,6 +118,7 @@ class Post {
     List<Comment>? comments,
     List<String>? reports,
     bool? isResolved,
+    bool? isHidden,
   }) => Post(
     id: id ?? this.id,
     type: type ?? this.type,
@@ -130,5 +135,6 @@ class Post {
     comments: comments ?? this.comments,
     reports: reports ?? this.reports,
     isResolved: isResolved ?? this.isResolved,
+    isHidden: isHidden ?? this.isHidden,
   );
 }

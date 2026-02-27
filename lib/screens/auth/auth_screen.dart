@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application/config/app_colors.dart';
+import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/screens/auth/otp_screen.dart';
 import 'package:flutter_application/utils/phone_input_formatter.dart';
@@ -117,9 +118,10 @@ class _AuthScreenState extends State<AuthScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login or Signup', style: GoogleFonts.inter()),
+        title: Text(l10n.loginOrSignup, style: GoogleFonts.inter()),
       ),
       body: Stack(
         children: [
@@ -146,8 +148,12 @@ class _AuthScreenState extends State<AuthScreen>
                     ),
                     dividerColor: Colors.transparent,
                     tabs: [
-                      Tab(child: Text('Login', style: GoogleFonts.inter())),
-                      Tab(child: Text('Signup', style: GoogleFonts.inter())),
+                      Tab(
+                        child: Text(l10n.loginTab, style: GoogleFonts.inter()),
+                      ),
+                      Tab(
+                        child: Text(l10n.signupTab, style: GoogleFonts.inter()),
+                      ),
                     ],
                   ),
                 ),
@@ -163,20 +169,20 @@ class _AuthScreenState extends State<AuthScreen>
                             children: [
                               _buildTextField(
                                 controller: _lIdentifier,
-                                label: 'Phone (0750 222 34 44)',
+                                label: l10n.phonePlaceholder,
                                 keyboardType: TextInputType.phone,
                                 textInputAction: TextInputAction.done,
                                 inputFormatters: [PhoneInputFormatter()],
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
-                                    return 'Required';
+                                    return l10n.requiredField;
                                   }
                                   final clean = value.replaceAll(
                                     RegExp(r'\s'),
                                     '',
                                   );
                                   if (!_phoneReg.hasMatch(clean)) {
-                                    return 'Enter 11 digits: 0750 222 34 44';
+                                    return l10n.phoneInvalid;
                                   }
                                   return null;
                                 },
@@ -193,7 +199,7 @@ class _AuthScreenState extends State<AuthScreen>
                                     ),
                                   ),
                                   child: Text(
-                                    'Send OTP',
+                                    l10n.sendOtp,
                                     style: GoogleFonts.inter(fontSize: 16),
                                   ),
                                 ),
@@ -210,12 +216,12 @@ class _AuthScreenState extends State<AuthScreen>
                             children: [
                               _buildTextField(
                                 controller: _sName,
-                                label: 'Name',
+                                label: l10n.namePlaceholder,
                                 textInputAction: TextInputAction.next,
                                 validator: (value) {
                                   if (value == null ||
                                       value.trim().length < 2) {
-                                    return 'Enter at least 2 characters';
+                                    return l10n.nameTooShort;
                                   }
                                   return null;
                                 },
@@ -223,20 +229,20 @@ class _AuthScreenState extends State<AuthScreen>
                               const SizedBox(height: 12),
                               _buildTextField(
                                 controller: _sPhone,
-                                label: 'Phone (0750 222 34 44)',
+                                label: l10n.phonePlaceholder,
                                 keyboardType: TextInputType.phone,
                                 textInputAction: TextInputAction.next,
                                 inputFormatters: [PhoneInputFormatter()],
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
-                                    return 'Phone is required';
+                                    return l10n.phoneRequired;
                                   }
                                   final clean = value.replaceAll(
                                     RegExp(r'\s'),
                                     '',
                                   );
                                   if (!_phoneReg.hasMatch(clean)) {
-                                    return 'Enter 11 digits: 0750 222 34 44';
+                                    return l10n.phoneInvalid;
                                   }
                                   return null;
                                 },
@@ -244,7 +250,7 @@ class _AuthScreenState extends State<AuthScreen>
                               const SizedBox(height: 12),
                               _buildTextField(
                                 controller: _sEmail,
-                                label: 'Email (optional)',
+                                label: l10n.emailPlaceholder,
                                 keyboardType: TextInputType.emailAddress,
                                 textInputAction: TextInputAction.done,
                                 onSubmitted: (_) => _doSignup(),
@@ -252,7 +258,7 @@ class _AuthScreenState extends State<AuthScreen>
                                   if (value != null &&
                                       value.trim().isNotEmpty &&
                                       !_emailReg.hasMatch(value.trim())) {
-                                    return 'Invalid email';
+                                    return l10n.emailInvalid;
                                   }
                                   return null;
                                 },
@@ -268,7 +274,7 @@ class _AuthScreenState extends State<AuthScreen>
                                     ),
                                   ),
                                   child: Text(
-                                    'Send OTP',
+                                    l10n.sendOtp,
                                     style: GoogleFonts.inter(fontSize: 16),
                                   ),
                                 ),

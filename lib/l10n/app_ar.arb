@@ -1,0 +1,191 @@
+{
+  "@@locale": "ar",
+
+  "appName": "Find It",
+  "tagline": "إعادة الأشياء المفقودة في كردستان",
+  "getStarted": "ابدأ الآن",
+
+  "loginOrSignup": "تسجيل الدخول أو إنشاء حساب",
+  "loginTab": "دخول",
+  "signupTab": "حساب جديد",
+  "phonePlaceholder": "الهاتف (0750 222 34 44)",
+  "requiredField": "مطلوب",
+  "phoneInvalid": "أدخل 11 رقمًا: 0750 222 34 44",
+  "namePlaceholder": "الاسم",
+  "nameTooShort": "أدخل حرفين على الأقل",
+  "phoneRequired": "الهاتف مطلوب",
+  "emailPlaceholder": "البريد الإلكتروني (اختياري)",
+  "emailInvalid": "بريد إلكتروني غير صالح",
+  "sendOtp": "إرسال رمز التحقق",
+
+  "verifyPhone": "التحقق من الهاتف",
+  "enterCodeSentTo": "أدخل الرمز المكون من 6 أرقام المُرسل إلى",
+  "codeInvalid": "أدخل الرمز المكون من 6 أرقام",
+  "verifyCode": "تحقق من الرمز",
+  "resendCountdown": "إعادة الإرسال خلال {seconds} ثانية",
+  "@resendCountdown": {
+    "placeholders": {
+      "seconds": { "type": "int" }
+    }
+  },
+  "resendCode": "إعادة إرسال الرمز",
+  "newCodeSent": "تم إرسال رمز جديد!",
+
+  "allCities": "جميع المدن",
+  "cityErbil": "أربيل",
+  "citySulaymaniyah": "السليمانية",
+  "cityDuhok": "دهوك",
+  "cityHalabja": "حلبجة",
+  "cityZakho": "زاخو",
+  "cityKoya": "كوية",
+  "searchHint": "ابحث عن أشياء، مدينة، شارع...",
+  "lostBadge": "{count} مفقود",
+  "@lostBadge": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "foundBadge": "{count} موجود",
+  "@foundBadge": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "resultsCount": "{count} نتيجة",
+  "@resultsCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "filterByCity": "تصفية حسب المدينة",
+  "all": "الكل",
+  "lost": "مفقود",
+  "found": "موجود",
+  "noItemsFound": "لا توجد عناصر",
+  "noItemsFoundHint": "جرب مدينة أخرى أو امسح حقل البحث.",
+
+  "pleaseLogIn": "يرجى تسجيل الدخول",
+  "logInToTrack": "سجل الدخول لمتابعة منشوراتك وتعليقاتك.",
+  "activityTitle": "النشاط",
+  "myPostsTab": "منشوراتي ({count})",
+  "@myPostsTab": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "myCommentsTab": "تعليقاتي ({count})",
+  "@myCommentsTab": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "noPostsYet": "لا توجد منشورات بعد",
+  "createFirstPost": "أنشئ منشورك الأول للبدء.",
+  "noCommentsYet": "لا توجد تعليقات بعد",
+  "commentToEngage": "علق على المنشورات للتفاعل مع المجتمع.",
+
+  "pleaseLogInProfile": "يرجى تسجيل الدخول لعرض ملفك الشخصي.",
+  "profileTitle": "الملف الشخصي",
+  "posts": "المنشورات",
+  "yourPosts": "منشوراتك",
+  "totalPosts": "{count} إجمالي",
+  "@totalPosts": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "noItemsPosted": "لم تنشر أي عناصر بعد.",
+
+  "settingsTitle": "الإعدادات",
+  "changeName": "تغيير الاسم",
+  "yourName": "اسمك",
+  "cancel": "إلغاء",
+  "save": "حفظ",
+  "account": "الحساب",
+  "updateDisplayName": "تحديث اسمك المعروض",
+  "logout": "تسجيل الخروج",
+  "logoutConfirm": "هل أنت متأكد من تسجيل الخروج؟",
+  "signOutDevice": "تسجيل الخروج من هذا الجهاز",
+  "deleteAccount": "حذف الحساب",
+  "deleteAccountConfirm": "سيحذف هذا حسابك وجميع منشوراتك بشكل دائم. لا يمكن التراجع عن ذلك.",
+  "permanentlyRemove": "إزالة حسابك ومنشوراتك بشكل دائم",
+  "delete": "حذف",
+  "language": "اللغة",
+  "selectLanguage": "اختر لغة التطبيق",
+  "english": "English",
+  "arabic": "العربية",
+  "preferences": "التفضيلات",
+
+  "postDetails": "تفاصيل المنشور",
+  "postNotFound": "المنشور غير موجود.",
+  "couldNotOpenWhatsapp": "تعذر فتح واتساب.",
+  "sharedVia": "مشاركة عبر تطبيق Find It",
+  "whatsappMessagePrefix": "مرحباً، رأيت منشورك عن:",
+  "loginToReport": "يرجى تسجيل الدخول للإبلاغ عن هذا المنشور.",
+  "cannotReportOwn": "لا يمكنك الإبلاغ عن منشورك الخاص.",
+  "alreadyReported": "لقد أبلغت عن هذا المنشور مسبقًا.",
+  "reportPost": "الإبلاغ عن المنشور",
+  "reportConfirm": "الإبلاغ عن هذا المنشور باعتباره مزيفًا أو غير لائق؟",
+  "report": "إبلاغ",
+  "reported": "تم الإبلاغ",
+  "postReported": "تم الإبلاغ عن المنشور. شكرًا.",
+  "markAsResolved": "وضع علامة محلول",
+  "markResolvedConfirm": "وضع علامة محلول على هذا المنشور؟ سيرى الآخرون أنه تم إغلاقه.",
+  "markResolved": "تحديد كمحلول",
+  "postMarkedResolved": "تم وضع علامة محلول على المنشور.",
+  "loginToComment": "يرجى تسجيل الدخول للتعليق.",
+  "commentAdded": "تمت إضافة التعليق.",
+  "deletePost": "حذف المنشور",
+  "deletePostConfirm": "هل أنت متأكد من حذف هذا المنشور؟",
+  "contactWhatsapp": "التواصل عبر واتساب",
+  "description": "الوصف",
+  "noDescription": "لم يتم تقديم وصف.",
+  "commentsSection": "التعليقات ({count})",
+  "@commentsSection": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "noCommentsSection": "لا توجد تعليقات بعد. كن أول من يعلق.",
+  "typeComment": "اكتب تعليقك...",
+  "itemResolved": "تم حل العنصر",
+  "resolvedBadge": "✓ محلول",
+  "viewPost": "عرض",
+  "share": "مشاركة",
+
+  "createPost": "إنشاء منشور",
+  "goHome": "الرئيسية",
+  "shareDetails": "شارك التفاصيل لمساعدة المجتمع على التعرف على العنصر.",
+  "itemName": "اسم العنصر",
+  "itemNameRequired": "يجب أن يكون اسم العنصر حرفين على الأقل",
+  "descriptionOptional": "الوصف (اختياري)",
+  "city": "المدينة",
+  "selectCity": "اختر المدينة",
+  "cityRequired": "يرجى اختيار مدينة",
+  "street": "الشارع",
+  "streetRequired": "الشارع مطلوب",
+  "imagesSection": "الصور ({count}/3)",
+  "@imagesSection": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "noImagesSelected": "لم يتم اختيار صور",
+  "maxImagesReached": "الحد الأقصى 3 صور مسموح به.",
+  "couldNotPickImage": "تعذر اختيار صورة. يرجى المحاولة مجددًا.",
+  "loginToPost": "يرجى تسجيل الدخول لإنشاء منشور.",
+  "addImage": "إضافة صورة",
+  "submit": "إرسال",
+  "postCreated": "تم إنشاء المنشور بنجاح.",
+
+  "homeNav": "الرئيسية",
+  "activityNav": "النشاط",
+  "profileNav": "الملف الشخصي",
+  "postFab": "نشر",
+  "createPostTooltip": "إنشاء منشور",
+
+  "typeLost": "مفقود",
+  "typeFound": "موجود",
+  "typeLostUpper": "مفقود",
+  "typeFoundUpper": "موجود"
+}

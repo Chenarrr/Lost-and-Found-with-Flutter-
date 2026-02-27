@@ -1,0 +1,191 @@
+{
+  "@@locale": "en",
+
+  "appName": "Find It",
+  "tagline": "Reuniting lost items across Kurdistan",
+  "getStarted": "Get Started",
+
+  "loginOrSignup": "Login or Signup",
+  "loginTab": "Login",
+  "signupTab": "Signup",
+  "phonePlaceholder": "Phone (0750 222 34 44)",
+  "requiredField": "Required",
+  "phoneInvalid": "Enter 11 digits: 0750 222 34 44",
+  "namePlaceholder": "Name",
+  "nameTooShort": "Enter at least 2 characters",
+  "phoneRequired": "Phone is required",
+  "emailPlaceholder": "Email (optional)",
+  "emailInvalid": "Invalid email",
+  "sendOtp": "Send OTP",
+
+  "verifyPhone": "Verify Phone",
+  "enterCodeSentTo": "Enter the 6-digit code sent to",
+  "codeInvalid": "Enter the 6-digit code",
+  "verifyCode": "Verify Code",
+  "resendCountdown": "Resend code in {seconds}s",
+  "@resendCountdown": {
+    "placeholders": {
+      "seconds": { "type": "int" }
+    }
+  },
+  "resendCode": "Resend Code",
+  "newCodeSent": "New code sent!",
+
+  "allCities": "All Cities",
+  "cityErbil": "Erbil",
+  "citySulaymaniyah": "Sulaymaniyah",
+  "cityDuhok": "Duhok",
+  "cityHalabja": "Halabja",
+  "cityZakho": "Zakho",
+  "cityKoya": "Koya",
+  "searchHint": "Search items, city, street...",
+  "lostBadge": "{count} Lost",
+  "@lostBadge": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "foundBadge": "{count} Found",
+  "@foundBadge": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "resultsCount": "{count} results",
+  "@resultsCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "filterByCity": "Filter by City",
+  "all": "All",
+  "lost": "Lost",
+  "found": "Found",
+  "noItemsFound": "No items found",
+  "noItemsFoundHint": "Try another city or clear the search field.",
+
+  "pleaseLogIn": "Please log in",
+  "logInToTrack": "Log in to track your posts and comments.",
+  "activityTitle": "Activity",
+  "myPostsTab": "My Posts ({count})",
+  "@myPostsTab": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "myCommentsTab": "My Comments ({count})",
+  "@myCommentsTab": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "noPostsYet": "No posts yet",
+  "createFirstPost": "Create your first post to get started.",
+  "noCommentsYet": "No comments yet",
+  "commentToEngage": "Comment on posts to engage with the community.",
+
+  "pleaseLogInProfile": "Please log in to view your profile.",
+  "profileTitle": "Profile",
+  "posts": "Posts",
+  "yourPosts": "Your Posts",
+  "totalPosts": "{count} total",
+  "@totalPosts": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "noItemsPosted": "You have not posted any items yet.",
+
+  "settingsTitle": "Settings",
+  "changeName": "Change Name",
+  "yourName": "Your name",
+  "cancel": "Cancel",
+  "save": "Save",
+  "account": "Account",
+  "updateDisplayName": "Update your display name",
+  "logout": "Logout",
+  "logoutConfirm": "Are you sure you want to log out of your account?",
+  "signOutDevice": "Sign out from this device",
+  "deleteAccount": "Delete Account",
+  "deleteAccountConfirm": "This will permanently delete your account and all your posts. This cannot be undone.",
+  "permanentlyRemove": "Permanently remove your account and posts",
+  "delete": "Delete",
+  "language": "Language",
+  "selectLanguage": "Choose app language",
+  "english": "English",
+  "arabic": "العربية",
+  "preferences": "Preferences",
+
+  "postDetails": "Post Details",
+  "postNotFound": "Post not found.",
+  "couldNotOpenWhatsapp": "Could not open WhatsApp.",
+  "sharedVia": "Shared via Find It app",
+  "whatsappMessagePrefix": "Hi, I saw your post about:",
+  "loginToReport": "Please login to report this post.",
+  "cannotReportOwn": "You cannot report your own post.",
+  "alreadyReported": "You already reported this post.",
+  "reportPost": "Report Post",
+  "reportConfirm": "Report this post as fake or inappropriate?",
+  "report": "Report",
+  "reported": "Reported",
+  "postReported": "Post reported. Thank you.",
+  "markAsResolved": "Mark as Resolved",
+  "markResolvedConfirm": "Mark this post as resolved? Others will see it has been closed.",
+  "markResolved": "Mark Resolved",
+  "postMarkedResolved": "Post marked as resolved.",
+  "loginToComment": "Please login to comment.",
+  "commentAdded": "Comment added.",
+  "deletePost": "Delete Post",
+  "deletePostConfirm": "Are you sure you want to delete this post?",
+  "contactWhatsapp": "Contact via WhatsApp",
+  "description": "Description",
+  "noDescription": "No description provided.",
+  "commentsSection": "Comments ({count})",
+  "@commentsSection": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "noCommentsSection": "No comments yet. Be the first to comment.",
+  "typeComment": "Type your comment...",
+  "itemResolved": "Item Resolved",
+  "resolvedBadge": "✓ RESOLVED",
+  "viewPost": "View",
+  "share": "Share",
+
+  "createPost": "Create Post",
+  "goHome": "Go Home",
+  "shareDetails": "Share details to help the community identify the item.",
+  "itemName": "Item Name",
+  "itemNameRequired": "Item name must be at least 2 characters",
+  "descriptionOptional": "Description (optional)",
+  "city": "City",
+  "selectCity": "Select city",
+  "cityRequired": "Please select a city",
+  "street": "Street",
+  "streetRequired": "Street is required",
+  "imagesSection": "Images ({count}/3)",
+  "@imagesSection": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "noImagesSelected": "No images selected",
+  "maxImagesReached": "Maximum 3 images allowed.",
+  "couldNotPickImage": "Could not pick image. Please try again.",
+  "loginToPost": "Please login to create a post.",
+  "addImage": "Add Image",
+  "submit": "Submit",
+  "postCreated": "Post created successfully.",
+
+  "homeNav": "Home",
+  "activityNav": "Activity",
+  "profileNav": "Profile",
+  "postFab": "Post",
+  "createPostTooltip": "Create post",
+
+  "typeLost": "Lost",
+  "typeFound": "Found",
+  "typeLostUpper": "LOST",
+  "typeFoundUpper": "FOUND"
+}

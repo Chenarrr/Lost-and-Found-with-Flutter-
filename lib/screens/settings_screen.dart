@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/config/app_colors.dart';
+import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/screens/auth/welcome_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -52,6 +53,7 @@ class SettingsScreen extends StatelessWidget {
   // ── Dialogs ────────────────────────────────────────────────────────────────
 
   Future<void> _showChangeNameDialog(BuildContext context) async {
+    final l10n = context.l10n;
     final app = Provider.of<AppState>(context, listen: false);
     final controller = TextEditingController(text: app.currentUser?.name ?? '');
 
@@ -65,7 +67,7 @@ class SettingsScreen extends StatelessWidget {
           builder: (ctx, setState) {
             return AlertDialog(
               title: Text(
-                'Change Name',
+                l10n.changeName,
                 style: GoogleFonts.inter(fontWeight: FontWeight.w700),
               ),
               content: TextField(
@@ -73,14 +75,14 @@ class SettingsScreen extends StatelessWidget {
                 autofocus: true,
                 textCapitalization: TextCapitalization.words,
                 decoration: InputDecoration(
-                  labelText: 'Your name',
+                  labelText: l10n.yourName,
                   errorText: error,
                 ),
               ),
               actions: [
                 TextButton(
                   onPressed: loading ? null : () => Navigator.of(ctx).pop(),
-                  child: Text('Cancel', style: GoogleFonts.inter()),
+                  child: Text(l10n.cancel, style: GoogleFonts.inter()),
                 ),
                 TextButton(
                   onPressed: loading
@@ -88,9 +90,7 @@ class SettingsScreen extends StatelessWidget {
                       : () async {
                           final name = controller.text.trim();
                           if (name.length < 2) {
-                            setState(
-                              () => error = 'Enter at least 2 characters',
-                            );
+                            setState(() => error = l10n.nameTooShort);
                             return;
                           }
                           setState(() {
@@ -115,7 +115,7 @@ class SettingsScreen extends StatelessWidget {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : Text(
-                          'Save',
+                          l10n.save,
                           style: GoogleFonts.inter(
                             fontWeight: FontWeight.w700,
                             color: AppColors.primaryBlue,
@@ -132,28 +132,68 @@ class SettingsScreen extends StatelessWidget {
     controller.dispose();
   }
 
+  Future<void> _showLanguageDialog(BuildContext context) async {
+    final l10n = context.l10n;
+    final app = Provider.of<AppState>(context, listen: false);
+    await showDialog<void>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(
+          l10n.language,
+          style: GoogleFonts.inter(fontWeight: FontWeight.w700),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _LanguageOption(
+              label: l10n.english,
+              isSelected: app.locale.languageCode == 'en',
+              onTap: () {
+                app.setLocale(const Locale('en'));
+                Navigator.of(context).pop();
+              },
+            ),
+            const SizedBox(height: 8),
+            _LanguageOption(
+              label: l10n.arabic,
+              isSelected: app.locale.languageCode == 'ar',
+              onTap: () {
+                app.setLocale(const Locale('ar'));
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(l10n.cancel, style: GoogleFonts.inter()),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _logout(BuildContext context) async {
+    final l10n = context.l10n;
     final app = Provider.of<AppState>(context, listen: false);
     final shouldLogout = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
         title: Text(
-          'Logout',
+          l10n.logout,
           style: GoogleFonts.inter(fontWeight: FontWeight.w700),
         ),
-        content: Text(
-          'Are you sure you want to log out of your account?',
-          style: GoogleFonts.inter(),
-        ),
+        content: Text(l10n.logoutConfirm, style: GoogleFonts.inter()),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text('Cancel', style: GoogleFonts.inter()),
+            child: Text(l10n.cancel, style: GoogleFonts.inter()),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             child: Text(
-              'Logout',
+              l10n.logout,
               style: GoogleFonts.inter(
                 color: AppColors.lostPrimary,
                 fontWeight: FontWeight.w700,
@@ -175,29 +215,26 @@ class SettingsScreen extends StatelessWidget {
   }
 
   Future<void> _deleteAccount(BuildContext context) async {
+    final l10n = context.l10n;
     final app = Provider.of<AppState>(context, listen: false);
 
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
         title: Text(
-          'Delete Account',
+          l10n.deleteAccount,
           style: GoogleFonts.inter(fontWeight: FontWeight.w700),
         ),
-        content: Text(
-          'This will permanently delete your account and all your posts. '
-          'This cannot be undone.',
-          style: GoogleFonts.inter(),
-        ),
+        content: Text(l10n.deleteAccountConfirm, style: GoogleFonts.inter()),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text('Cancel', style: GoogleFonts.inter()),
+            child: Text(l10n.cancel, style: GoogleFonts.inter()),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             child: Text(
-              'Delete',
+              l10n.delete,
               style: GoogleFonts.inter(
                 color: AppColors.lostPrimary,
                 fontWeight: FontWeight.w700,
@@ -234,17 +271,24 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Use typed primitives — avoids the _dependents.isEmpty assertion that
-    // fires when `dynamic` is used and auth state changes during navigation.
+    final l10n = context.l10n;
     final userName = context.select<AppState, String>(
       (app) => app.currentUser?.name ?? '',
     );
     final userPhone = context.select<AppState, String>(
       (app) => app.currentUser?.phone ?? '',
     );
+    final currentLangCode = context.select<AppState, String>(
+      (app) => app.locale.languageCode,
+    );
+    final currentLangLabel = currentLangCode == 'ar'
+        ? l10n.arabic
+        : l10n.english;
 
     return Scaffold(
-      appBar: AppBar(title: Text('Settings', style: GoogleFonts.inter())),
+      appBar: AppBar(
+        title: Text(l10n.settingsTitle, style: GoogleFonts.inter()),
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -304,7 +348,7 @@ class SettingsScreen extends StatelessWidget {
 
           // ── Account section ───────────────────────────────────────
           Text(
-            'Account',
+            l10n.account,
             style: GoogleFonts.inter(
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -325,8 +369,8 @@ class SettingsScreen extends StatelessWidget {
                   icon: Icons.edit_rounded,
                   iconBg: AppColors.infoBox,
                   iconFg: AppColors.primaryBlue,
-                  title: 'Change Name',
-                  subtitle: 'Update your display name',
+                  title: l10n.changeName,
+                  subtitle: l10n.updateDisplayName,
                   onTap: () => _showChangeNameDialog(context),
                 ),
 
@@ -336,8 +380,8 @@ class SettingsScreen extends StatelessWidget {
                   icon: Icons.logout,
                   iconBg: AppColors.lostLight,
                   iconFg: AppColors.lostPrimary,
-                  title: 'Logout',
-                  subtitle: 'Sign out from this device',
+                  title: l10n.logout,
+                  subtitle: l10n.signOutDevice,
                   onTap: () => _logout(context),
                 ),
 
@@ -347,11 +391,69 @@ class SettingsScreen extends StatelessWidget {
                   icon: Icons.delete_forever_rounded,
                   iconBg: AppColors.lostLight,
                   iconFg: AppColors.lostDark,
-                  title: 'Delete Account',
-                  subtitle: 'Permanently remove your account and posts',
+                  title: l10n.deleteAccount,
+                  subtitle: l10n.permanentlyRemove,
                   onTap: () => _deleteAccount(context),
                 ),
               ],
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // ── Preferences section ───────────────────────────────────
+          Text(
+            l10n.preferences,
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textSecondary,
+              letterSpacing: 0.5,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.borderGray),
+            ),
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 4,
+              ),
+              leading: Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: AppColors.skyTop,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.language_rounded,
+                  color: AppColors.primaryBlue,
+                ),
+              ),
+              title: Text(
+                l10n.language,
+                style: GoogleFonts.inter(
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              subtitle: Text(
+                currentLangLabel,
+                style: GoogleFonts.inter(
+                  color: AppColors.textSecondary,
+                  fontSize: 12,
+                ),
+              ),
+              trailing: const Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.iconGray,
+              ),
+              onTap: () => _showLanguageDialog(context),
             ),
           ),
 
@@ -378,6 +480,57 @@ class SettingsScreen extends StatelessWidget {
 
           const SizedBox(height: 24),
         ],
+      ),
+    );
+  }
+}
+
+class _LanguageOption extends StatelessWidget {
+  const _LanguageOption({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.infoBox : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? AppColors.primaryBlue : AppColors.borderGray,
+          ),
+        ),
+        child: Row(
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                color: isSelected
+                    ? AppColors.primaryBlue
+                    : AppColors.textPrimary,
+                fontSize: 15,
+              ),
+            ),
+            const Spacer(),
+            if (isSelected)
+              const Icon(
+                Icons.check_rounded,
+                color: AppColors.primaryBlue,
+                size: 20,
+              ),
+          ],
+        ),
       ),
     );
   }

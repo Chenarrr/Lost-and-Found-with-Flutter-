@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/config/app_colors.dart';
+import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/models/comment.dart';
 import 'package:flutter_application/models/post.dart';
 import 'package:flutter_application/providers/app_state.dart';
@@ -45,7 +46,9 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   }
 
   Future<void> _contactViaWhatsApp(String phone, String itemName) async {
-    final message = Uri.encodeComponent('Hi, I saw your post about: $itemName');
+    final message = Uri.encodeComponent(
+      '${context.l10n.whatsappMessagePrefix} $itemName',
+    );
     final cleanPhone = phone.trim().replaceAll(RegExp(r'[\s+]'), '');
     final whatsappUrl = Uri.parse(
       'whatsapp://send?phone=$cleanPhone&text=$message',
@@ -60,12 +63,15 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
       }
     } catch (_) {
       if (!mounted) return;
-      _showMessage('Could not open WhatsApp.', isError: true);
+      _showMessage(context.l10n.couldNotOpenWhatsapp, isError: true);
     }
   }
 
   void _sharePost(Post post) {
-    final type = post.type.name.toUpperCase();
+    final l10n = context.l10n;
+    final type = post.type == PostType.lost
+        ? l10n.typeLostUpper
+        : l10n.typeFoundUpper;
     final desc = post.description?.isNotEmpty == true
         ? '\n\n${post.description}'
         : '';
@@ -74,42 +80,40 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
       '📍 ${post.city}, ${post.street}\n'
       '👤 ${post.userName}  📞 ${post.userPhone}'
       '$desc\n\n'
-      'Shared via Find It app',
+      '${l10n.sharedVia}',
     );
   }
 
   Future<void> _confirmReport(AppState app, Post post) async {
     final currentUser = app.currentUser;
+    final l10n = context.l10n;
     if (currentUser == null) {
-      _showMessage('Please login to report this post.', isError: true);
+      _showMessage(l10n.loginToReport, isError: true);
       return;
     }
     if (currentUser.id == post.userId) {
-      _showMessage('You cannot report your own post.', isError: true);
+      _showMessage(l10n.cannotReportOwn, isError: true);
       return;
     }
     if (post.reports.contains(currentUser.id)) {
-      _showMessage('You already reported this post.');
+      _showMessage(l10n.alreadyReported);
       return;
     }
 
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text('Report Post', style: GoogleFonts.inter()),
-        content: Text(
-          'Report this post as fake or inappropriate?',
-          style: GoogleFonts.inter(),
-        ),
+        title: Text(l10n.reportPost, style: GoogleFonts.inter()),
+        content: Text(l10n.reportConfirm, style: GoogleFonts.inter()),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text('Cancel', style: GoogleFonts.inter()),
+            child: Text(l10n.cancel, style: GoogleFonts.inter()),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             child: Text(
-              'Report',
+              l10n.report,
               style: GoogleFonts.inter(
                 color: AppColors.lostPrimary,
                 fontWeight: FontWeight.w700,
@@ -123,27 +127,25 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     if (confirmed != true) return;
     await app.reportPost(post.id, currentUser.id);
     if (!mounted) return;
-    _showMessage('Post reported. Thank you.');
+    _showMessage(l10n.postReported);
   }
 
   Future<void> _markResolved(AppState app, Post post) async {
+    final l10n = context.l10n;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text('Mark as Resolved', style: GoogleFonts.inter()),
-        content: Text(
-          'Mark this post as resolved? Others will see it has been closed.',
-          style: GoogleFonts.inter(),
-        ),
+        title: Text(l10n.markAsResolved, style: GoogleFonts.inter()),
+        content: Text(l10n.markResolvedConfirm, style: GoogleFonts.inter()),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text('Cancel', style: GoogleFonts.inter()),
+            child: Text(l10n.cancel, style: GoogleFonts.inter()),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             child: Text(
-              'Mark Resolved',
+              l10n.markResolved,
               style: GoogleFonts.inter(
                 color: AppColors.foundPrimary,
                 fontWeight: FontWeight.w700,
@@ -157,7 +159,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     if (confirmed != true) return;
     await app.markPostResolved(post.id);
     if (!mounted) return;
-    _showMessage('Post marked as resolved.');
+    _showMessage(l10n.postMarkedResolved);
   }
 
   Future<void> _addComment(AppState app, Post post) async {
@@ -166,7 +168,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
     final user = app.currentUser;
     if (user == null) {
-      _showMessage('Please login to comment.', isError: true);
+      _showMessage(context.l10n.loginToComment, isError: true);
       return;
     }
 
@@ -182,27 +184,25 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     await app.addComment(post.id, comment);
     if (!mounted) return;
     _commentController.clear();
-    _showMessage('Comment added.');
+    _showMessage(context.l10n.commentAdded);
   }
 
   Future<void> _deletePost(AppState app, Post post) async {
+    final l10n = context.l10n;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text('Delete Post', style: GoogleFonts.inter()),
-        content: Text(
-          'Are you sure you want to delete this post?',
-          style: GoogleFonts.inter(),
-        ),
+        title: Text(l10n.deletePost, style: GoogleFonts.inter()),
+        content: Text(l10n.deletePostConfirm, style: GoogleFonts.inter()),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text('Cancel', style: GoogleFonts.inter()),
+            child: Text(l10n.cancel, style: GoogleFonts.inter()),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             child: Text(
-              'Delete',
+              l10n.delete,
               style: GoogleFonts.inter(
                 color: AppColors.lostPrimary,
                 fontWeight: FontWeight.w700,
@@ -241,14 +241,17 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final app = Provider.of<AppState>(context);
+    final l10n = context.l10n;
     final postIndex = app.posts.indexWhere((post) => post.id == widget.postId);
 
     if (postIndex == -1) {
       return Scaffold(
-        appBar: AppBar(title: Text('Post Details', style: GoogleFonts.inter())),
+        appBar: AppBar(
+          title: Text(l10n.postDetails, style: GoogleFonts.inter()),
+        ),
         body: Center(
           child: Text(
-            'Post not found.',
+            l10n.postNotFound,
             style: GoogleFonts.inter(color: AppColors.textSecondary),
           ),
         ),
@@ -262,11 +265,11 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Post Details', style: GoogleFonts.inter()),
+        title: Text(l10n.postDetails, style: GoogleFonts.inter()),
         actions: [
           IconButton(
             icon: const Icon(Icons.share_outlined),
-            tooltip: 'Share',
+            tooltip: l10n.share,
             onPressed: () => _sharePost(post),
           ),
         ],
@@ -313,7 +316,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: Text(
-                        post.type.name.toUpperCase(),
+                        isLost ? l10n.typeLostUpper : l10n.typeFoundUpper,
                         style: GoogleFonts.inter(
                           color: Colors.white,
                           fontSize: 11,
@@ -352,7 +355,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                           borderRadius: BorderRadius.circular(999),
                         ),
                         child: Text(
-                          '✓ RESOLVED',
+                          l10n.resolvedBadge,
                           style: GoogleFonts.inter(
                             color: AppColors.foundDark,
                             fontSize: 11,
@@ -366,8 +369,8 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                       onPressed: () => _confirmReport(app, post),
                       child: Text(
                         post.reports.contains(app.currentUser?.id)
-                            ? 'Reported'
-                            : 'Report',
+                            ? l10n.reported
+                            : l10n.report,
                         style: GoogleFonts.inter(
                           color: post.reports.contains(app.currentUser?.id)
                               ? AppColors.textTertiary
@@ -402,7 +405,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      timeago.format(post.createdAt),
+                      timeago.format(post.createdAt, locale: l10n.localeName),
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         color: AppColors.textTertiary,
@@ -432,7 +435,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                         _contactViaWhatsApp(post.userPhone, post.itemName),
                     icon: const Icon(Icons.chat_rounded),
                     label: Text(
-                      'Contact via WhatsApp',
+                      l10n.contactWhatsapp,
                       style: GoogleFonts.inter(fontWeight: FontWeight.w600),
                     ),
                     style: ElevatedButton.styleFrom(
@@ -444,7 +447,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Description',
+                  l10n.description,
                   style: GoogleFonts.inter(
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
@@ -452,7 +455,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  post.description ?? 'No description provided.',
+                  post.description ?? l10n.noDescription,
                   style: GoogleFonts.inter(color: AppColors.textSecondary),
                 ),
               ],
@@ -470,7 +473,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Comments (${post.comments.length})',
+                  l10n.commentsSection(post.comments.length),
                   style: GoogleFonts.inter(
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
@@ -486,7 +489,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      'No comments yet. Be the first to comment.',
+                      l10n.noCommentsSection,
                       style: GoogleFonts.inter(
                         color: AppColors.textSecondary,
                         fontSize: 13,
@@ -533,7 +536,10 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                 ),
                               ),
                               Text(
-                                timeago.format(comment.createdAt),
+                                timeago.format(
+                                  comment.createdAt,
+                                  locale: l10n.localeName,
+                                ),
                                 style: GoogleFonts.inter(
                                   fontSize: 11,
                                   color: AppColors.textTertiary,
@@ -561,7 +567,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                   textInputAction: TextInputAction.send,
                   onSubmitted: (_) => _addComment(app, post),
                   decoration: InputDecoration(
-                    hintText: 'Type your comment...',
+                    hintText: l10n.typeComment,
                     suffixIcon: IconButton(
                       onPressed: () => _addComment(app, post),
                       icon: const Icon(Icons.send_rounded),
@@ -581,7 +587,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                           color: AppColors.foundPrimary,
                         ),
                         label: Text(
-                          'Mark as Resolved',
+                          l10n.markAsResolved,
                           style: GoogleFonts.inter(fontWeight: FontWeight.w600),
                         ),
                         style: OutlinedButton.styleFrom(
@@ -615,7 +621,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            'Item Resolved',
+                            l10n.itemResolved,
                             style: GoogleFonts.inter(
                               color: AppColors.foundDark,
                               fontWeight: FontWeight.w600,
@@ -637,7 +643,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                         ),
                       ),
                       child: Text(
-                        'Delete Post',
+                        l10n.deletePost,
                         style: GoogleFonts.inter(fontWeight: FontWeight.w600),
                       ),
                     ),

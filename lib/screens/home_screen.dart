@@ -3,10 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_application/config/app_colors.dart';
+import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/models/post.dart';
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/widgets/post_card.dart';
-import 'package:flutter_application/config/app_colors.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -48,6 +49,27 @@ class _HomeScreenState extends State<HomeScreen> {
       if (!mounted) return;
       setState(() => _searchQuery = value.trim().toLowerCase());
     });
+  }
+
+  String _cityDisplayName(String city, AppLocalizations l10n) {
+    switch (city) {
+      case 'All Cities':
+        return l10n.allCities;
+      case 'Erbil':
+        return l10n.cityErbil;
+      case 'Sulaymaniyah':
+        return l10n.citySulaymaniyah;
+      case 'Duhok':
+        return l10n.cityDuhok;
+      case 'Halabja':
+        return l10n.cityHalabja;
+      case 'Zakho':
+        return l10n.cityZakho;
+      case 'Koya':
+        return l10n.cityKoya;
+      default:
+        return city;
+    }
   }
 
   Widget _typeChip(String label, PostType? type) {
@@ -99,6 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final postsSource = context.select<AppState, List<Post>>(
       (app) => app.posts,
     );
@@ -129,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
             controller: _searchController,
             style: GoogleFonts.inter(fontSize: 15),
             decoration: InputDecoration(
-              hintText: 'Search items, city, street...',
+              hintText: l10n.searchHint,
               prefixIcon: const Icon(
                 Icons.search_rounded,
                 color: AppColors.primaryBlue,
@@ -160,19 +183,19 @@ class _HomeScreenState extends State<HomeScreen> {
           Row(
             children: [
               _statBadge(
-                '$lostCount Lost',
+                l10n.lostBadge(lostCount),
                 AppColors.lostPrimary,
                 AppColors.lostLight,
               ),
               const SizedBox(width: 8),
               _statBadge(
-                '$foundCount Found',
+                l10n.foundBadge(foundCount),
                 AppColors.foundPrimary,
                 AppColors.foundLight,
               ),
               const Spacer(),
               Text(
-                '${posts.length} results',
+                l10n.resultsCount(posts.length),
                 style: GoogleFonts.inter(
                   fontSize: 13,
                   color: AppColors.textTertiary,
@@ -204,7 +227,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Text(
-                      'Filter by City',
+                      l10n.filterByCity,
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
@@ -228,7 +251,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         size: 22,
                       ),
                       title: Text(
-                        city,
+                        _cityDisplayName(city, l10n),
                         style: GoogleFonts.inter(
                           fontSize: 15,
                           fontWeight: city == _cityFilter
@@ -279,7 +302,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    _cityFilter,
+                    _cityDisplayName(_cityFilter, l10n),
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -303,11 +326,11 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 10),
           Row(
             children: [
-              _typeChip('All', null),
+              _typeChip(l10n.all, null),
               const SizedBox(width: 8),
-              _typeChip('Lost', PostType.lost),
+              _typeChip(l10n.lost, PostType.lost),
               const SizedBox(width: 8),
-              _typeChip('Found', PostType.found),
+              _typeChip(l10n.found, PostType.found),
             ],
           ),
           const SizedBox(height: 14),
@@ -333,7 +356,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 14),
                     Text(
-                      'No items found',
+                      l10n.noItemsFound,
                       style: GoogleFonts.inter(
                         fontSize: 19,
                         color: AppColors.textPrimary,
@@ -342,7 +365,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'Try another city or clear the search field.',
+                      l10n.noItemsFoundHint,
                       style: GoogleFonts.inter(color: AppColors.textSecondary),
                     ),
                   ],

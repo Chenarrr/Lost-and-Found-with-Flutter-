@@ -14,6 +14,7 @@
 
 - [About the App](#about-the-app)
 - [Features](#features)
+- [Localization](#localization)
 - [How to Use](#how-to-use)
 - [Tech Stack](#tech-stack)
 - [Architecture](#architecture)
@@ -82,9 +83,17 @@ Find It was built to solve a simple but common problem in Kurdish communities: w
 
 ### Settings
 - **Change Name** — update display name stored in Firestore
+- **Language** — switch between **English** and **Arabic (العربية)** at any time; the entire app (including RTL layout) updates instantly without restarting
 - **Logout** — sign out from the current device
 - **Delete Account** — permanently deletes the account, all posts, and the Firebase Auth record (with re-auth prompt if session is stale)
 - **App version** shown at the bottom
+
+### Localization
+- Full **English / Arabic** support across every screen, dialog, button, and validation message
+- RTL layout handled automatically by Flutter when Arabic is active
+- Arabic relative timestamps via `timeago` (`"منذ دقيقتين"` instead of "2 minutes ago")
+- City names, category chips, and all UI strings are translated
+- The selected language is stored in app state and applied app-wide without a restart
 
 ---
 
@@ -153,7 +162,8 @@ Find It was built to solve a simple but common problem in Kurdish communities: w
 | Share | `share_plus` | Native OS share sheet |
 | App Info | `package_info_plus` | Display app version in Settings |
 | ID Generation | `uuid` | Unique IDs for posts and comments |
-| Time Display | `timeago` | Human-friendly timestamps ("2 hours ago") |
+| Time Display | `timeago` | Human-friendly timestamps ("2 hours ago" / "منذ ساعتين") |
+| Localization | `flutter_localizations` + `intl` | English & Arabic translations, RTL layout |
 
 ---
 
@@ -168,6 +178,12 @@ lib/
 │
 ├── config/
 │   └── app_colors.dart          # Centralized color tokens (brand, status, neutrals)
+│
+├── l10n/
+│   ├── app_en.arb               # English string resources
+│   ├── app_ar.arb               # Arabic string resources
+│   ├── app_localizations.dart   # Generated — do not edit manually
+│   └── l10n.dart                # `context.l10n` extension + re-export
 │
 ├── models/
 │   ├── post.dart                # Post model — PostType & PostCategory enums, toJson/fromJson
@@ -199,6 +215,8 @@ lib/
 │
 └── utils/
     └── phone_input_formatter.dart  # TextInputFormatter for Iraqi phone numbers
+
+l10n.yaml                            # Flutter codegen config — arb-dir, output file
 ```
 
 ### Data flow
@@ -460,7 +478,7 @@ Images are named `{itemName}_{userPhone}` for traceability. The API key is loade
 
 Every post detail screen has a **Contact via WhatsApp** button (styled with WhatsApp green `#25D366`). It:
 
-1. Builds a pre-filled message: `"Hi, I saw your post about: {itemName}"`.
+1. Builds a pre-filled message in the active language: `"Hi, I saw your post about: {itemName}"` (or the Arabic equivalent).
 2. Strips all spaces from the phone number.
 3. Tries the native deep link: `whatsapp://send?phone={number}&text={message}`.
 4. Falls back to the web URL `https://wa.me/{number}?text={message}` if WhatsApp is not installed.

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/config/app_colors.dart';
+import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/models/post.dart';
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/screens/settings_screen.dart';
@@ -12,6 +13,7 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final app = Provider.of<AppState>(context);
     final user = app.currentUser;
 
@@ -26,7 +28,7 @@ class ProfileScreen extends StatelessWidget {
             border: Border.all(color: AppColors.borderGray),
           ),
           child: Text(
-            'Please log in to view your profile.',
+            l10n.pleaseLogInProfile,
             style: GoogleFonts.inter(
               fontSize: 15,
               color: AppColors.textSecondary,
@@ -48,7 +50,7 @@ class ProfileScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Profile', style: GoogleFonts.inter()),
+        title: Text(l10n.profileTitle, style: GoogleFonts.inter()),
         actions: [
           IconButton(
             onPressed: () => Navigator.of(
@@ -159,9 +161,9 @@ class ProfileScreen extends StatelessWidget {
                   spacing: 10,
                   runSpacing: 10,
                   children: [
-                    _StatPill(label: 'Posts', value: '${userPosts.length}'),
-                    _StatPill(label: 'Lost', value: '$lostCount'),
-                    _StatPill(label: 'Found', value: '$foundCount'),
+                    _StatPill(label: l10n.posts, value: '${userPosts.length}'),
+                    _StatPill(label: l10n.typeLost, value: '$lostCount'),
+                    _StatPill(label: l10n.typeFound, value: '$foundCount'),
                   ],
                 ),
               ],
@@ -171,7 +173,7 @@ class ProfileScreen extends StatelessWidget {
           Row(
             children: [
               Text(
-                'Your Posts',
+                l10n.yourPosts,
                 style: GoogleFonts.inter(
                   fontSize: 19,
                   fontWeight: FontWeight.w700,
@@ -180,7 +182,7 @@ class ProfileScreen extends StatelessWidget {
               ),
               const Spacer(),
               Text(
-                '${userPosts.length} total',
+                l10n.totalPosts(userPosts.length),
                 style: GoogleFonts.inter(
                   color: AppColors.textSecondary,
                   fontWeight: FontWeight.w600,
@@ -207,7 +209,7 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'You have not posted any items yet.',
+                    l10n.noItemsPosted,
                     style: GoogleFonts.inter(
                       color: AppColors.textSecondary,
                       fontWeight: FontWeight.w600,

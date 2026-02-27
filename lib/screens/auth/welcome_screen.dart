@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_application/config/app_colors.dart';
+import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/screens/auth/auth_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -29,7 +31,7 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    'Find It',
+                    l10n.appName,
                     style: GoogleFonts.inter(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -38,10 +40,7 @@ class WelcomeScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 48),
-              Text(
-                'Reuniting lost items across Kurdistan',
-                style: GoogleFonts.inter(fontSize: 18),
-              ),
+              Text(l10n.tagline, style: GoogleFonts.inter(fontSize: 18)),
               const SizedBox(height: 24),
               const Spacer(),
               SizedBox(
@@ -72,7 +71,7 @@ class WelcomeScreen extends StatelessWidget {
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       child: Text(
-                        'Get Started',
+                        l10n.getStarted,
                         style: GoogleFonts.inter(
                           fontSize: 16,
                           color: Colors.white,

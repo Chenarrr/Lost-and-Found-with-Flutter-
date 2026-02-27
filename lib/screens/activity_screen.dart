@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/config/app_colors.dart';
+import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/models/comment.dart';
 import 'package:flutter_application/models/post.dart';
 import 'package:flutter_application/providers/app_state.dart';
@@ -14,15 +15,16 @@ class ActivityScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final app = Provider.of<AppState>(context);
     final user = app.currentUser;
 
     if (user == null) {
-      return const Scaffold(
+      return Scaffold(
         body: _ActivityEmpty(
           icon: Icons.lock_outline_rounded,
-          title: 'Please log in',
-          message: 'Log in to track your posts and comments.',
+          title: l10n.pleaseLogIn,
+          message: l10n.logInToTrack,
         ),
       );
     }
@@ -47,7 +49,7 @@ class ActivityScreen extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Activity', style: GoogleFonts.inter()),
+          title: Text(l10n.activityTitle, style: GoogleFonts.inter()),
           bottom: TabBar(
             labelStyle: GoogleFonts.inter(fontWeight: FontWeight.w600),
             unselectedLabelStyle: GoogleFonts.inter(
@@ -57,18 +59,18 @@ class ActivityScreen extends StatelessWidget {
             labelColor: AppColors.primaryBlue,
             unselectedLabelColor: AppColors.textSecondary,
             tabs: [
-              Tab(text: 'My Posts (${userPosts.length})'),
-              Tab(text: 'My Comments (${userComments.length})'),
+              Tab(text: l10n.myPostsTab(userPosts.length)),
+              Tab(text: l10n.myCommentsTab(userComments.length)),
             ],
           ),
         ),
         body: TabBarView(
           children: [
             if (userPosts.isEmpty)
-              const _ActivityEmpty(
+              _ActivityEmpty(
                 icon: Icons.post_add_rounded,
-                title: 'No posts yet',
-                message: 'Create your first post to get started.',
+                title: l10n.noPostsYet,
+                message: l10n.createFirstPost,
               )
             else
               ListView.builder(
@@ -79,10 +81,10 @@ class ActivityScreen extends StatelessWidget {
                     PostCard(post: userPosts[index]),
               ),
             if (userComments.isEmpty)
-              const _ActivityEmpty(
+              _ActivityEmpty(
                 icon: Icons.comment_bank_outlined,
-                title: 'No comments yet',
-                message: 'Comment on posts to engage with the community.',
+                title: l10n.noCommentsYet,
+                message: l10n.commentToEngage,
               )
             else
               ListView.builder(
@@ -138,8 +140,8 @@ class ActivityScreen extends StatelessWidget {
                               ),
                               child: Text(
                                 entry.post.type == PostType.lost
-                                    ? 'Lost'
-                                    : 'Found',
+                                    ? l10n.typeLost
+                                    : l10n.typeFound,
                                 style: GoogleFonts.inter(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w600,
@@ -165,7 +167,10 @@ class ActivityScreen extends StatelessWidget {
                         ),
                       ),
                       trailing: Text(
-                        timeago.format(entry.comment.createdAt),
+                        timeago.format(
+                          entry.comment.createdAt,
+                          locale: l10n.localeName,
+                        ),
                         style: GoogleFonts.inter(
                           fontSize: 11,
                           color: AppColors.textTertiary,

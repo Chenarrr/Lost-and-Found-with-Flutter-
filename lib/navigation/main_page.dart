@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_application/config/app_colors.dart';
+import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/screens/home_screen.dart';
 import 'package:flutter_application/screens/activity_screen.dart';
 import 'package:flutter_application/screens/profile_screen.dart';
@@ -37,6 +38,7 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final showHomeAppBar = _selectedIndex == 0;
 
     return Scaffold(
@@ -68,7 +70,7 @@ class _MainPageState extends State<MainPage> {
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    'Find It',
+                    l10n.appName,
                     style: GoogleFonts.inter(
                       fontWeight: FontWeight.w700,
                       fontSize: 22,
@@ -99,7 +101,7 @@ class _MainPageState extends State<MainPage> {
                     ),
                     child: const Icon(Icons.add, color: AppColors.primaryBlue),
                   ),
-                  tooltip: 'Create post',
+                  tooltip: l10n.createPostTooltip,
                 ),
                 const SizedBox(width: 8),
               ],
@@ -114,16 +116,19 @@ class _MainPageState extends State<MainPage> {
         child: BottomNavigationBar(
           currentIndex: _selectedIndex,
           onTap: (index) => setState(() => _selectedIndex = index),
-          items: const [
+          items: [
             BottomNavigationBarItem(
-              icon: Icon(Icons.home_filled),
-              label: 'Home',
+              icon: const Icon(Icons.home_filled),
+              label: l10n.homeNav,
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.show_chart),
-              label: 'Activity',
+              icon: const Icon(Icons.show_chart),
+              label: l10n.activityNav,
             ),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.person),
+              label: l10n.profileNav,
+            ),
           ],
           selectedLabelStyle: GoogleFonts.inter(fontWeight: FontWeight.w600),
           unselectedLabelStyle: GoogleFonts.inter(fontWeight: FontWeight.w500),
@@ -153,7 +158,7 @@ class _MainPageState extends State<MainPage> {
         child: FloatingActionButton.extended(
           onPressed: _openCreatePost,
           label: Text(
-            'Post',
+            l10n.postFab,
             style: GoogleFonts.inter(fontWeight: FontWeight.w600),
           ),
           icon: const Icon(Icons.add),

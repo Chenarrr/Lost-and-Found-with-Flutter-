@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/config/app_colors.dart';
+import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/models/post.dart';
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -88,9 +89,28 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
     );
   }
 
+  String _cityDisplayName(String city, AppLocalizations l10n) {
+    switch (city) {
+      case 'Erbil':
+        return l10n.cityErbil;
+      case 'Sulaymaniyah':
+        return l10n.citySulaymaniyah;
+      case 'Duhok':
+        return l10n.cityDuhok;
+      case 'Halabja':
+        return l10n.cityHalabja;
+      case 'Zakho':
+        return l10n.cityZakho;
+      case 'Koya':
+        return l10n.cityKoya;
+      default:
+        return city;
+    }
+  }
+
   Future<void> _pickImage() async {
     if (_imagePaths.length >= 3) {
-      _showMessage('Maximum 3 images allowed.', isError: true);
+      _showMessage(context.l10n.maxImagesReached, isError: true);
       return;
     }
 
@@ -104,7 +124,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
       setState(() => _imagePaths.add(picked.path));
     } catch (_) {
       if (!mounted) return;
-      _showMessage('Could not pick image. Please try again.', isError: true);
+      _showMessage(context.l10n.couldNotPickImage, isError: true);
     }
   }
 
@@ -115,7 +135,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
     final messenger = ScaffoldMessenger.of(context);
     final currentUser = app.currentUser;
     if (currentUser == null) {
-      _showMessage('Please login to create a post.', isError: true);
+      _showMessage(context.l10n.loginToPost, isError: true);
       return;
     }
 
@@ -144,8 +164,8 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
     setState(() => _isLoading = false);
     Navigator.of(context).pop();
     messenger.showSnackBar(
-      const SnackBar(
-        content: Text('Post created successfully.'),
+      SnackBar(
+        content: Text(context.l10n.postCreated),
         backgroundColor: AppColors.primaryBlueDark,
       ),
     );
@@ -153,13 +173,14 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Create Post', style: GoogleFonts.inter()),
+        title: Text(l10n.createPost, style: GoogleFonts.inter()),
         actions: [
           IconButton(
             onPressed: _goHome,
-            tooltip: 'Go Home',
+            tooltip: l10n.goHome,
             icon: const Icon(Icons.home_rounded),
           ),
           const SizedBox(width: 6),
@@ -179,7 +200,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Share details to help the community identify the item.',
+                  l10n.shareDetails,
                   style: GoogleFonts.inter(
                     color: AppColors.textSecondary,
                     fontSize: 13,
@@ -189,7 +210,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                 Row(
                   children: [
                     ChoiceChip(
-                      label: Text('Lost', style: GoogleFonts.inter()),
+                      label: Text(l10n.typeLost, style: GoogleFonts.inter()),
                       selected: _postType == PostType.lost,
                       onSelected: (_) =>
                           setState(() => _postType = PostType.lost),
@@ -204,7 +225,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                     ),
                     const SizedBox(width: 8),
                     ChoiceChip(
-                      label: Text('Found', style: GoogleFonts.inter()),
+                      label: Text(l10n.typeFound, style: GoogleFonts.inter()),
                       selected: _postType == PostType.found,
                       onSelected: (_) =>
                           setState(() => _postType = PostType.found),
@@ -250,11 +271,11 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                   maxLength: 60,
                   validator: (value) {
                     if (value == null || value.trim().length < 2) {
-                      return 'Item name must be at least 2 characters';
+                      return l10n.itemNameRequired;
                     }
                     return null;
                   },
-                  decoration: const InputDecoration(labelText: 'Item Name'),
+                  decoration: InputDecoration(labelText: l10n.itemName),
                 ),
                 const SizedBox(height: 10),
                 TextFormField(
@@ -263,30 +284,33 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                   minLines: 2,
                   maxLines: 4,
                   textInputAction: TextInputAction.newline,
-                  decoration: const InputDecoration(
-                    labelText: 'Description (optional)',
+                  decoration: InputDecoration(
+                    labelText: l10n.descriptionOptional,
                   ),
                 ),
                 const SizedBox(height: 10),
                 DropdownButtonFormField<String>(
                   initialValue: _selectedCity,
                   isExpanded: true,
-                  decoration: const InputDecoration(labelText: 'City'),
+                  decoration: InputDecoration(labelText: l10n.city),
                   hint: Text(
-                    'Select city',
+                    l10n.selectCity,
                     style: GoogleFonts.inter(color: AppColors.placeholderGray),
                   ),
                   items: _cityOptions
                       .map(
                         (city) => DropdownMenuItem<String>(
                           value: city,
-                          child: Text(city, style: GoogleFonts.inter()),
+                          child: Text(
+                            _cityDisplayName(city, l10n),
+                            style: GoogleFonts.inter(),
+                          ),
                         ),
                       )
                       .toList(),
                   onChanged: (value) => setState(() => _selectedCity = value),
                   validator: (value) =>
-                      value == null ? 'Please select a city' : null,
+                      value == null ? l10n.cityRequired : null,
                 ),
                 const SizedBox(height: 10),
                 TextFormField(
@@ -294,15 +318,15 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                   textInputAction: TextInputAction.done,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Street is required';
+                      return l10n.streetRequired;
                     }
                     return null;
                   },
-                  decoration: const InputDecoration(labelText: 'Street'),
+                  decoration: InputDecoration(labelText: l10n.street),
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Images (${_imagePaths.length}/3)',
+                  l10n.imagesSection(_imagePaths.length),
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -320,7 +344,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                     ),
                     child: Center(
                       child: Text(
-                        'No images selected',
+                        l10n.noImagesSelected,
                         style: GoogleFonts.inter(
                           color: AppColors.textSecondary,
                         ),
@@ -365,7 +389,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                   OutlinedButton.icon(
                     onPressed: _pickImage,
                     icon: const Icon(Icons.add_photo_alternate_outlined),
-                    label: Text('Add Image', style: GoogleFonts.inter()),
+                    label: Text(l10n.addImage, style: GoogleFonts.inter()),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.primaryBlue,
                       side: const BorderSide(color: AppColors.primaryBlue),
@@ -392,7 +416,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                             ),
                           )
                         : Text(
-                            'Submit',
+                            l10n.submit,
                             style: GoogleFonts.inter(fontSize: 16),
                           ),
                   ),

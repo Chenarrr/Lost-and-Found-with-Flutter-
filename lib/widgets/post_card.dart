@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/config/app_colors.dart';
+import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/models/post.dart';
 import 'package:flutter_application/screens/post/post_detail_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -17,6 +18,7 @@ class PostCard extends StatelessWidget {
     final isLost = post.type == PostType.lost;
     final accentColor = isLost ? AppColors.lostPrimary : AppColors.foundPrimary;
     final softColor = isLost ? AppColors.lostLight : AppColors.foundLight;
+    final l10n = context.l10n;
 
     return GestureDetector(
       onTap: () => Navigator.of(context).push(
@@ -118,7 +120,9 @@ class PostCard extends StatelessWidget {
                                           ),
                                         ),
                                         child: Text(
-                                          post.type.name.toUpperCase(),
+                                          isLost
+                                              ? l10n.typeLostUpper
+                                              : l10n.typeFoundUpper,
                                           style: GoogleFonts.inter(
                                             color: Colors.white,
                                             fontSize: 10,
@@ -200,7 +204,10 @@ class PostCard extends StatelessWidget {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              timeago.format(post.createdAt),
+                              timeago.format(
+                                post.createdAt,
+                                locale: l10n.localeName,
+                              ),
                               style: GoogleFonts.inter(
                                 fontSize: 12,
                                 color: AppColors.textTertiary,
@@ -253,7 +260,7 @@ class PostCard extends StatelessWidget {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
-                                    'View',
+                                    l10n.viewPost,
                                     style: GoogleFonts.inter(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w700,

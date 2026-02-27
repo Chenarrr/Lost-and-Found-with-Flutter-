@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application/config/app_colors.dart';
+import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/navigation/main_page.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -64,7 +65,7 @@ class _OtpScreenState extends State<OtpScreen> {
   Future<void> _verify() async {
     final code = _otpController.text.trim();
     if (code.length != 6) {
-      setState(() => _error = 'Enter the 6-digit code');
+      setState(() => _error = context.l10n.codeInvalid);
       return;
     }
 
@@ -109,7 +110,7 @@ class _OtpScreenState extends State<OtpScreen> {
         _startCountdown();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('New code sent!', style: GoogleFonts.inter()),
+            content: Text(context.l10n.newCodeSent, style: GoogleFonts.inter()),
             backgroundColor: AppColors.primaryBlueDark,
             behavior: SnackBarBehavior.floating,
           ),
@@ -120,15 +121,16 @@ class _OtpScreenState extends State<OtpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
-      appBar: AppBar(title: Text('Verify Phone', style: GoogleFonts.inter())),
+      appBar: AppBar(title: Text(l10n.verifyPhone, style: GoogleFonts.inter())),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Enter the 6-digit code sent to',
+              l10n.enterCodeSentTo,
               style: GoogleFonts.inter(
                 fontSize: 14,
                 color: AppColors.textSecondary,
@@ -191,7 +193,7 @@ class _OtpScreenState extends State<OtpScreen> {
                         ),
                       )
                     : Text(
-                        'Verify Code',
+                        l10n.verifyCode,
                         style: GoogleFonts.inter(fontSize: 16),
                       ),
               ),
@@ -206,7 +208,7 @@ class _OtpScreenState extends State<OtpScreen> {
                     )
                   : _secondsLeft > 0
                   ? Text(
-                      'Resend code in ${_secondsLeft}s',
+                      l10n.resendCountdown(_secondsLeft),
                       style: GoogleFonts.inter(
                         color: AppColors.textTertiary,
                         fontSize: 14,
@@ -215,7 +217,7 @@ class _OtpScreenState extends State<OtpScreen> {
                   : TextButton(
                       onPressed: _resend,
                       child: Text(
-                        'Resend Code',
+                        l10n.resendCode,
                         style: GoogleFonts.inter(
                           color: AppColors.primaryBlue,
                           fontWeight: FontWeight.w600,

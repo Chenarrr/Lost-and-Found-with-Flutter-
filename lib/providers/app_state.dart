@@ -4,7 +4,6 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide User;
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
@@ -17,6 +16,16 @@ class AppState extends ChangeNotifier {
   bool _isInitialized = false;
   User? currentUser;
   List<Post> posts = [];
+
+  // Locale
+  Locale _locale = const Locale('en');
+  Locale get locale => _locale;
+  void setLocale(Locale locale) {
+    if (_locale == locale) return;
+    _locale = locale;
+    notifyListeners();
+  }
+
   StreamSubscription<QuerySnapshot>? _postsSubscription;
 
   // OTP State

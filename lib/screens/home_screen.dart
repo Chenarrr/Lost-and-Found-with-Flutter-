@@ -242,35 +242,122 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(height: 14),
-          SizedBox(
-            height: 44,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: _cities.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 10),
-              itemBuilder: (_, index) {
-                final city = _cities[index];
-                final isActive = city == _cityFilter;
-                return ChoiceChip(
-                  label: Text(
-                    city,
-                    style: GoogleFonts.inter(
-                      color: isActive ? Colors.white : AppColors.textPrimary,
-                      fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-                      fontSize: 14,
+          GestureDetector(
+            onTap: () => showModalBottomSheet(
+              context: context,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              builder: (_) => Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 12),
+                  Container(
+                    width: 36,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: AppColors.borderGray,
+                      borderRadius: BorderRadius.circular(999),
                     ),
                   ),
-                  selected: isActive,
-                  showCheckmark: false,
-                  onSelected: (_) => setState(() => _cityFilter = city),
-                  selectedColor: AppColors.primaryBlue,
-                  backgroundColor: AppColors.cardWhite,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(999),
+                  const SizedBox(height: 16),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(
+                      'Filter by City',
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
                   ),
-                  side: const BorderSide(color: AppColors.borderGray),
-                );
-              },
+                  const SizedBox(height: 8),
+                  for (final city in _cities)
+                    ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                      ),
+                      leading: Icon(
+                        city == 'All Cities'
+                            ? Icons.public_rounded
+                            : Icons.location_on_rounded,
+                        color: city == _cityFilter
+                            ? AppColors.primaryBlue
+                            : AppColors.iconGray,
+                        size: 22,
+                      ),
+                      title: Text(
+                        city,
+                        style: GoogleFonts.inter(
+                          fontSize: 15,
+                          fontWeight: city == _cityFilter
+                              ? FontWeight.w700
+                              : FontWeight.w500,
+                          color: city == _cityFilter
+                              ? AppColors.primaryBlue
+                              : AppColors.textPrimary,
+                        ),
+                      ),
+                      trailing: city == _cityFilter
+                          ? const Icon(
+                              Icons.check_rounded,
+                              color: AppColors.primaryBlue,
+                            )
+                          : null,
+                      onTap: () {
+                        setState(() => _cityFilter = city);
+                        Navigator.pop(context);
+                      },
+                    ),
+                  const SizedBox(height: 16),
+                ],
+              ),
+            ),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: _cityFilter == 'All Cities'
+                    ? AppColors.cardWhite
+                    : AppColors.primaryBlue,
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(
+                  color: _cityFilter == 'All Cities'
+                      ? AppColors.borderGray
+                      : AppColors.primaryBlue,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.location_on_rounded,
+                    size: 16,
+                    color: _cityFilter == 'All Cities'
+                        ? AppColors.iconGray
+                        : Colors.white,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    _cityFilter,
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: _cityFilter == 'All Cities'
+                          ? AppColors.textPrimary
+                          : Colors.white,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    size: 18,
+                    color: _cityFilter == 'All Cities'
+                        ? AppColors.iconGray
+                        : Colors.white,
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 10),

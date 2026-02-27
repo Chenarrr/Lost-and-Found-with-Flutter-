@@ -187,5 +187,15 @@
   "typeLost": "مفقود",
   "typeFound": "موجود",
   "typeLostUpper": "مفقود",
-  "typeFoundUpper": "موجود"
+  "typeFoundUpper": "موجود",
+
+  "reauthTitle": "التحقق من هويتك",
+  "reauthBody": "لحذف حسابك، سنرسل رمز تحقق إلى {phone}.",
+  "@reauthBody": {
+    "placeholders": {
+      "phone": { "type": "String" }
+    }
+  },
+  "sendingCode": "جارٍ الإرسال…",
+  "confirmDelete": "تأكيد وحذف"
 }

@@ -5,6 +5,7 @@ import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/screens/auth/otp_screen.dart';
 import 'package:flutter_application/utils/phone_input_formatter.dart';
+import 'package:flutter_application/widgets/lang_toggle.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
@@ -122,6 +123,7 @@ class _AuthScreenState extends State<AuthScreen>
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.loginOrSignup, style: GoogleFonts.inter()),
+        actions: const [LangToggle(), SizedBox(width: 12)],
       ),
       body: Stack(
         children: [

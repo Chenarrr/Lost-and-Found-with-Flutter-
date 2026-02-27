@@ -308,12 +308,56 @@ class AppState extends ChangeNotifier {
       return null;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'requires-recent-login') {
-        return 'Please log out and log back in before deleting your account.';
+        return 'requires-recent-login';
       }
       return e.message ?? 'Failed to delete account.';
     } catch (e) {
       debugPrint('Error deleting account: $e');
       return 'Failed to delete account.';
+    }
+  }
+
+  /// Sends an OTP to the current user's phone for re-authentication.
+  Future<void> startReauthOtp(Function(String?) onCodeSent) async {
+    final phone = _auth.currentUser?.phoneNumber ?? currentUser?.phone ?? '';
+    if (phone.isEmpty) {
+      onCodeSent('Could not find phone number.');
+      return;
+    }
+    _verifyPhone(phone, onCodeSent);
+  }
+
+  /// Re-authenticates with an OTP code and then permanently deletes the account.
+  Future<String?> reauthWithOtpAndDelete(String code) async {
+    if (_verificationId == null) return 'Verification ID is missing.';
+    final user = _auth.currentUser;
+    if (user == null) return 'Not logged in.';
+
+    try {
+      final credential = PhoneAuthProvider.credential(
+        verificationId: _verificationId!,
+        smsCode: code,
+      );
+      await user.reauthenticateWithCredential(credential);
+
+      final uid = user.uid;
+      final snap = await _firestore
+          .collection('posts')
+          .where('userId', isEqualTo: uid)
+          .get();
+      for (final doc in snap.docs) {
+        await doc.reference.delete();
+      }
+      await _firestore.collection('users').doc(uid).delete();
+      await user.delete();
+      return null;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'invalid-verification-code') {
+        return 'Invalid code. Please try again.';
+      }
+      return e.message ?? 'Failed to verify and delete account.';
+    } catch (e) {
+      return 'An error occurred: $e';
     }
   }
 

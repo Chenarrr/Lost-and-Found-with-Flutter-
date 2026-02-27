@@ -425,4 +425,18 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get typeFoundUpper => 'موجود';
+
+  @override
+  String get reauthTitle => 'التحقق من هويتك';
+
+  @override
+  String reauthBody(String phone) {
+    return 'لحذف حسابك، سنرسل رمز تحقق إلى $phone.';
+  }
+
+  @override
+  String get sendingCode => 'جارٍ الإرسال…';
+
+  @override
+  String get confirmDelete => 'تأكيد وحذف';
 }

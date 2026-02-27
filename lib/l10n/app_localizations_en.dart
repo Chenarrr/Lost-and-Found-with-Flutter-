@@ -426,4 +426,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get typeFoundUpper => 'FOUND';
+
+  @override
+  String get reauthTitle => 'Verify Your Identity';
+
+  @override
+  String reauthBody(String phone) {
+    return 'To delete your account, we need to verify your phone number. A code will be sent to $phone.';
+  }
+
+  @override
+  String get sendingCode => 'Sending code…';
+
+  @override
+  String get confirmDelete => 'Confirm & Delete';
 }

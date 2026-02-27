@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/screens/auth/auth_screen.dart';
+import 'package:flutter_application/widgets/lang_toggle.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -17,6 +18,11 @@ class WelcomeScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 24),
+              const Align(
+                alignment: Alignment.centerRight,
+                child: LangToggle(),
+              ),
+              const SizedBox(height: 20),
               Row(
                 children: [
                   const CircleAvatar(

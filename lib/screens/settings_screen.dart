@@ -251,6 +251,11 @@ class SettingsScreen extends StatelessWidget {
 
     if (!context.mounted) return;
 
+    if (err == 'requires-recent-login') {
+      await _showReauthDialog(context);
+      return;
+    }
+
     if (err != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -265,6 +270,160 @@ class SettingsScreen extends StatelessWidget {
         (route) => false,
       );
     }
+  }
+
+  Future<void> _showReauthDialog(BuildContext context) async {
+    final l10n = context.l10n;
+    final app = Provider.of<AppState>(context, listen: false);
+    final phone = app.currentUser?.phone ?? '';
+    final codeController = TextEditingController();
+    final outerNavigator = Navigator.of(context);
+
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        bool sending = false;
+        bool codeSent = false;
+        bool deleting = false;
+        String? error;
+
+        return StatefulBuilder(
+          builder: (ctx, setState) {
+            return AlertDialog(
+              title: Text(
+                l10n.reauthTitle,
+                style: GoogleFonts.inter(fontWeight: FontWeight.w700),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(l10n.reauthBody(phone), style: GoogleFonts.inter()),
+                  if (codeSent) ...[
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: codeController,
+                      keyboardType: TextInputType.number,
+                      maxLength: 6,
+                      decoration: InputDecoration(
+                        labelText: l10n.verifyCode,
+                        hintText: l10n.codeInvalid,
+                        counterText: '',
+                      ),
+                    ),
+                  ],
+                  if (error != null) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      error!,
+                      style: GoogleFonts.inter(
+                        color: AppColors.lostPrimary,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: (sending || deleting)
+                      ? null
+                      : () => Navigator.of(ctx).pop(),
+                  child: Text(l10n.cancel, style: GoogleFonts.inter()),
+                ),
+                if (!codeSent)
+                  TextButton(
+                    onPressed: sending
+                        ? null
+                        : () async {
+                            setState(() {
+                              sending = true;
+                              error = null;
+                            });
+                            await app.startReauthOtp((err) {
+                              if (err != null) {
+                                setState(() {
+                                  sending = false;
+                                  error = err;
+                                });
+                              } else {
+                                setState(() {
+                                  sending = false;
+                                  codeSent = true;
+                                });
+                              }
+                            });
+                          },
+                    child: sending
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Text(
+                            l10n.sendOtp,
+                            style: GoogleFonts.inter(
+                              color: AppColors.primaryBlue,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                  )
+                else
+                  TextButton(
+                    onPressed: deleting
+                        ? null
+                        : () async {
+                            final code = codeController.text.trim();
+                            if (code.length != 6) {
+                              setState(() => error = l10n.codeInvalid);
+                              return;
+                            }
+                            setState(() {
+                              deleting = true;
+                              error = null;
+                            });
+                            final dialogNavigator = Navigator.of(ctx);
+                            final deleteErr = await app.reauthWithOtpAndDelete(
+                              code,
+                            );
+                            if (deleteErr != null) {
+                              setState(() {
+                                deleting = false;
+                                error = deleteErr;
+                              });
+                            } else {
+                              dialogNavigator.pop();
+                              outerNavigator.pushAndRemoveUntil(
+                                MaterialPageRoute(
+                                  builder: (_) => const WelcomeScreen(),
+                                ),
+                                (route) => false,
+                              );
+                            }
+                          },
+                    child: deleting
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Text(
+                            l10n.confirmDelete,
+                            style: GoogleFonts.inter(
+                              color: AppColors.lostPrimary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                  ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    codeController.dispose();
   }
 
   // ── Build ──────────────────────────────────────────────────────────────────

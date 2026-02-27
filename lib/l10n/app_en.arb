@@ -187,5 +187,15 @@
   "typeLost": "Lost",
   "typeFound": "Found",
   "typeLostUpper": "LOST",
-  "typeFoundUpper": "FOUND"
+  "typeFoundUpper": "FOUND",
+
+  "reauthTitle": "Verify Your Identity",
+  "reauthBody": "To delete your account, we need to verify your phone number. A code will be sent to {phone}.",
+  "@reauthBody": {
+    "placeholders": {
+      "phone": { "type": "String" }
+    }
+  },
+  "sendingCode": "Sending code…",
+  "confirmDelete": "Confirm & Delete"
 }

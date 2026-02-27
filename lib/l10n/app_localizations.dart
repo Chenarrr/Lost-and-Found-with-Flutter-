@@ -889,6 +889,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'FOUND'**
   String get typeFoundUpper;
+
+  /// No description provided for @reauthTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify Your Identity'**
+  String get reauthTitle;
+
+  /// No description provided for @reauthBody.
+  ///
+  /// In en, this message translates to:
+  /// **'To delete your account, we need to verify your phone number. A code will be sent to {phone}.'**
+  String reauthBody(String phone);
+
+  /// No description provided for @sendingCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Sending code…'**
+  String get sendingCode;
+
+  /// No description provided for @confirmDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm & Delete'**
+  String get confirmDelete;
 }
 
 class _AppLocalizationsDelegate

@@ -27,16 +27,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get signupTab => 'Signup';
 
   @override
-  String get phonePlaceholder => 'Phone (0750 222 34 44)';
+  String get phonePlaceholder => '750 222 34 44';
 
   @override
   String get requiredField => 'Required';
 
   @override
-  String get phoneInvalid => 'Enter 11 digits: 0750 222 34 44';
+  String get phoneInvalid => 'Enter 10 digits starting with 7';
 
   @override
-  String get namePlaceholder => 'Name';
+  String get namePlaceholder => 'Full Name';
 
   @override
   String get nameTooShort => 'Enter at least 2 characters';
@@ -52,6 +52,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sendOtp => 'Send OTP';
+
+  @override
+  String get genderLabel => 'Gender';
+
+  @override
+  String get genderMale => 'Male';
+
+  @override
+  String get genderFemale => 'Female';
+
+  @override
+  String get genderRequired => 'Please select a gender';
+
+  @override
+  String get ageLabel => 'Age';
+
+  @override
+  String get ageRequired => 'Age is required';
+
+  @override
+  String get ageInvalid => 'Enter a valid age (13–100)';
 
   @override
   String get verifyPhone => 'Verify Phone';

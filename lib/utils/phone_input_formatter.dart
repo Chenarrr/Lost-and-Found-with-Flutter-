@@ -1,27 +1,27 @@
 import 'package:flutter/services.dart';
 
+/// Formats a 10-digit Iraqi mobile number (without leading 0 or country code)
+/// as: 750 222 34 44
 class PhoneInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
     TextEditingValue oldValue,
     TextEditingValue newValue,
   ) {
-    final text = newValue.text.replaceAll(RegExp(r'\D'), '');
+    final digits = newValue.text.replaceAll(RegExp(r'\D'), '');
 
-    if (text.isEmpty) return newValue.copyWith(text: '');
-    if (text.length > 11) return oldValue;
+    if (digits.isEmpty) return newValue.copyWith(text: '');
+    if (digits.length > 10) return oldValue;
 
-    final formatted = StringBuffer();
-    for (int i = 0; i < text.length; i++) {
-      if (i == 4 || i == 7 || i == 9) {
-        formatted.write(' ');
-      }
-      formatted.write(text[i]);
+    final buf = StringBuffer();
+    for (int i = 0; i < digits.length; i++) {
+      if (i == 3 || i == 6 || i == 8) buf.write(' ');
+      buf.write(digits[i]);
     }
 
     return newValue.copyWith(
-      text: formatted.toString(),
-      selection: TextSelection.collapsed(offset: formatted.length),
+      text: buf.toString(),
+      selection: TextSelection.collapsed(offset: buf.length),
     );
   }
 }

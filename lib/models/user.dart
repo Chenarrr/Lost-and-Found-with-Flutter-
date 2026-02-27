@@ -5,6 +5,8 @@ class User {
     required this.phone,
     this.email,
     required this.createdAt,
+    this.gender,
+    this.age,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => User(
@@ -13,6 +15,8 @@ class User {
     phone: json['phone'] as String,
     email: json['email'] as String?,
     createdAt: DateTime.parse(json['createdAt'] as String),
+    gender: json['gender'] as String?,
+    age: json['age'] as int?,
   );
 
   final String id;
@@ -20,6 +24,9 @@ class User {
   final String phone;
   final String? email;
   final DateTime createdAt;
+  final String?
+  gender; // 'male' | 'female' — stored in DB only, not shown in posts
+  final int? age; // stored in DB only, not shown in posts
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -27,6 +34,8 @@ class User {
     'phone': phone,
     'email': email,
     'createdAt': createdAt.toIso8601String(),
+    'gender': gender,
+    'age': age,
   };
 
   User copyWith({
@@ -35,11 +44,15 @@ class User {
     String? phone,
     String? email,
     DateTime? createdAt,
+    String? gender,
+    int? age,
   }) => User(
     id: id ?? this.id,
     name: name ?? this.name,
     phone: phone ?? this.phone,
     email: email ?? this.email,
     createdAt: createdAt ?? this.createdAt,
+    gender: gender ?? this.gender,
+    age: age ?? this.age,
   );
 }

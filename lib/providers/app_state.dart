@@ -33,6 +33,8 @@ class AppState extends ChangeNotifier {
   String? _pendingPhone;
   String? _pendingName;
   String? _pendingEmail;
+  String? _pendingGender;
+  int? _pendingAge;
 
   final FirebaseAuth? _mockAuth;
   final FirebaseFirestore? _mockFirestore;
@@ -148,11 +150,15 @@ class AppState extends ChangeNotifier {
     required String name,
     required String phone,
     String? email,
+    String? gender,
+    int? age,
     required Function(String?) onCodeSent,
   }) async {
     _pendingName = name;
     _pendingPhone = phone;
     _pendingEmail = email;
+    _pendingGender = gender;
+    _pendingAge = age;
 
     _verifyPhone(phone, onCodeSent);
   }
@@ -169,6 +175,9 @@ class AppState extends ChangeNotifier {
     String standardizedPhone = phone.trim().replaceAll(RegExp(r'\s+'), '');
     if (standardizedPhone.startsWith('0')) {
       standardizedPhone = '+964${standardizedPhone.substring(1)}';
+    } else if (!standardizedPhone.startsWith('+') &&
+        standardizedPhone.startsWith('7')) {
+      standardizedPhone = '+964$standardizedPhone';
     }
 
     debugPrint('[Auth] Verifying phone: $standardizedPhone');
@@ -257,6 +266,8 @@ class AppState extends ChangeNotifier {
           phone: _pendingPhone ?? firebaseUser.phoneNumber ?? '',
           email: _pendingEmail,
           createdAt: DateTime.now(),
+          gender: _pendingGender,
+          age: _pendingAge,
         );
 
         final dataToSave = newUser.toJson();

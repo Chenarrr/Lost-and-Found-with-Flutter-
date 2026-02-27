@@ -27,16 +27,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get signupTab => 'حساب جديد';
 
   @override
-  String get phonePlaceholder => 'الهاتف (0750 222 34 44)';
+  String get phonePlaceholder => '750 222 34 44';
 
   @override
   String get requiredField => 'مطلوب';
 
   @override
-  String get phoneInvalid => 'أدخل 11 رقمًا: 0750 222 34 44';
+  String get phoneInvalid => 'أدخل 10 أرقام تبدأ بـ 7';
 
   @override
-  String get namePlaceholder => 'الاسم';
+  String get namePlaceholder => 'الاسم الكامل';
 
   @override
   String get nameTooShort => 'أدخل حرفين على الأقل';
@@ -52,6 +52,27 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get sendOtp => 'إرسال رمز التحقق';
+
+  @override
+  String get genderLabel => 'الجنس';
+
+  @override
+  String get genderMale => 'ذكر';
+
+  @override
+  String get genderFemale => 'أنثى';
+
+  @override
+  String get genderRequired => 'يرجى اختيار الجنس';
+
+  @override
+  String get ageLabel => 'العمر';
+
+  @override
+  String get ageRequired => 'العمر مطلوب';
+
+  @override
+  String get ageInvalid => 'أدخل عمرًا صحيحًا (13–100)';
 
   @override
   String get verifyPhone => 'التحقق من الهاتف';

@@ -20,18 +20,23 @@ class _AuthScreenState extends State<AuthScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
 
+  // Signup fields
   final _sName = TextEditingController();
   final _sPhone = TextEditingController();
   final _sEmail = TextEditingController();
+  final _sAge = TextEditingController();
+  String? _sGender; // 'male' | 'female'
 
-  final _lIdentifier = TextEditingController();
+  // Login field
+  final _lPhone = TextEditingController();
 
   final _formKeySignup = GlobalKey<FormState>();
   final _formKeyLogin = GlobalKey<FormState>();
 
   bool _loading = false;
 
-  final _phoneReg = RegExp(r'^0\d{10}$');
+  // 10 digits starting with 7
+  final _phoneReg = RegExp(r'^7\d{9}$');
   final _emailReg = RegExp(r'^[\w\.\-]+@([\w\-]+\.)+[\w\-]{2,4}$');
 
   @override
@@ -46,7 +51,8 @@ class _AuthScreenState extends State<AuthScreen>
     _sName.dispose();
     _sPhone.dispose();
     _sEmail.dispose();
-    _lIdentifier.dispose();
+    _sAge.dispose();
+    _lPhone.dispose();
     super.dispose();
   }
 
@@ -61,10 +67,20 @@ class _AuthScreenState extends State<AuthScreen>
     );
   }
 
+  String _toE164(String fieldValue) {
+    final digits = fieldValue.replaceAll(RegExp(r'\s'), '');
+    return '+964$digits';
+  }
+
   Future<void> _doSignup() async {
     if (!_formKeySignup.currentState!.validate()) return;
+    if (_sGender == null) {
+      _showMessage(context.l10n.genderRequired, isError: true);
+      return;
+    }
+
     final app = Provider.of<AppState>(context, listen: false);
-    final phone = _sPhone.text.trim().replaceAll(RegExp(r'\s'), '');
+    final phone = _toE164(_sPhone.text.trim());
 
     setState(() => _loading = true);
 
@@ -72,6 +88,8 @@ class _AuthScreenState extends State<AuthScreen>
       name: _sName.text.trim(),
       phone: phone,
       email: _sEmail.text.trim().isEmpty ? null : _sEmail.text.trim(),
+      gender: _sGender,
+      age: int.tryParse(_sAge.text.trim()),
       onCodeSent: (error) {
         if (!mounted) return;
         setState(() => _loading = false);
@@ -96,7 +114,7 @@ class _AuthScreenState extends State<AuthScreen>
     if (!_formKeyLogin.currentState!.validate()) return;
 
     final app = Provider.of<AppState>(context, listen: false);
-    final phone = _lIdentifier.text.trim();
+    final phone = _toE164(_lPhone.text.trim());
 
     setState(() => _loading = true);
     await app.initiateOtpLogin(
@@ -161,130 +179,7 @@ class _AuthScreenState extends State<AuthScreen>
                 Expanded(
                   child: TabBarView(
                     controller: _tabController,
-                    children: [
-                      SingleChildScrollView(
-                        padding: const EdgeInsets.only(top: 16),
-                        child: Form(
-                          key: _formKeyLogin,
-                          child: Column(
-                            children: [
-                              _buildTextField(
-                                controller: _lIdentifier,
-                                label: l10n.phonePlaceholder,
-                                keyboardType: TextInputType.phone,
-                                textInputAction: TextInputAction.done,
-                                inputFormatters: [PhoneInputFormatter()],
-                                validator: (value) {
-                                  if (value == null || value.trim().isEmpty) {
-                                    return l10n.requiredField;
-                                  }
-                                  final clean = value.replaceAll(
-                                    RegExp(r'\s'),
-                                    '',
-                                  );
-                                  if (!_phoneReg.hasMatch(clean)) {
-                                    return l10n.phoneInvalid;
-                                  }
-                                  return null;
-                                },
-                                onSubmitted: (_) => _doLogin(),
-                              ),
-                              const SizedBox(height: 18),
-                              SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed: _doLogin,
-                                  style: ElevatedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 14,
-                                    ),
-                                  ),
-                                  child: Text(
-                                    l10n.sendOtp,
-                                    style: GoogleFonts.inter(fontSize: 16),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      SingleChildScrollView(
-                        padding: const EdgeInsets.only(top: 16),
-                        child: Form(
-                          key: _formKeySignup,
-                          child: Column(
-                            children: [
-                              _buildTextField(
-                                controller: _sName,
-                                label: l10n.namePlaceholder,
-                                textInputAction: TextInputAction.next,
-                                validator: (value) {
-                                  if (value == null ||
-                                      value.trim().length < 2) {
-                                    return l10n.nameTooShort;
-                                  }
-                                  return null;
-                                },
-                              ),
-                              const SizedBox(height: 12),
-                              _buildTextField(
-                                controller: _sPhone,
-                                label: l10n.phonePlaceholder,
-                                keyboardType: TextInputType.phone,
-                                textInputAction: TextInputAction.next,
-                                inputFormatters: [PhoneInputFormatter()],
-                                validator: (value) {
-                                  if (value == null || value.trim().isEmpty) {
-                                    return l10n.phoneRequired;
-                                  }
-                                  final clean = value.replaceAll(
-                                    RegExp(r'\s'),
-                                    '',
-                                  );
-                                  if (!_phoneReg.hasMatch(clean)) {
-                                    return l10n.phoneInvalid;
-                                  }
-                                  return null;
-                                },
-                              ),
-                              const SizedBox(height: 12),
-                              _buildTextField(
-                                controller: _sEmail,
-                                label: l10n.emailPlaceholder,
-                                keyboardType: TextInputType.emailAddress,
-                                textInputAction: TextInputAction.done,
-                                onSubmitted: (_) => _doSignup(),
-                                validator: (value) {
-                                  if (value != null &&
-                                      value.trim().isNotEmpty &&
-                                      !_emailReg.hasMatch(value.trim())) {
-                                    return l10n.emailInvalid;
-                                  }
-                                  return null;
-                                },
-                              ),
-                              const SizedBox(height: 18),
-                              SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed: _doSignup,
-                                  style: ElevatedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 14,
-                                    ),
-                                  ),
-                                  child: Text(
-                                    l10n.sendOtp,
-                                    style: GoogleFonts.inter(fontSize: 16),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
+                    children: [_buildLoginForm(l10n), _buildSignupForm(l10n)],
                   ),
                 ),
               ],
@@ -302,10 +197,167 @@ class _AuthScreenState extends State<AuthScreen>
     );
   }
 
+  // ── Login form ────────────────────────────────────────────────────────────
+
+  Widget _buildLoginForm(AppLocalizations l10n) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.only(top: 24),
+      child: Form(
+        key: _formKeyLogin,
+        child: Column(
+          children: [
+            _buildPhoneField(
+              controller: _lPhone,
+              l10n: l10n,
+              isRequired: true,
+              onSubmitted: (_) => _doLogin(),
+            ),
+            const SizedBox(height: 20),
+            _buildSubmitButton(l10n.sendOtp, _doLogin),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ── Signup form ───────────────────────────────────────────────────────────
+
+  Widget _buildSignupForm(AppLocalizations l10n) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.only(top: 24),
+      child: Form(
+        key: _formKeySignup,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildTextField(
+              controller: _sName,
+              label: l10n.namePlaceholder,
+              textInputAction: TextInputAction.next,
+              validator: (v) =>
+                  (v == null || v.trim().length < 2) ? l10n.nameTooShort : null,
+            ),
+            const SizedBox(height: 14),
+            _buildPhoneField(controller: _sPhone, l10n: l10n, isRequired: true),
+            const SizedBox(height: 14),
+            _buildSectionLabel(l10n.genderLabel),
+            const SizedBox(height: 8),
+            _buildGenderSelector(l10n),
+            const SizedBox(height: 14),
+            _buildTextField(
+              controller: _sAge,
+              label: l10n.ageLabel,
+              keyboardType: TextInputType.number,
+              textInputAction: TextInputAction.next,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              validator: (v) {
+                if (v == null || v.trim().isEmpty) return l10n.ageRequired;
+                final age = int.tryParse(v.trim());
+                if (age == null || age < 13 || age > 100) {
+                  return l10n.ageInvalid;
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 14),
+            _buildTextField(
+              controller: _sEmail,
+              label: l10n.emailPlaceholder,
+              keyboardType: TextInputType.emailAddress,
+              textInputAction: TextInputAction.done,
+              onSubmitted: (_) => _doSignup(),
+              validator: (v) {
+                if (v != null &&
+                    v.trim().isNotEmpty &&
+                    !_emailReg.hasMatch(v.trim())) {
+                  return l10n.emailInvalid;
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 22),
+            _buildSubmitButton(l10n.sendOtp, _doSignup),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ── Shared widgets ────────────────────────────────────────────────────────
+
+  Widget _buildPhoneField({
+    required TextEditingController controller,
+    required AppLocalizations l10n,
+    bool isRequired = false,
+    void Function(String)? onSubmitted,
+  }) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: TextInputType.phone,
+      textInputAction: onSubmitted != null
+          ? TextInputAction.done
+          : TextInputAction.next,
+      onFieldSubmitted: onSubmitted,
+      inputFormatters: [PhoneInputFormatter()],
+      validator: (value) {
+        final clean = (value ?? '').replaceAll(RegExp(r'\s'), '');
+        if (clean.isEmpty) {
+          return isRequired ? l10n.phoneRequired : null;
+        }
+        if (!_phoneReg.hasMatch(clean)) return l10n.phoneInvalid;
+        return null;
+      },
+      decoration: InputDecoration(
+        labelText: l10n.phonePlaceholder,
+        labelStyle: GoogleFonts.inter(color: AppColors.textSecondary),
+        prefixIcon: Container(
+          alignment: Alignment.center,
+          width: 64,
+          child: Text(
+            '+964',
+            style: GoogleFonts.inter(
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
+              fontSize: 15,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGenderSelector(AppLocalizations l10n) {
+    return Row(
+      children: [
+        _GenderChip(
+          label: l10n.genderMale,
+          icon: Icons.male_rounded,
+          selected: _sGender == 'male',
+          onTap: () => setState(() => _sGender = 'male'),
+        ),
+        const SizedBox(width: 12),
+        _GenderChip(
+          label: l10n.genderFemale,
+          icon: Icons.female_rounded,
+          selected: _sGender == 'female',
+          onTap: () => setState(() => _sGender = 'female'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSectionLabel(String text) => Text(
+    text,
+    style: GoogleFonts.inter(
+      fontSize: 13,
+      fontWeight: FontWeight.w500,
+      color: AppColors.textSecondary,
+    ),
+  );
+
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
-    bool obscure = false,
     TextInputType keyboardType = TextInputType.text,
     TextInputAction textInputAction = TextInputAction.next,
     String? Function(String?)? validator,
@@ -314,7 +366,6 @@ class _AuthScreenState extends State<AuthScreen>
   }) {
     return TextFormField(
       controller: controller,
-      obscureText: obscure,
       validator: validator,
       keyboardType: keyboardType,
       textInputAction: textInputAction,
@@ -323,6 +374,78 @@ class _AuthScreenState extends State<AuthScreen>
       decoration: InputDecoration(
         labelText: label,
         labelStyle: GoogleFonts.inter(color: AppColors.textSecondary),
+      ),
+    );
+  }
+
+  Widget _buildSubmitButton(String label, VoidCallback onPressed) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+        ),
+        child: Text(label, style: GoogleFonts.inter(fontSize: 16)),
+      ),
+    );
+  }
+}
+
+// ── Gender chip ──────────────────────────────────────────────────────────────
+
+class _GenderChip extends StatelessWidget {
+  const _GenderChip({
+    required this.label,
+    required this.icon,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            color: selected ? AppColors.infoBox : Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: selected ? AppColors.primaryBlue : AppColors.borderGray,
+              width: selected ? 1.5 : 1,
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 20,
+                color: selected
+                    ? AppColors.primaryBlue
+                    : AppColors.textSecondary,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: GoogleFonts.inter(
+                  fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                  color: selected
+                      ? AppColors.primaryBlue
+                      : AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

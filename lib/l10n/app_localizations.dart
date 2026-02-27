@@ -137,7 +137,7 @@ abstract class AppLocalizations {
   /// No description provided for @phonePlaceholder.
   ///
   /// In en, this message translates to:
-  /// **'Phone (0750 222 34 44)'**
+  /// **'750 222 34 44'**
   String get phonePlaceholder;
 
   /// No description provided for @requiredField.
@@ -149,13 +149,13 @@ abstract class AppLocalizations {
   /// No description provided for @phoneInvalid.
   ///
   /// In en, this message translates to:
-  /// **'Enter 11 digits: 0750 222 34 44'**
+  /// **'Enter 10 digits starting with 7'**
   String get phoneInvalid;
 
   /// No description provided for @namePlaceholder.
   ///
   /// In en, this message translates to:
-  /// **'Name'**
+  /// **'Full Name'**
   String get namePlaceholder;
 
   /// No description provided for @nameTooShort.
@@ -187,6 +187,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Send OTP'**
   String get sendOtp;
+
+  /// No description provided for @genderLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Gender'**
+  String get genderLabel;
+
+  /// No description provided for @genderMale.
+  ///
+  /// In en, this message translates to:
+  /// **'Male'**
+  String get genderMale;
+
+  /// No description provided for @genderFemale.
+  ///
+  /// In en, this message translates to:
+  /// **'Female'**
+  String get genderFemale;
+
+  /// No description provided for @genderRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a gender'**
+  String get genderRequired;
+
+  /// No description provided for @ageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Age'**
+  String get ageLabel;
+
+  /// No description provided for @ageRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Age is required'**
+  String get ageRequired;
+
+  /// No description provided for @ageInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid age (13–100)'**
+  String get ageInvalid;
 
   /// No description provided for @verifyPhone.
   ///

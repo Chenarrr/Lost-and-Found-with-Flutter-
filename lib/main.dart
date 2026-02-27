@@ -11,7 +11,6 @@ import 'package:flutter_application/navigation/root_router.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
-  GoogleFonts.config.allowRuntimeFetching = false;
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const FindItApp());
 }

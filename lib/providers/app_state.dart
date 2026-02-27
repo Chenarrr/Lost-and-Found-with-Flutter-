@@ -97,30 +97,34 @@ class AppState extends ChangeNotifier {
         .snapshots()
         .listen(
           (snapshot) {
-            posts = snapshot.docs.map((doc) {
-              final data = doc.data();
-              data['id'] = doc.id;
-              if (data['createdAt'] is Timestamp) {
-                data['createdAt'] = (data['createdAt'] as Timestamp)
-                    .toDate()
-                    .toIso8601String();
-              }
-
-              // Handle comments timestamps
-              if (data['comments'] != null) {
-                final comments = data['comments'] as List<dynamic>;
-                for (var i = 0; i < comments.length; i++) {
-                  final comment = comments[i] as Map<String, dynamic>;
-                  if (comment['createdAt'] is Timestamp) {
-                    comment['createdAt'] = (comment['createdAt'] as Timestamp)
+            posts = snapshot.docs
+                .map((doc) {
+                  final data = doc.data();
+                  data['id'] = doc.id;
+                  if (data['createdAt'] is Timestamp) {
+                    data['createdAt'] = (data['createdAt'] as Timestamp)
                         .toDate()
                         .toIso8601String();
                   }
-                }
-              }
 
-              return Post.fromJson(data);
-            }).where((p) => !p.isHidden).toList();
+                  // Handle comments timestamps
+                  if (data['comments'] != null) {
+                    final comments = data['comments'] as List<dynamic>;
+                    for (var i = 0; i < comments.length; i++) {
+                      final comment = comments[i] as Map<String, dynamic>;
+                      if (comment['createdAt'] is Timestamp) {
+                        comment['createdAt'] =
+                            (comment['createdAt'] as Timestamp)
+                                .toDate()
+                                .toIso8601String();
+                      }
+                    }
+                  }
+
+                  return Post.fromJson(data);
+                })
+                .where((p) => !p.isHidden)
+                .toList();
             notifyListeners();
           },
           onError: (e) {

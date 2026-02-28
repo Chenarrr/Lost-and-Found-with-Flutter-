@@ -29,7 +29,6 @@ class _CkbMaterialLocalizationsDelegate
   bool shouldReload(_CkbMaterialLocalizationsDelegate old) => false;
 }
 
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');

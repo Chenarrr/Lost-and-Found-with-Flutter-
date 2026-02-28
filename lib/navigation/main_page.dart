@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/l10n/l10n.dart';
+import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/screens/home_screen.dart';
 import 'package:flutter_application/screens/activity_screen.dart';
 import 'package:flutter_application/screens/profile_screen.dart';
@@ -39,6 +41,9 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final cs = Theme.of(context).colorScheme;
+    final app = context.watch<AppState>();
+    final isDark = app.themeMode == ThemeMode.dark;
     final showHomeAppBar = _selectedIndex == 0;
 
     return Scaffold(
@@ -79,25 +84,37 @@ class _MainPageState extends State<MainPage> {
                   ),
                 ],
               ),
-              flexibleSpace: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [AppColors.skyTop, AppColors.skyBottom],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
-                ),
-              ),
+              flexibleSpace: isDark
+                  ? null
+                  : Container(
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [AppColors.skyTop, AppColors.skyBottom],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        ),
+                      ),
+                    ),
               actions: [
+                IconButton(
+                  onPressed: () => app.setThemeMode(
+                    isDark ? ThemeMode.light : ThemeMode.dark,
+                  ),
+                  icon: Icon(
+                    isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+                    color: AppColors.primaryBlue,
+                  ),
+                  tooltip: isDark ? 'Light mode' : 'Dark mode',
+                ),
                 IconButton(
                   onPressed: _openCreatePost,
                   icon: Container(
                     width: 36,
                     height: 36,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: cs.surface,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.borderGray),
+                      border: Border.all(color: cs.outlineVariant),
                     ),
                     child: const Icon(Icons.add, color: AppColors.primaryBlue),
                   ),
@@ -109,9 +126,9 @@ class _MainPageState extends State<MainPage> {
           : null,
       body: IndexedStack(index: _selectedIndex, children: _tabs),
       bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: AppColors.borderGray)),
+        decoration: BoxDecoration(
+          color: cs.surface,
+          border: Border(top: BorderSide(color: cs.outlineVariant)),
         ),
         child: BottomNavigationBar(
           currentIndex: _selectedIndex,

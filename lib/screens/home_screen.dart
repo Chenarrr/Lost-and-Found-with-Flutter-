@@ -73,6 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _typeChip(String label, PostType? type) {
+    final cs = Theme.of(context).colorScheme;
     final isActive = _typeFilter == type;
     final Color activeColor;
     if (type == PostType.lost) {
@@ -86,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
       label: Text(
         label,
         style: GoogleFonts.inter(
-          color: isActive ? Colors.white : AppColors.textPrimary,
+          color: isActive ? Colors.white : cs.onSurface,
           fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
           fontSize: 14,
         ),
@@ -95,9 +96,9 @@ class _HomeScreenState extends State<HomeScreen> {
       showCheckmark: false,
       onSelected: (_) => setState(() => _typeFilter = type),
       selectedColor: activeColor,
-      backgroundColor: AppColors.cardWhite,
+      backgroundColor: cs.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
-      side: const BorderSide(color: AppColors.borderGray),
+      side: BorderSide(color: cs.outlineVariant),
     );
   }
 
@@ -122,6 +123,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final postsSource = context.select<AppState, List<Post>>(
       (app) => app.posts,
     );
@@ -165,12 +168,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         _searchDebounce?.cancel();
                         setState(() => _searchQuery = '');
                       },
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.close_rounded,
-                        color: AppColors.iconGray,
+                        color: cs.onSurfaceVariant,
                       ),
                     ),
-              fillColor: Colors.white,
+              fillColor: cs.surface,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
                 borderSide: BorderSide.none,
@@ -185,108 +188,116 @@ class _HomeScreenState extends State<HomeScreen> {
               _statBadge(
                 l10n.lostBadge(lostCount),
                 AppColors.lostPrimary,
-                AppColors.lostLight,
+                isDark
+                    ? AppColors.lostPrimary.withAlpha(30)
+                    : AppColors.lostLight,
               ),
               const SizedBox(width: 8),
               _statBadge(
                 l10n.foundBadge(foundCount),
                 AppColors.foundPrimary,
-                AppColors.foundLight,
+                isDark
+                    ? AppColors.foundPrimary.withAlpha(30)
+                    : AppColors.foundLight,
               ),
               const Spacer(),
               Text(
                 l10n.resultsCount(posts.length),
                 style: GoogleFonts.inter(
                   fontSize: 13,
-                  color: AppColors.textTertiary,
+                  color: cs.onSurfaceVariant,
                   fontWeight: FontWeight.w500,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 14),
+          // ── City filter ──────────────────────────────────────────
           GestureDetector(
             onTap: () => showModalBottomSheet(
               context: context,
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
               ),
-              builder: (_) => Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const SizedBox(height: 12),
-                  Container(
-                    width: 36,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: AppColors.borderGray,
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Text(
-                      l10n.filterByCity,
-                      style: GoogleFonts.inter(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
+              builder: (ctx) {
+                final sheetCs = Theme.of(ctx).colorScheme;
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(height: 12),
+                    Container(
+                      width: 36,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: sheetCs.outlineVariant,
+                        borderRadius: BorderRadius.circular(999),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  for (final city in _cities)
-                    ListTile(
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                      ),
-                      leading: Icon(
-                        city == 'All Cities'
-                            ? Icons.public_rounded
-                            : Icons.location_on_rounded,
-                        color: city == _cityFilter
-                            ? AppColors.primaryBlue
-                            : AppColors.iconGray,
-                        size: 22,
-                      ),
-                      title: Text(
-                        _cityDisplayName(city, l10n),
+                    const SizedBox(height: 16),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Text(
+                        l10n.filterByCity,
                         style: GoogleFonts.inter(
-                          fontSize: 15,
-                          fontWeight: city == _cityFilter
-                              ? FontWeight.w700
-                              : FontWeight.w500,
-                          color: city == _cityFilter
-                              ? AppColors.primaryBlue
-                              : AppColors.textPrimary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: sheetCs.onSurface,
                         ),
                       ),
-                      trailing: city == _cityFilter
-                          ? const Icon(
-                              Icons.check_rounded,
-                              color: AppColors.primaryBlue,
-                            )
-                          : null,
-                      onTap: () {
-                        setState(() => _cityFilter = city);
-                        Navigator.pop(context);
-                      },
                     ),
-                  const SizedBox(height: 16),
-                ],
-              ),
+                    const SizedBox(height: 8),
+                    for (final city in _cities)
+                      ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                        ),
+                        leading: Icon(
+                          city == 'All Cities'
+                              ? Icons.public_rounded
+                              : Icons.location_on_rounded,
+                          color: city == _cityFilter
+                              ? AppColors.primaryBlue
+                              : sheetCs.onSurfaceVariant,
+                          size: 22,
+                        ),
+                        title: Text(
+                          _cityDisplayName(city, l10n),
+                          style: GoogleFonts.inter(
+                            fontSize: 15,
+                            fontWeight: city == _cityFilter
+                                ? FontWeight.w700
+                                : FontWeight.w500,
+                            color: city == _cityFilter
+                                ? AppColors.primaryBlue
+                                : sheetCs.onSurface,
+                          ),
+                        ),
+                        trailing: city == _cityFilter
+                            ? const Icon(
+                                Icons.check_rounded,
+                                color: AppColors.primaryBlue,
+                              )
+                            : null,
+                        onTap: () {
+                          setState(() => _cityFilter = city);
+                          Navigator.pop(ctx);
+                        },
+                      ),
+                    const SizedBox(height: 16),
+                  ],
+                );
+              },
             ),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
                 color: _cityFilter == 'All Cities'
-                    ? AppColors.cardWhite
+                    ? cs.surface
                     : AppColors.primaryBlue,
                 borderRadius: BorderRadius.circular(999),
                 border: Border.all(
                   color: _cityFilter == 'All Cities'
-                      ? AppColors.borderGray
+                      ? cs.outlineVariant
                       : AppColors.primaryBlue,
                 ),
               ),
@@ -297,7 +308,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Icons.location_on_rounded,
                     size: 16,
                     color: _cityFilter == 'All Cities'
-                        ? AppColors.iconGray
+                        ? cs.onSurfaceVariant
                         : Colors.white,
                   ),
                   const SizedBox(width: 6),
@@ -307,7 +318,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: _cityFilter == 'All Cities'
-                          ? AppColors.textPrimary
+                          ? cs.onSurface
                           : Colors.white,
                     ),
                   ),
@@ -316,7 +327,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Icons.keyboard_arrow_down_rounded,
                     size: 18,
                     color: _cityFilter == 'All Cities'
-                        ? AppColors.iconGray
+                        ? cs.onSurfaceVariant
                         : Colors.white,
                   ),
                 ],
@@ -344,13 +355,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       width: 84,
                       height: 84,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: cs.surface,
                         shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.borderGray),
+                        border: Border.all(color: cs.outlineVariant),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.search_off_rounded,
-                        color: AppColors.iconGray,
+                        color: cs.onSurfaceVariant,
                         size: 38,
                       ),
                     ),
@@ -359,14 +370,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       l10n.noItemsFound,
                       style: GoogleFonts.inter(
                         fontSize: 19,
-                        color: AppColors.textPrimary,
+                        color: cs.onSurface,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                     const SizedBox(height: 6),
                     Text(
                       l10n.noItemsFoundHint,
-                      style: GoogleFonts.inter(color: AppColors.textSecondary),
+                      style: GoogleFonts.inter(color: cs.onSurfaceVariant),
                     ),
                   ],
                 ),

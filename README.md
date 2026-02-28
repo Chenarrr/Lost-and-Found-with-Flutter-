@@ -15,6 +15,7 @@
 - [About the App](#about-the-app)
 - [Features](#features)
 - [Localization](#localization)
+- [Adding a Language](#adding-a-language)
 - [How to Use](#how-to-use)
 - [Tech Stack](#tech-stack)
 - [Architecture](#architecture)
@@ -83,15 +84,15 @@ Find It was built to solve a simple but common problem in Kurdish communities: w
 
 ### Settings
 - **Change Name** — update display name stored in Firestore
-- **Language** — switch between **English** and **Arabic (العربية)** at any time; the entire app (including RTL layout) updates instantly without restarting
+- **Language** — switch between **English**, **Arabic (العربية)**, and **Kurdish Sorani (کوردی)** at any time; the entire app (including RTL layout) updates instantly without restarting
 - **Logout** — sign out from the current device
 - **Delete Account** — permanently deletes the account, all posts, and the Firebase Auth record (with re-auth prompt if session is stale)
 - **App version** shown at the bottom
 
 ### Localization
-- Full **English / Arabic** support across every screen, dialog, button, and validation message
-- RTL layout handled automatically by Flutter when Arabic is active
-- Arabic relative timestamps via `timeago` (`"منذ دقيقتين"` instead of "2 minutes ago")
+- Full **English / Arabic / Kurdish Sorani (کوردی)** support across every screen, dialog, button, and validation message
+- RTL layout is automatic for Arabic; Kurdish Sorani (uses Arabic script) is forced RTL via a `Directionality` override in `MaterialApp.builder`
+- Relative timestamps via `timeago` in all three languages (`"منذ دقيقتين"` / Kurdish uses Arabic-script time messages)
 - City names, category chips, and all UI strings are translated
 - The selected language is stored in app state and applied app-wide without a restart
 
@@ -163,7 +164,7 @@ Find It was built to solve a simple but common problem in Kurdish communities: w
 | App Info | `package_info_plus` | Display app version in Settings |
 | ID Generation | `uuid` | Unique IDs for posts and comments |
 | Time Display | `timeago` | Human-friendly timestamps ("2 hours ago" / "منذ ساعتين") |
-| Localization | `flutter_localizations` + `intl` | English & Arabic translations, RTL layout |
+| Localization | `flutter_localizations` + `intl` | English, Arabic & Kurdish Sorani translations, RTL layout |
 
 ---
 
@@ -180,8 +181,9 @@ lib/
 │   └── app_colors.dart          # Centralized color tokens (brand, status, neutrals)
 │
 ├── l10n/
-│   ├── app_en.arb               # English string resources
+│   ├── app_en.arb               # English string resources (template)
 │   ├── app_ar.arb               # Arabic string resources
+│   ├── app_ckb.arb              # Kurdish Sorani string resources
 │   ├── app_localizations.dart   # Generated — do not edit manually
 │   └── l10n.dart                # `context.l10n` extension + re-export
 │
@@ -274,6 +276,136 @@ posts/
     comments    { id, postId, userId, userName, text, createdAt }[]
     reports     String[]  (array of userIds who reported)
 ```
+
+---
+
+## Adding a Language
+
+The app uses Flutter's built-in ARB-based localization system (`flutter gen-l10n`). Adding a new language takes 7 steps.
+
+### How it works
+
+| File | Role |
+|---|---|
+| `l10n.yaml` | Tells Flutter where ARB files live and what to generate |
+| `lib/l10n/app_en.arb` | Template — defines every string key (English values) |
+| `lib/l10n/app_XX.arb` | One file per language, same keys, translated values |
+| `lib/l10n/app_localizations.dart` | **Generated — never edit manually** |
+| `lib/l10n/l10n.dart` | Provides `context.l10n` shorthand for all widgets |
+
+### Step-by-step
+
+**1. Create the ARB file**
+
+Create `lib/l10n/app_XX.arb` where `XX` is the [BCP 47 language code](https://en.wikipedia.org/wiki/IETF_language_tag) (e.g. `fr`, `ku`, `fa`).
+
+```json
+{
+  "@@locale": "XX",
+  "appName": "Find It",
+  "tagline": "Your translated tagline here",
+  ...
+}
+```
+
+Copy every key from `app_en.arb` and translate the values. Parametrised strings must keep their placeholder blocks:
+
+```json
+"resendCountdown": "Resend in {seconds}s",
+"@resendCountdown": {
+  "placeholders": {
+    "seconds": { "type": "int" }
+  }
+}
+```
+
+**2. Add the language-name key to all existing ARBs**
+
+In `app_en.arb`, `app_ar.arb`, `app_ckb.arb`, and your new `app_XX.arb`, add:
+
+```json
+"newLanguageName": "Displayed name in that language"
+```
+
+**3. Run codegen**
+
+```bash
+flutter gen-l10n
+```
+
+Flutter scans all `app_*.arb` files automatically — no manual registration needed.
+
+**4. Add a chip to `LangToggle`**
+
+In `lib/widgets/lang_toggle.dart`, add to the `Wrap`:
+
+```dart
+_Chip(
+  label: 'Your Language',
+  selected: code == 'XX',
+  onTap: () => context.read<AppState>().setLocale(const Locale('XX')),
+),
+```
+
+**5. Add an option to the Settings language dialog**
+
+In `lib/screens/settings_screen.dart`, add a `_LanguageOption` entry in `_showLanguageDialog` and extend the `currentLangLabel` conditional.
+
+**6. Handle RTL (if needed)**
+
+Flutter auto-detects RTL for `ar`, `fa`, `he`, `ur`. For any other RTL language (e.g. Kurdish Sorani `ckb`), extend the condition in `lib/main.dart`:
+
+```dart
+builder: (context, child) {
+  final isRtl = app.locale.languageCode == 'ar' ||
+                app.locale.languageCode == 'ckb' ||
+                app.locale.languageCode == 'XX'; // ← add here if RTL
+  return Directionality(
+    textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
+    child: child!,
+  );
+},
+```
+
+Also add a `_CkbMaterialLocalizationsDelegate`-style bridge in `main.dart` so Material widgets (`AppBar`, dialogs, etc.) don't crash:
+
+```dart
+class _XxMaterialLocalizationsDelegate
+    extends LocalizationsDelegate<MaterialLocalizations> {
+  const _XxMaterialLocalizationsDelegate();
+  @override bool isSupported(Locale locale) => locale.languageCode == 'XX';
+  @override Future<MaterialLocalizations> load(Locale locale) =>
+      GlobalMaterialLocalizations.delegate.load(const Locale('ar')); // or 'en'
+  @override bool shouldReload(_) => false;
+}
+```
+
+Then add it first in `localizationsDelegates`:
+
+```dart
+localizationsDelegates: const [
+  _XxMaterialLocalizationsDelegate(),
+  _CkbMaterialLocalizationsDelegate(),
+  ...AppLocalizations.localizationsDelegates,
+],
+```
+
+**7. Register `timeago` locale**
+
+In `lib/main.dart` inside `main()`:
+
+```dart
+timeago.setLocaleMessages('XX', timeago.XxMessages()); // use ArMessages() as fallback for Arabic-script languages
+```
+
+**8. Format and verify**
+
+```bash
+dart format lib/
+flutter analyze
+```
+
+> **Note:** ARB files are JSON — skip them from `dart format`. Only run it on `.dart` files.
 
 ---
 

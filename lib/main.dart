@@ -3,12 +3,32 @@ import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'firebase_options.dart';
 import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/l10n/app_localizations.dart';
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/navigation/root_router.dart';
+
+// Kurdish Sorani (ckb) is not in GlobalMaterialLocalizations, so Material
+// widgets like AppBar would crash with "No MaterialLocalizations found".
+// This delegate bridges ckb → Arabic material strings (same script/RTL).
+class _CkbMaterialLocalizationsDelegate
+    extends LocalizationsDelegate<MaterialLocalizations> {
+  const _CkbMaterialLocalizationsDelegate();
+
+  @override
+  bool isSupported(Locale locale) => locale.languageCode == 'ckb';
+
+  @override
+  Future<MaterialLocalizations> load(Locale locale) =>
+      GlobalMaterialLocalizations.delegate.load(const Locale('ar'));
+
+  @override
+  bool shouldReload(_CkbMaterialLocalizationsDelegate old) => false;
+}
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,7 +52,10 @@ class FindItApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'Find It',
           locale: app.locale,
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: const [
+            _CkbMaterialLocalizationsDelegate(),
+            ...AppLocalizations.localizationsDelegates,
+          ],
           supportedLocales: AppLocalizations.supportedLocales,
           builder: (context, child) {
             final isRtl =

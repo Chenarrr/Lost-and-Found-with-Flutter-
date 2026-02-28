@@ -56,7 +56,9 @@ class Post {
     imageUrls: List<String>.from(json['imageUrls'] as List? ?? []),
     userName: json['userName'] as String,
     userPhone: json['userPhone'] as String,
-    createdAt: DateTime.parse(json['createdAt'] as String),
+    createdAt: json['createdAt'] != null
+        ? DateTime.parse(json['createdAt'] as String)
+        : DateTime.now(),
     userId: json['userId'] as String,
     comments: (json['comments'] as List<dynamic>? ?? [])
         .map((c) => Comment.fromJson(c as Map<String, dynamic>))

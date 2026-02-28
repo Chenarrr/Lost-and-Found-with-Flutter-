@@ -219,22 +219,21 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     Navigator.of(context).pop();
   }
 
-  Widget _buildImage(String url) {
+  Widget _buildImage(String url, ColorScheme cs) {
+    final placeholder = ColoredBox(color: cs.surfaceContainerHighest);
     if (url.startsWith('http')) {
       return CachedNetworkImage(
         imageUrl: url,
         fit: BoxFit.cover,
-        placeholder: (_, __) => const ColoredBox(color: AppColors.borderGray),
-        errorWidget: (_, __, ___) =>
-            const ColoredBox(color: AppColors.borderGray),
+        placeholder: (_, __) => placeholder,
+        errorWidget: (_, __, ___) => placeholder,
       );
     }
 
     return Image.file(
       File(url),
       fit: BoxFit.cover,
-      errorBuilder: (_, __, ___) =>
-          const ColoredBox(color: AppColors.borderGray),
+      errorBuilder: (_, __, ___) => placeholder,
     );
   }
 
@@ -242,6 +241,8 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   Widget build(BuildContext context) {
     final app = Provider.of<AppState>(context);
     final l10n = context.l10n;
+    final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final postIndex = app.posts.indexWhere((post) => post.id == widget.postId);
 
     if (postIndex == -1) {
@@ -252,7 +253,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
         body: Center(
           child: Text(
             l10n.postNotFound,
-            style: GoogleFonts.inter(color: AppColors.textSecondary),
+            style: GoogleFonts.inter(color: cs.onSurfaceVariant),
           ),
         ),
       );
@@ -277,35 +278,41 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          // ── Image ────────────────────────────────────────────────────
           ClipRRect(
             borderRadius: BorderRadius.circular(18),
             child: SizedBox(
               height: 240,
               child: post.imageUrls.isNotEmpty
-                  ? _buildImage(post.imageUrls.first)
-                  : const ColoredBox(color: AppColors.borderGray),
+                  ? _buildImage(post.imageUrls.first, cs)
+                  : ColoredBox(color: cs.surfaceContainerHighest),
             ),
           ),
           const SizedBox(height: 14),
+
+          // ── Main info card ────────────────────────────────────────────
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: cs.surface,
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: AppColors.borderGray),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.textPrimary.withAlpha(16),
-                  blurRadius: 14,
-                  offset: const Offset(0, 6),
-                ),
-              ],
+              border: Border.all(color: cs.outlineVariant),
+              boxShadow: isDark
+                  ? null
+                  : [
+                      BoxShadow(
+                        color: Colors.black.withAlpha(16),
+                        blurRadius: 14,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
+                    // Type badge
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 10,
@@ -325,19 +332,22 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                       ),
                     ),
                     const SizedBox(width: 8),
+                    // Category badge
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 10,
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.skyTop,
+                        color: isDark
+                            ? cs.surfaceContainerHighest
+                            : AppColors.skyTop,
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: Text(
                         post.category.displayName,
                         style: GoogleFonts.inter(
-                          color: AppColors.textSecondary,
+                          color: cs.onSurfaceVariant,
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
                         ),
@@ -351,7 +361,9 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.foundLight,
+                          color: isDark
+                              ? AppColors.foundPrimary.withAlpha(40)
+                              : AppColors.foundLight,
                           borderRadius: BorderRadius.circular(999),
                         ),
                         child: Text(
@@ -373,7 +385,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                             : l10n.report,
                         style: GoogleFonts.inter(
                           color: post.reports.contains(app.currentUser?.id)
-                              ? AppColors.textTertiary
+                              ? cs.onSurfaceVariant
                               : AppColors.lostPrimary,
                           fontWeight: FontWeight.w600,
                         ),
@@ -387,42 +399,42 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                   style: GoogleFonts.inter(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
+                    color: cs.onSurface,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   '${post.city}, ${post.street}',
-                  style: GoogleFonts.inter(color: AppColors.textSecondary),
+                  style: GoogleFonts.inter(color: cs.onSurfaceVariant),
                 ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.access_time,
                       size: 14,
-                      color: AppColors.textTertiary,
+                      color: cs.onSurfaceVariant,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       timeago.format(post.createdAt, locale: l10n.localeName),
                       style: GoogleFonts.inter(
                         fontSize: 12,
-                        color: AppColors.textTertiary,
+                        color: cs.onSurfaceVariant,
                       ),
                     ),
                     const SizedBox(width: 12),
-                    const Icon(
+                    Icon(
                       Icons.person_outline,
                       size: 14,
-                      color: AppColors.textTertiary,
+                      color: cs.onSurfaceVariant,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       post.userName,
                       style: GoogleFonts.inter(
                         fontSize: 12,
-                        color: AppColors.textTertiary,
+                        color: cs.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -450,24 +462,26 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                   l10n.description,
                   style: GoogleFonts.inter(
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
+                    color: cs.onSurface,
                   ),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   post.description ?? l10n.noDescription,
-                  style: GoogleFonts.inter(color: AppColors.textSecondary),
+                  style: GoogleFonts.inter(color: cs.onSurfaceVariant),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 14),
+
+          // ── Comments card ─────────────────────────────────────────────
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: cs.surface,
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: AppColors.borderGray),
+              border: Border.all(color: cs.outlineVariant),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -476,7 +490,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                   l10n.commentsSection(post.comments.length),
                   style: GoogleFonts.inter(
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
+                    color: cs.onSurface,
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -485,13 +499,13 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: AppColors.bgGray,
+                      color: cs.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       l10n.noCommentsSection,
                       style: GoogleFonts.inter(
-                        color: AppColors.textSecondary,
+                        color: cs.onSurfaceVariant,
                         fontSize: 13,
                       ),
                     ),
@@ -502,9 +516,9 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                       margin: const EdgeInsets.only(bottom: 8),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppColors.bgGray,
+                        color: cs.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.borderGray),
+                        border: Border.all(color: cs.outlineVariant),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -531,7 +545,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                   comment.userName,
                                   style: GoogleFonts.inter(
                                     fontWeight: FontWeight.w600,
-                                    color: AppColors.textPrimary,
+                                    color: cs.onSurface,
                                   ),
                                 ),
                               ),
@@ -542,7 +556,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                 ),
                                 style: GoogleFonts.inter(
                                   fontSize: 11,
-                                  color: AppColors.textTertiary,
+                                  color: cs.onSurfaceVariant,
                                 ),
                               ),
                             ],
@@ -551,7 +565,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                           Text(
                             comment.text,
                             style: GoogleFonts.inter(
-                              color: AppColors.textSecondary,
+                              color: cs.onSurfaceVariant,
                             ),
                           ),
                         ],
@@ -576,7 +590,6 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                 ),
                 if (isOwner) ...[
                   const SizedBox(height: 8),
-                  // Mark as resolved — only show if not yet resolved
                   if (!post.isResolved)
                     SizedBox(
                       width: double.infinity,
@@ -607,7 +620,9 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                         horizontal: 16,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.foundLight,
+                        color: isDark
+                            ? AppColors.foundPrimary.withAlpha(40)
+                            : AppColors.foundLight,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: AppColors.foundPrimary),
                       ),

@@ -68,15 +68,17 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
   }
 
   Widget _buildImagePreview(String path) {
+    final placeholder = ColoredBox(
+      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+    );
     if (path.startsWith('http')) {
       return CachedNetworkImage(
         imageUrl: path,
         width: double.infinity,
         height: 120,
         fit: BoxFit.cover,
-        placeholder: (_, __) => const ColoredBox(color: AppColors.borderGray),
-        errorWidget: (_, __, ___) =>
-            const ColoredBox(color: AppColors.borderGray),
+        placeholder: (_, __) => placeholder,
+        errorWidget: (_, __, ___) => placeholder,
       );
     }
     return Image.file(
@@ -84,8 +86,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
       width: double.infinity,
       height: 120,
       fit: BoxFit.cover,
-      errorBuilder: (_, __, ___) =>
-          const ColoredBox(color: AppColors.borderGray),
+      errorBuilder: (_, __, ___) => placeholder,
     );
   }
 
@@ -174,6 +175,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final cs = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.createPost, style: GoogleFonts.inter()),
@@ -202,7 +204,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                 Text(
                   l10n.shareDetails,
                   style: GoogleFonts.inter(
-                    color: AppColors.textSecondary,
+                    color: cs.onSurfaceVariant,
                     fontSize: 13,
                   ),
                 ),
@@ -215,11 +217,16 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                       onSelected: (_) =>
                           setState(() => _postType = PostType.lost),
                       selectedColor: AppColors.lostPrimary,
-                      backgroundColor: AppColors.borderGray,
+                      backgroundColor: cs.surface,
+                      showCheckmark: false,
+                      side: BorderSide(color: cs.outlineVariant),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(999),
+                      ),
                       labelStyle: GoogleFonts.inter(
                         color: _postType == PostType.lost
                             ? Colors.white
-                            : AppColors.textPrimary,
+                            : cs.onSurface,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -230,11 +237,16 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                       onSelected: (_) =>
                           setState(() => _postType = PostType.found),
                       selectedColor: AppColors.foundPrimary,
-                      backgroundColor: AppColors.borderGray,
+                      backgroundColor: cs.surface,
+                      showCheckmark: false,
+                      side: BorderSide(color: cs.outlineVariant),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(999),
+                      ),
                       labelStyle: GoogleFonts.inter(
                         color: _postType == PostType.found
                             ? Colors.white
-                            : AppColors.textPrimary,
+                            : cs.onSurface,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -254,11 +266,14 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                       selected: isSelected,
                       onSelected: (_) => setState(() => _category = category),
                       selectedColor: AppColors.primaryBlue,
-                      backgroundColor: AppColors.borderGray,
+                      backgroundColor: cs.surface,
+                      showCheckmark: false,
+                      side: BorderSide(color: cs.outlineVariant),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(999),
+                      ),
                       labelStyle: GoogleFonts.inter(
-                        color: isSelected
-                            ? Colors.white
-                            : AppColors.textPrimary,
+                        color: isSelected ? Colors.white : cs.onSurface,
                         fontWeight: FontWeight.w600,
                       ),
                     );
@@ -295,7 +310,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                   decoration: InputDecoration(labelText: l10n.city),
                   hint: Text(
                     l10n.selectCity,
-                    style: GoogleFonts.inter(color: AppColors.placeholderGray),
+                    style: GoogleFonts.inter(color: cs.onSurfaceVariant),
                   ),
                   items: _cityOptions
                       .map(
@@ -330,7 +345,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: cs.onSurface,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -338,15 +353,15 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                   Container(
                     height: 120,
                     decoration: BoxDecoration(
-                      color: AppColors.bgGray,
+                      color: cs.surface,
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: AppColors.borderGray),
+                      border: Border.all(color: cs.outlineVariant),
                     ),
                     child: Center(
                       child: Text(
                         l10n.noImagesSelected,
                         style: GoogleFonts.inter(
-                          color: AppColors.textSecondary,
+                          color: cs.onSurfaceVariant,
                         ),
                       ),
                     ),

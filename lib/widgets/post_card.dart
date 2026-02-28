@@ -19,6 +19,9 @@ class PostCard extends StatelessWidget {
     final accentColor = isLost ? AppColors.lostPrimary : AppColors.foundPrimary;
     final softColor = isLost ? AppColors.lostLight : AppColors.foundLight;
     final l10n = context.l10n;
+    final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final adaptedSoftColor = isDark ? accentColor.withAlpha(30) : softColor;
 
     return GestureDetector(
       onTap: () => Navigator.of(context).push(
@@ -31,9 +34,9 @@ class PostCard extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.only(bottom: 14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: cs.surface,
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppColors.borderGray),
+          border: Border.all(color: cs.outlineVariant),
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(18),
@@ -64,17 +67,19 @@ class PostCard extends StatelessWidget {
                                             width: 88,
                                             height: 88,
                                             fit: BoxFit.cover,
-                                            placeholder: (_, __) =>
-                                                const ColoredBox(
-                                                  color: AppColors.borderGray,
-                                                ),
+                                            placeholder: (_, __) => ColoredBox(
+                                              color:
+                                                  cs.surfaceContainerHighest,
+                                            ),
                                             errorWidget: (_, __, ___) =>
-                                                const ColoredBox(
-                                                  color: AppColors.borderGray,
+                                                ColoredBox(
+                                                  color:
+                                                      cs.surfaceContainerHighest,
                                                   child: Center(
                                                     child: Icon(
                                                       Icons.broken_image,
-                                                      color: AppColors.iconGray,
+                                                      color:
+                                                          cs.onSurfaceVariant,
                                                     ),
                                                   ),
                                                 ),
@@ -88,7 +93,7 @@ class PostCard extends StatelessWidget {
                                   : Container(
                                       width: 88,
                                       height: 88,
-                                      color: softColor,
+                                      color: adaptedSoftColor,
                                       child: Icon(
                                         isLost
                                             ? Icons.search_rounded
@@ -136,7 +141,7 @@ class PostCard extends StatelessWidget {
                                         post.category.displayName,
                                         style: GoogleFonts.inter(
                                           fontSize: 12,
-                                          color: AppColors.textTertiary,
+                                          color: cs.onSurfaceVariant,
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
@@ -156,7 +161,7 @@ class PostCard extends StatelessWidget {
                                     style: GoogleFonts.inter(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w700,
-                                      color: AppColors.textPrimary,
+                                      color: cs.onSurface,
                                       height: 1.2,
                                     ),
                                     maxLines: 2,
@@ -176,7 +181,7 @@ class PostCard extends StatelessWidget {
                                           '${post.city} · ${post.street}',
                                           style: GoogleFonts.inter(
                                             fontSize: 12,
-                                            color: AppColors.textSecondary,
+                                            color: cs.onSurfaceVariant,
                                           ),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
@@ -191,16 +196,16 @@ class PostCard extends StatelessWidget {
                         ),
 
                         const SizedBox(height: 10),
-                        const Divider(height: 1, color: AppColors.borderGray),
+                        Divider(height: 1, color: cs.outlineVariant),
                         const SizedBox(height: 10),
 
                         // ── Bottom row ────────────────────────────────
                         Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.access_time_rounded,
                               size: 13,
-                              color: AppColors.iconGray,
+                              color: cs.onSurfaceVariant,
                             ),
                             const SizedBox(width: 4),
                             Text(
@@ -210,14 +215,14 @@ class PostCard extends StatelessWidget {
                               ),
                               style: GoogleFonts.inter(
                                 fontSize: 12,
-                                color: AppColors.textTertiary,
+                                color: cs.onSurfaceVariant,
                               ),
                             ),
                             const SizedBox(width: 10),
-                            const Icon(
+                            Icon(
                               Icons.person_rounded,
                               size: 13,
-                              color: AppColors.iconGray,
+                              color: cs.onSurfaceVariant,
                             ),
                             const SizedBox(width: 4),
                             Expanded(
@@ -225,23 +230,23 @@ class PostCard extends StatelessWidget {
                                 post.userName,
                                 style: GoogleFonts.inter(
                                   fontSize: 12,
-                                  color: AppColors.textTertiary,
+                                  color: cs.onSurfaceVariant,
                                 ),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
                             if (post.comments.isNotEmpty) ...[
-                              const Icon(
+                              Icon(
                                 Icons.chat_bubble_outline_rounded,
                                 size: 13,
-                                color: AppColors.iconGray,
+                                color: cs.onSurfaceVariant,
                               ),
                               const SizedBox(width: 3),
                               Text(
                                 '${post.comments.length}',
                                 style: GoogleFonts.inter(
                                   fontSize: 12,
-                                  color: AppColors.textTertiary,
+                                  color: cs.onSurfaceVariant,
                                 ),
                               ),
                               const SizedBox(width: 10),
@@ -253,7 +258,7 @@ class PostCard extends StatelessWidget {
                                 vertical: 6,
                               ),
                               decoration: BoxDecoration(
-                                color: softColor,
+                                color: adaptedSoftColor,
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Row(

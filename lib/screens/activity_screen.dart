@@ -57,7 +57,7 @@ class ActivityScreen extends StatelessWidget {
             ),
             indicatorColor: AppColors.primaryBlue,
             labelColor: AppColors.primaryBlue,
-            unselectedLabelColor: AppColors.textSecondary,
+            unselectedLabelColor: Theme.of(context).colorScheme.onSurfaceVariant,
             tabs: [
               Tab(text: l10n.myPostsTab(userPosts.length)),
               Tab(text: l10n.myCommentsTab(userComments.length)),
@@ -94,12 +94,15 @@ class ActivityScreen extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final entry = userComments[index];
                   final isLost = entry.post.type == PostType.lost;
+                  final cs = Theme.of(context).colorScheme;
+                  final isDark =
+                      Theme.of(context).brightness == Brightness.dark;
                   return Container(
                     margin: const EdgeInsets.only(bottom: 10),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: cs.surface,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.borderGray),
+                      border: Border.all(color: cs.outlineVariant),
                     ),
                     child: ListTile(
                       contentPadding: const EdgeInsets.symmetric(
@@ -120,7 +123,7 @@ class ActivityScreen extends StatelessWidget {
                         style: GoogleFonts.inter(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
+                          color: cs.onSurface,
                         ),
                       ),
                       subtitle: Padding(
@@ -134,8 +137,12 @@ class ActivityScreen extends StatelessWidget {
                               ),
                               decoration: BoxDecoration(
                                 color: isLost
-                                    ? AppColors.lostLight
-                                    : AppColors.foundLight,
+                                    ? (isDark
+                                        ? AppColors.lostPrimary.withAlpha(40)
+                                        : AppColors.lostLight)
+                                    : (isDark
+                                        ? AppColors.foundPrimary.withAlpha(40)
+                                        : AppColors.foundLight),
                                 borderRadius: BorderRadius.circular(999),
                               ),
                               child: Text(
@@ -159,7 +166,7 @@ class ActivityScreen extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                                 style: GoogleFonts.inter(
                                   fontSize: 12,
-                                  color: AppColors.textSecondary,
+                                  color: cs.onSurfaceVariant,
                                 ),
                               ),
                             ),
@@ -173,7 +180,7 @@ class ActivityScreen extends StatelessWidget {
                         ),
                         style: GoogleFonts.inter(
                           fontSize: 11,
-                          color: AppColors.textTertiary,
+                          color: cs.onSurfaceVariant,
                         ),
                       ),
                     ),
@@ -200,6 +207,7 @@ class _ActivityEmpty extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -210,11 +218,11 @@ class _ActivityEmpty extends StatelessWidget {
               width: 76,
               height: 76,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: cs.surface,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppColors.borderGray),
+                border: Border.all(color: cs.outlineVariant),
               ),
-              child: Icon(icon, size: 36, color: AppColors.iconGray),
+              child: Icon(icon, size: 36, color: cs.onSurfaceVariant),
             ),
             const SizedBox(height: 14),
             Text(
@@ -222,7 +230,7 @@ class _ActivityEmpty extends StatelessWidget {
               style: GoogleFonts.inter(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: cs.onSurface,
               ),
               textAlign: TextAlign.center,
             ),
@@ -230,7 +238,7 @@ class _ActivityEmpty extends StatelessWidget {
             Text(
               message,
               style: GoogleFonts.inter(
-                color: AppColors.textSecondary,
+                color: cs.onSurfaceVariant,
                 fontSize: 13,
               ),
               textAlign: TextAlign.center,

@@ -32,9 +32,11 @@ class SettingsScreen extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final adaptedBg = isDark ? iconFg.withAlpha(40) : iconBg;
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-      leading: _leadingIcon(icon, iconBg, iconFg),
+      leading: _leadingIcon(icon, adaptedBg, iconFg),
       title: Text(
         title,
         style: GoogleFonts.inter(
@@ -634,17 +636,12 @@ class SettingsScreen extends StatelessWidget {
                 horizontal: 14,
                 vertical: 4,
               ),
-              leading: Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: AppColors.skyTop,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(
-                  Icons.language_rounded,
-                  color: AppColors.primaryBlue,
-                ),
+              leading: _leadingIcon(
+                Icons.language_rounded,
+                isDark
+                    ? AppColors.primaryBlue.withAlpha(40)
+                    : AppColors.skyTop,
+                AppColors.primaryBlue,
               ),
               title: Text(
                 l10n.language,

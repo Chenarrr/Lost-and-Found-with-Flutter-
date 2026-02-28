@@ -26,6 +26,15 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Theme
+  ThemeMode _themeMode = ThemeMode.light;
+  ThemeMode get themeMode => _themeMode;
+  void setThemeMode(ThemeMode mode) {
+    if (_themeMode == mode) return;
+    _themeMode = mode;
+    notifyListeners();
+  }
+
   StreamSubscription<QuerySnapshot>? _postsSubscription;
 
   // OTP State

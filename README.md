@@ -78,11 +78,13 @@ Find It was built to solve a simple but common problem in Kurdish communities: w
 - **My Comments** — a chronological list of every comment the user has left, with the post it belongs to
 
 ### Profile
-- Avatar with name initial, phone number, and optional email
-- Post stats: total, lost count, found count
+- **Gradient hero card** — blue-to-indigo banner with a white avatar box showing the user's initial, name, phone, and "Member since" date
+- **3 stat cards** — Posts, Lost, and Found counts with coloured icons; cards adapt to light/dark theme automatically
+- Your Posts list below the stats
 - Quick link to Settings
 
 ### Settings
+- **Dark Mode toggle** — prominent switch at the top; flips the entire app between light and dark instantly without a restart
 - **Change Name** — update display name stored in Firestore
 - **Language** — switch between **English**, **Arabic (العربية)**, and **Kurdish Sorani (کوردی)** at any time; the entire app (including RTL layout) updates instantly without restarting
 - **Logout** — sign out from the current device

@@ -8,12 +8,31 @@ import 'package:flutter_application/widgets/post_card.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+String _memberSince(DateTime dt) {
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+  return '${months[dt.month - 1]} ${dt.year}';
+}
+
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final cs = Theme.of(context).colorScheme;
     final app = Provider.of<AppState>(context);
     final user = app.currentUser;
 
@@ -23,15 +42,15 @@ class ProfileScreen extends StatelessWidget {
           margin: const EdgeInsets.all(24),
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: cs.surface,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.borderGray),
+            border: Border.all(color: cs.outlineVariant),
           ),
           child: Text(
             l10n.pleaseLogInProfile,
             style: GoogleFonts.inter(
               fontSize: 15,
-              color: AppColors.textSecondary,
+              color: cs.onSurfaceVariant,
               fontWeight: FontWeight.w600,
             ),
             textAlign: TextAlign.center,
@@ -60,9 +79,9 @@ class ProfileScreen extends StatelessWidget {
               width: 34,
               height: 34,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: cs.surface,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: AppColors.borderGray),
+                border: Border.all(color: cs.outlineVariant),
               ),
               child: const Icon(Icons.settings, color: AppColors.primaryBlue),
             ),
@@ -73,103 +92,134 @@ class ProfileScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
         children: [
+          // ── Section A: Hero Card ──────────────────────────────────────
           Container(
-            padding: const EdgeInsets.all(18),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [AppColors.skyTop, Colors.white],
+                colors: [AppColors.primaryBlue, AppColors.accentIndigo],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: AppColors.borderGray),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primaryBlue.withAlpha(16),
-                  blurRadius: 20,
+                  color: AppColors.primaryBlue.withAlpha(60),
+                  blurRadius: 24,
                   offset: const Offset(0, 10),
                 ),
               ],
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 68,
-                      height: 68,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [
-                            AppColors.primaryBlue,
-                            AppColors.primaryBlueDark,
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        user.name.isNotEmpty ? user.name[0].toUpperCase() : '?',
-                        style: GoogleFonts.inter(
-                          color: Colors.white,
-                          fontSize: 28,
-                          fontWeight: FontWeight.w700,
-                        ),
+                // Avatar with white ring
+                Container(
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withAlpha(50),
+                    borderRadius: BorderRadius.circular(23),
+                    border: Border.all(color: Colors.white, width: 2),
+                  ),
+                  child: Container(
+                    width: 68,
+                    height: 68,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      user.name.isNotEmpty ? user.name[0].toUpperCase() : '?',
+                      style: GoogleFonts.inter(
+                        color: AppColors.primaryBlue,
+                        fontSize: 28,
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        user.name,
+                        style: GoogleFonts.inter(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        user.phone,
+                        style: GoogleFonts.inter(
+                          color: Colors.white.withAlpha(204),
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
                         children: [
-                          Text(
-                            user.name,
-                            style: GoogleFonts.inter(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.textPrimary,
-                            ),
+                          const Icon(
+                            Icons.calendar_today_rounded,
+                            size: 12,
+                            color: Colors.white60,
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(width: 4),
                           Text(
-                            user.phone,
+                            'Member since ${_memberSince(user.createdAt)}',
                             style: GoogleFonts.inter(
-                              color: AppColors.textSecondary,
+                              color: Colors.white60,
+                              fontSize: 12,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          if (user.email != null) ...[
-                            const SizedBox(height: 2),
-                            Text(
-                              user.email!,
-                              style: GoogleFonts.inter(
-                                color: AppColors.textSecondary,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
                         ],
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 14),
-                Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: [
-                    _StatPill(label: l10n.posts, value: '${userPosts.length}'),
-                    _StatPill(label: l10n.typeLost, value: '$lostCount'),
-                    _StatPill(label: l10n.typeFound, value: '$foundCount'),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
+          const SizedBox(height: 14),
+
+          // ── Section B: Stat Cards ─────────────────────────────────────
+          Row(
+            children: [
+              _StatCard(
+                icon: Icons.inventory_2_rounded,
+                iconColor: AppColors.primaryBlue,
+                iconBg: AppColors.infoBox,
+                count: userPosts.length,
+                label: l10n.posts,
+              ),
+              const SizedBox(width: 10),
+              _StatCard(
+                icon: Icons.search_rounded,
+                iconColor: AppColors.lostPrimary,
+                iconBg: AppColors.lostLight,
+                count: lostCount,
+                label: l10n.typeLost,
+              ),
+              const SizedBox(width: 10),
+              _StatCard(
+                icon: Icons.check_circle_rounded,
+                iconColor: AppColors.foundPrimary,
+                iconBg: AppColors.foundLight,
+                count: foundCount,
+                label: l10n.typeFound,
+              ),
+            ],
+          ),
           const SizedBox(height: 20),
+
+          // ── Section C: Your Posts ─────────────────────────────────────
           Row(
             children: [
               Text(
@@ -177,14 +227,14 @@ class ProfileScreen extends StatelessWidget {
                 style: GoogleFonts.inter(
                   fontSize: 19,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+                  color: cs.onSurface,
                 ),
               ),
               const Spacer(),
               Text(
                 l10n.totalPosts(userPosts.length),
                 style: GoogleFonts.inter(
-                  color: AppColors.textSecondary,
+                  color: cs.onSurfaceVariant,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -194,24 +244,24 @@ class ProfileScreen extends StatelessWidget {
           if (userPosts.isEmpty)
             Container(
               margin: const EdgeInsets.only(top: 8),
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: cs.surface,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.borderGray),
+                border: Border.all(color: cs.outlineVariant),
               ),
               child: Column(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.inventory_2_outlined,
                     size: 34,
-                    color: AppColors.iconGray,
+                    color: cs.onSurfaceVariant,
                   ),
                   const SizedBox(height: 10),
                   Text(
                     l10n.noItemsPosted,
                     style: GoogleFonts.inter(
-                      color: AppColors.textSecondary,
+                      color: cs.onSurfaceVariant,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -228,41 +278,68 @@ class ProfileScreen extends StatelessWidget {
   }
 }
 
-class _StatPill extends StatelessWidget {
-  const _StatPill({required this.label, required this.value});
+class _StatCard extends StatelessWidget {
+  const _StatCard({
+    required this.icon,
+    required this.iconColor,
+    required this.iconBg,
+    required this.count,
+    required this.label,
+  });
 
+  final IconData icon;
+  final Color iconColor;
+  final Color iconBg;
+  final int count;
   final String label;
-  final String value;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white.withAlpha(210),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.borderGray),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            '$label: ',
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              color: AppColors.textSecondary,
-              fontWeight: FontWeight.w600,
+    final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final effectiveIconBg = isDark ? iconColor.withAlpha(40) : iconBg;
+
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+        decoration: BoxDecoration(
+          color: cs.surface,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: cs.outlineVariant),
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: effectiveIconBg,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              alignment: Alignment.center,
+              child: Icon(icon, color: iconColor, size: 20),
             ),
-          ),
-          Text(
-            value,
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              color: AppColors.textPrimary,
-              fontWeight: FontWeight.w700,
+            const SizedBox(height: 10),
+            Text(
+              '$count',
+              style: GoogleFonts.inter(
+                fontSize: 24,
+                fontWeight: FontWeight.w800,
+                color: cs.onSurface,
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: cs.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }

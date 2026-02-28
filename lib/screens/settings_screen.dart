@@ -22,33 +22,34 @@ class SettingsScreen extends StatelessWidget {
     child: Icon(icon, color: fg),
   );
 
-  Widget _tile({
+  Widget _tile(
+    BuildContext context, {
     required IconData icon,
     required Color iconBg,
     required Color iconFg,
     required String title,
     required String subtitle,
     required VoidCallback onTap,
-  }) => ListTile(
-    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-    leading: _leadingIcon(icon, iconBg, iconFg),
-    title: Text(
-      title,
-      style: GoogleFonts.inter(
-        fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
+  }) {
+    final cs = Theme.of(context).colorScheme;
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+      leading: _leadingIcon(icon, iconBg, iconFg),
+      title: Text(
+        title,
+        style: GoogleFonts.inter(
+          fontWeight: FontWeight.w600,
+          color: cs.onSurface,
+        ),
       ),
-    ),
-    subtitle: Text(
-      subtitle,
-      style: GoogleFonts.inter(color: AppColors.textSecondary, fontSize: 12),
-    ),
-    trailing: const Icon(
-      Icons.chevron_right_rounded,
-      color: AppColors.iconGray,
-    ),
-    onTap: onTap,
-  );
+      subtitle: Text(
+        subtitle,
+        style: GoogleFonts.inter(color: cs.onSurfaceVariant, fontSize: 12),
+      ),
+      trailing: Icon(Icons.chevron_right_rounded, color: cs.onSurfaceVariant),
+      onTap: onTap,
+    );
+  }
 
   // ── Dialogs ────────────────────────────────────────────────────────────────
 
@@ -440,20 +441,17 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final userName = context.select<AppState, String>(
-      (app) => app.currentUser?.name ?? '',
-    );
-    final userPhone = context.select<AppState, String>(
-      (app) => app.currentUser?.phone ?? '',
-    );
-    final currentLangCode = context.select<AppState, String>(
-      (app) => app.locale.languageCode,
-    );
+    final cs = Theme.of(context).colorScheme;
+    final app = context.watch<AppState>();
+    final userName = app.currentUser?.name ?? '';
+    final userPhone = app.currentUser?.phone ?? '';
+    final currentLangCode = app.locale.languageCode;
     final currentLangLabel = currentLangCode == 'ar'
         ? l10n.arabic
         : currentLangCode == 'ckb'
         ? l10n.kurdish
         : l10n.english;
+    final isDark = app.themeMode == ThemeMode.dark;
 
     return Scaffold(
       appBar: AppBar(
@@ -462,17 +460,13 @@ class SettingsScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // ── User info header ──────────────────────────────────────
+          // ── User info header ──────────────────────────────────────────
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [AppColors.skyTop, Colors.white],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              color: cs.surface,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppColors.borderGray),
+              border: Border.all(color: cs.outlineVariant),
             ),
             child: Row(
               children: [
@@ -497,7 +491,7 @@ class SettingsScreen extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 17,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
+                        color: cs.onSurface,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -505,7 +499,7 @@ class SettingsScreen extends StatelessWidget {
                       userPhone,
                       style: GoogleFonts.inter(
                         fontSize: 13,
-                        color: AppColors.textSecondary,
+                        color: cs.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -516,26 +510,71 @@ class SettingsScreen extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          // ── Account section ───────────────────────────────────────
+          // ── Dark Mode toggle ──────────────────────────────────────────
+          Container(
+            decoration: BoxDecoration(
+              color: cs.surface,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: cs.outlineVariant),
+            ),
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 4,
+              ),
+              leading: Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? AppColors.primaryBlue.withAlpha(40)
+                      : AppColors.infoBox,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
+                  color: AppColors.primaryBlue,
+                ),
+              ),
+              title: Text(
+                l10n.darkMode,
+                style: GoogleFonts.inter(
+                  fontWeight: FontWeight.w600,
+                  color: cs.onSurface,
+                ),
+              ),
+              trailing: Switch(
+                value: isDark,
+                activeThumbColor: AppColors.primaryBlue,
+                onChanged: (v) =>
+                    app.setThemeMode(v ? ThemeMode.dark : ThemeMode.light),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // ── Account section ───────────────────────────────────────────
           Text(
             l10n.account,
             style: GoogleFonts.inter(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary,
+              color: cs.onSurfaceVariant,
               letterSpacing: 0.5,
             ),
           ),
           const SizedBox(height: 8),
           Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: cs.surface,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.borderGray),
+              border: Border.all(color: cs.outlineVariant),
             ),
             child: Column(
               children: [
                 _tile(
+                  context,
                   icon: Icons.edit_rounded,
                   iconBg: AppColors.infoBox,
                   iconFg: AppColors.primaryBlue,
@@ -544,9 +583,10 @@ class SettingsScreen extends StatelessWidget {
                   onTap: () => _showChangeNameDialog(context),
                 ),
 
-                const Divider(height: 1, color: AppColors.borderGray),
+                Divider(height: 1, color: cs.outlineVariant),
 
                 _tile(
+                  context,
                   icon: Icons.logout,
                   iconBg: AppColors.lostLight,
                   iconFg: AppColors.lostPrimary,
@@ -555,9 +595,10 @@ class SettingsScreen extends StatelessWidget {
                   onTap: () => _logout(context),
                 ),
 
-                const Divider(height: 1, color: AppColors.borderGray),
+                Divider(height: 1, color: cs.outlineVariant),
 
                 _tile(
+                  context,
                   icon: Icons.delete_forever_rounded,
                   iconBg: AppColors.lostLight,
                   iconFg: AppColors.lostDark,
@@ -571,22 +612,22 @@ class SettingsScreen extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          // ── Preferences section ───────────────────────────────────
+          // ── Preferences section ───────────────────────────────────────
           Text(
             l10n.preferences,
             style: GoogleFonts.inter(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary,
+              color: cs.onSurfaceVariant,
               letterSpacing: 0.5,
             ),
           ),
           const SizedBox(height: 8),
           Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: cs.surface,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.borderGray),
+              border: Border.all(color: cs.outlineVariant),
             ),
             child: ListTile(
               contentPadding: const EdgeInsets.symmetric(
@@ -609,19 +650,19 @@ class SettingsScreen extends StatelessWidget {
                 l10n.language,
                 style: GoogleFonts.inter(
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: cs.onSurface,
                 ),
               ),
               subtitle: Text(
                 currentLangLabel,
                 style: GoogleFonts.inter(
-                  color: AppColors.textSecondary,
+                  color: cs.onSurfaceVariant,
                   fontSize: 12,
                 ),
               ),
-              trailing: const Icon(
+              trailing: Icon(
                 Icons.chevron_right_rounded,
-                color: AppColors.iconGray,
+                color: cs.onSurfaceVariant,
               ),
               onTap: () => _showLanguageDialog(context),
             ),
@@ -629,7 +670,7 @@ class SettingsScreen extends StatelessWidget {
 
           const SizedBox(height: 32),
 
-          // ── App version footer ────────────────────────────────────
+          // ── App version footer ────────────────────────────────────────
           FutureBuilder<PackageInfo>(
             future: PackageInfo.fromPlatform(),
             builder: (context, snap) {
@@ -641,7 +682,7 @@ class SettingsScreen extends StatelessWidget {
                   version,
                   style: GoogleFonts.inter(
                     fontSize: 12,
-                    color: AppColors.textTertiary,
+                    color: cs.onSurfaceVariant,
                   ),
                 ),
               );
@@ -668,16 +709,19 @@ class _LanguageOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.infoBox : Colors.transparent,
+          color: isSelected
+              ? AppColors.primaryBlue.withAlpha(20)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? AppColors.primaryBlue : AppColors.borderGray,
+            color: isSelected ? AppColors.primaryBlue : cs.outlineVariant,
           ),
         ),
         child: Row(
@@ -686,9 +730,7 @@ class _LanguageOption extends StatelessWidget {
               label,
               style: GoogleFonts.inter(
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                color: isSelected
-                    ? AppColors.primaryBlue
-                    : AppColors.textPrimary,
+                color: isSelected ? AppColors.primaryBlue : cs.onSurface,
                 fontSize: 15,
               ),
             ),

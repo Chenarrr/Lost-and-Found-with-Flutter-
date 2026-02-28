@@ -270,6 +270,9 @@ class AppLocalizationsCkb extends AppLocalizations {
   String get preferences => 'ئارەزووەکان';
 
   @override
+  String get darkMode => 'شێوازی تاریک';
+
+  @override
   String get postDetails => 'وردەکاری پۆست';
 
   @override

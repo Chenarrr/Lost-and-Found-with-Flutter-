@@ -1,0 +1,209 @@
+{
+  "@@locale": "ckb",
+
+  "appName": "Find It",
+  "tagline": "گەڕانەوەی شتە وەڵاوبووەکان لە کوردستان",
+  "getStarted": "دەستپێبکە",
+
+  "loginOrSignup": "چوونەژوورەوە یان تۆمارکردن",
+  "loginTab": "چوونەژوورەوە",
+  "signupTab": "تۆمارکردن",
+  "phonePlaceholder": "ژمارەی مۆبایل",
+  "requiredField": "پێویستە",
+  "phoneInvalid": "١٠ ژمارە بنووسە کە دەستپێدەکات بە ٧",
+  "namePlaceholder": "ناوی تەواو",
+  "nameTooShort": "لانیکەم ٢ پیت بنووسە",
+  "phoneRequired": "ژمارەی مۆبایل پێویستە",
+  "emailPlaceholder": "ئیمەیل (دەکرێت بەتاڵ بێت)",
+  "emailInvalid": "ئیمەیلەکە دروست نییە",
+  "sendOtp": "کۆدی دووپاتکردنەوە بنێرە",
+  "genderLabel": "ڕەگەز",
+  "genderMale": "نێر",
+  "genderFemale": "مێ",
+  "genderRequired": "تکایە ڕەگەزێک هەڵبژێرە",
+  "ageLabel": "تەمەن",
+  "ageRequired": "تەمەن پێویستە",
+  "ageInvalid": "تەمەنێکی دروست بنووسە (١٣–١٠٠)",
+
+  "verifyPhone": "دووپاتکردنەوەی مۆبایل",
+  "enterCodeSentTo": "کۆدی ٦ ژمارەیی کە نێردراوە بۆ بنووسە",
+  "codeInvalid": "کۆدی ٦ ژمارەیی بنووسە",
+  "verifyCode": "کۆدەکە دووپات بکەرەوە",
+  "resendCountdown": "نێردنەوەی دووبارەی کۆد لە {seconds} چرکەدا",
+  "@resendCountdown": {
+    "placeholders": {
+      "seconds": { "type": "int" }
+    }
+  },
+  "resendCode": "کۆدەکە دووبارە بنێرە",
+  "newCodeSent": "کۆدی نوێ نێردرا!",
+
+  "allCities": "هەموو شارەکان",
+  "cityErbil": "هەولێر",
+  "citySulaymaniyah": "سلێمانی",
+  "cityDuhok": "دهۆک",
+  "cityHalabja": "حەڵەبجە",
+  "cityZakho": "زاخۆ",
+  "cityKoya": "کۆیە",
+  "searchHint": "بگەڕێ بۆ شت، شار، کوچە...",
+  "lostBadge": "{count} وەڵاوبوو",
+  "@lostBadge": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "foundBadge": "{count} دۆزرایەوە",
+  "@foundBadge": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "resultsCount": "{count} ئەنجام",
+  "@resultsCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "filterByCity": "پاڵاوتن بە شار",
+  "all": "هەموو",
+  "lost": "وەڵاوبوو",
+  "found": "دۆزرایەوە",
+  "noItemsFound": "هیچ شتێک نەدۆزرایەوە",
+  "noItemsFoundHint": "شارێکی تر هەوڵبدە یان مەیدانی گەڕان پاکبکەرەوە.",
+
+  "pleaseLogIn": "تکایە بچۆ ژوورەوە",
+  "logInToTrack": "بچۆ ژوورەوە بۆ شوێنکەوتنی پۆستەکانت و لێدوانەکانت.",
+  "activityTitle": "چالاکی",
+  "myPostsTab": "پۆستەکانم ({count})",
+  "@myPostsTab": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "myCommentsTab": "لێدوانەکانم ({count})",
+  "@myCommentsTab": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "noPostsYet": "هێشتا هیچ پۆستێک نییە",
+  "createFirstPost": "یەکەم پۆستەکەت دروست بکە بۆ دەستپێکردن.",
+  "noCommentsYet": "هێشتا هیچ لێدوانێک نییە",
+  "commentToEngage": "لێدوان لەسەر پۆستەکان بدە بۆ پەیوەندیکردن بە کۆمەڵگەوە.",
+
+  "pleaseLogInProfile": "تکایە بچۆ ژوورەوە بۆ بینینی پرۆفایلەکەت.",
+  "profileTitle": "پرۆفایل",
+  "posts": "پۆستەکان",
+  "yourPosts": "پۆستەکانت",
+  "totalPosts": "{count} کۆی گشتی",
+  "@totalPosts": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "noItemsPosted": "هێشتا هیچ شتێکت نەناردووە.",
+
+  "settingsTitle": "ڕێکخستنەکان",
+  "changeName": "گۆڕینی ناو",
+  "yourName": "ناوت",
+  "cancel": "پاشگەزبوونەوە",
+  "save": "پاشەکەوتکردن",
+  "account": "ئەکاونت",
+  "updateDisplayName": "نەمایشی ناوت نوێبکەرەوە",
+  "logout": "دەرچوون",
+  "logoutConfirm": "دڵنیایت دەتەوێت دەربچیت؟",
+  "signOutDevice": "دەرچوون لەم ئامێرە",
+  "deleteAccount": "سڕینەوەی ئەکاونت",
+  "deleteAccountConfirm": "ئەمە ئەکاونت و هەموو پۆستەکانت بۆ هەمیشە دەسڕێتەوە. ناتوانرێت پاشگەزبوونەوە.",
+  "permanentlyRemove": "بۆ هەمیشە ئەکاونت و پۆستەکانت دەسڕێتەوە",
+  "delete": "سڕینەوە",
+  "language": "زمان",
+  "selectLanguage": "زمانی بەرنامە هەڵبژێرە",
+  "english": "English",
+  "arabic": "العربية",
+  "kurdish": "کوردی",
+  "preferences": "ئارەزووەکان",
+
+  "postDetails": "وردەکاری پۆست",
+  "postNotFound": "پۆستەکە نەدۆزرایەوە.",
+  "couldNotOpenWhatsapp": "نەتوانرا واتساپ کرانەوە.",
+  "sharedVia": "بە ئەپی Find It هاوبەشکرا",
+  "whatsappMessagePrefix": "سڵاو، پۆستەکەت دیتم دەربارەی:",
+  "loginToReport": "تکایە بچۆ ژوورەوە بۆ ئاگادارکردنەوە لەم پۆستە.",
+  "cannotReportOwn": "ناتوانیت پۆستی خۆت ئاگادار بکەیتەوە.",
+  "alreadyReported": "پێشتر ئاگادارت کردووەتەوە لەم پۆستە.",
+  "reportPost": "ئاگادارکردنەوە لەم پۆستە",
+  "reportConfirm": "ئایا ئاگادار بکەیتەوە لەم پۆستە وەک درۆ یان نەگونجاو؟",
+  "report": "ئاگادارکردنەوە",
+  "reported": "ئاگادارکرایەوە",
+  "postReported": "پۆستەکە ئاگادارکرایەوە. سپاس.",
+  "markAsResolved": "وەک چارەسەرکراو نیشانبکە",
+  "markResolvedConfirm": "ئایا ئەم پۆستە وەک چارەسەرکراو نیشانبکەیت؟ تریش دەیبینن کە داخراوە.",
+  "markResolved": "وەک چارەسەرکراو نیشانبکە",
+  "postMarkedResolved": "پۆستەکە وەک چارەسەرکراو نیشانکرا.",
+  "loginToComment": "تکایە بچۆ ژوورەوە بۆ لێدوانکردن.",
+  "commentAdded": "لێدوانەکە زیادکرا.",
+  "deletePost": "سڕینەوەی پۆست",
+  "deletePostConfirm": "دڵنیایت دەتەوێت ئەم پۆستە بسڕیتەوە؟",
+  "contactWhatsapp": "پەیوەندی بە واتساپ",
+  "description": "وەسف",
+  "noDescription": "هیچ وەسفێک نەدراوە.",
+  "commentsSection": "لێدوانەکان ({count})",
+  "@commentsSection": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "noCommentsSection": "هێشتا هیچ لێدوانێک نییە. یەکەم بە.",
+  "typeComment": "لێدوانەکەت بنووسە...",
+  "itemResolved": "شتەکە چارەسەرکرا",
+  "resolvedBadge": "✓ چارەسەرکرا",
+  "viewPost": "بینین",
+  "share": "هاوبەشکردن",
+
+  "createPost": "دروستکردنی پۆست",
+  "goHome": "سەرەتا",
+  "shareDetails": "وردەکارییەکان هاوبەش بکە بۆ یارمەتیدانی کۆمەڵگە.",
+  "itemName": "ناوی شتەکە",
+  "itemNameRequired": "ناوی شتەکە دەبێت لانیکەم ٢ پیت بێت",
+  "descriptionOptional": "وەسف (دەکرێت بەتاڵ بێت)",
+  "city": "شار",
+  "selectCity": "شار هەڵبژێرە",
+  "cityRequired": "تکایە شارێک هەڵبژێرە",
+  "street": "کوچە",
+  "streetRequired": "کوچە پێویستە",
+  "imagesSection": "وێنەکان ({count}/3)",
+  "@imagesSection": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "noImagesSelected": "هیچ وێنەیەک هەڵنەبژێردراوە",
+  "maxImagesReached": "زۆربەی ٣ وێنە ڕێپێدراوە.",
+  "couldNotPickImage": "نەتوانرا وێنە هەڵبژێردرێت. تکایە دووبارە هەوڵبدەرەوە.",
+  "loginToPost": "تکایە بچۆ ژوورەوە بۆ دروستکردنی پۆست.",
+  "addImage": "زیادکردنی وێنە",
+  "submit": "ناردن",
+  "postCreated": "پۆستەکە بە سەرکەوتوویی دروستکرا.",
+
+  "homeNav": "سەرەتا",
+  "activityNav": "چالاکی",
+  "profileNav": "پرۆفایل",
+  "postFab": "پۆست",
+  "createPostTooltip": "دروستکردنی پۆست",
+
+  "typeLost": "وەڵاوبوو",
+  "typeFound": "دۆزرایەوە",
+  "typeLostUpper": "وەڵاوبوو",
+  "typeFoundUpper": "دۆزرایەوە",
+
+  "reauthTitle": "دووپاتکردنەوەی ناسنامە",
+  "reauthBody": "بۆ سڕینەوەی ئەکاونتەکەت، کۆدی دووپاتکردنەوە دەنێردرێت بۆ {phone}.",
+  "@reauthBody": {
+    "placeholders": {
+      "phone": { "type": "String" }
+    }
+  },
+  "sendingCode": "کۆد دەنێردرێت…",
+  "confirmDelete": "دووپاتکردنەوە و سڕینەوە"
+}

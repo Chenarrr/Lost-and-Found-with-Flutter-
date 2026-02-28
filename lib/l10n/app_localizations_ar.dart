@@ -261,6 +261,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get arabic => 'العربية';
 
   @override
+  String get kurdish => 'کوردی';
+
+  @override
   String get preferences => 'التفضيلات';
 
   @override

@@ -162,6 +162,15 @@ class SettingsScreen extends StatelessWidget {
                 Navigator.of(context).pop();
               },
             ),
+            const SizedBox(height: 8),
+            _LanguageOption(
+              label: l10n.kurdish,
+              isSelected: app.locale.languageCode == 'ckb',
+              onTap: () {
+                app.setLocale(const Locale('ckb'));
+                Navigator.of(context).pop();
+              },
+            ),
           ],
         ),
         actions: [
@@ -442,6 +451,8 @@ class SettingsScreen extends StatelessWidget {
     );
     final currentLangLabel = currentLangCode == 'ar'
         ? l10n.arabic
+        : currentLangCode == 'ckb'
+        ? l10n.kurdish
         : l10n.english;
 
     return Scaffold(

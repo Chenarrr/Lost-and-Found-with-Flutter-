@@ -15,6 +15,7 @@ Future<void> main() async {
   await dotenv.load(fileName: '.env');
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   timeago.setLocaleMessages('ar', timeago.ArMessages());
+  timeago.setLocaleMessages('ckb', timeago.ArMessages());
   runApp(const FindItApp());
 }
 
@@ -33,6 +34,15 @@ class FindItApp extends StatelessWidget {
           locale: app.locale,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
+          builder: (context, child) {
+            final isRtl =
+                app.locale.languageCode == 'ar' ||
+                app.locale.languageCode == 'ckb';
+            return Directionality(
+              textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
+              child: child!,
+            );
+          },
           theme: ThemeData(
             useMaterial3: true,
             colorScheme: const ColorScheme.light(

@@ -11,20 +11,26 @@ class LangToggle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final app = context.watch<AppState>();
-    final isAr = app.locale.languageCode == 'ar';
-    return Row(
-      mainAxisSize: MainAxisSize.min,
+    final code = app.locale.languageCode;
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      alignment: WrapAlignment.center,
       children: [
         _Chip(
           label: 'English',
-          selected: !isAr,
+          selected: code == 'en',
           onTap: () => context.read<AppState>().setLocale(const Locale('en')),
         ),
-        const SizedBox(width: 10),
         _Chip(
           label: 'العربية',
-          selected: isAr,
+          selected: code == 'ar',
           onTap: () => context.read<AppState>().setLocale(const Locale('ar')),
+        ),
+        _Chip(
+          label: 'کوردی',
+          selected: code == 'ckb',
+          onTap: () => context.read<AppState>().setLocale(const Locale('ckb')),
         ),
       ],
     );

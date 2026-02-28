@@ -6,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_ar.dart';
+import 'app_localizations_ckb.dart';
 import 'app_localizations_en.dart';
 
 // ignore_for_file: type=lint
@@ -95,6 +96,7 @@ abstract class AppLocalizations {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('ar'),
+    Locale('ckb'),
     Locale('en'),
   ];
 
@@ -572,6 +574,12 @@ abstract class AppLocalizations {
   /// **'العربية'**
   String get arabic;
 
+  /// No description provided for @kurdish.
+  ///
+  /// In en, this message translates to:
+  /// **'کوردی'**
+  String get kurdish;
+
   /// No description provided for @preferences.
   ///
   /// In en, this message translates to:
@@ -968,7 +976,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['ar', 'en'].contains(locale.languageCode);
+      <String>['ar', 'ckb', 'en'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -979,6 +987,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   switch (locale.languageCode) {
     case 'ar':
       return AppLocalizationsAr();
+    case 'ckb':
+      return AppLocalizationsCkb();
     case 'en':
       return AppLocalizationsEn();
   }

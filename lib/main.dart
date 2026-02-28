@@ -30,11 +30,11 @@ class _CkbMaterialLocalizationsDelegate
 }
 
 // ── Dark palette ────────────────────────────────────────────────────────────
-const _darkBg = Color(0xFF0D1621); // scaffold
-const _darkSurface = Color(0xFF162032); // cards / containers
-const _darkBorder = Color(0xFF243347); // dividers / borders
-const _darkOnSurface = Color(0xFFDCE9FA); // primary text
-const _darkOnSurface2 = Color(0xFF7A9AB8); // secondary text
+const _darkBg = Color(0xFF111111); // scaffold
+const _darkSurface = Color(0xFF1C1C1C); // cards / containers
+const _darkBorder = Color(0xFF2E2E2E); // dividers / borders
+const _darkOnSurface = Color(0xFFF0F0F0); // primary text
+const _darkOnSurface2 = Color(0xFF9E9E9E); // secondary text
 
 ThemeData _lightTheme() => ThemeData(
   useMaterial3: true,

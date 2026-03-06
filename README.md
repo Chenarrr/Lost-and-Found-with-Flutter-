@@ -10,8 +10,71 @@
 
 ---
 
+## Development Quick Reference
+
+### How to run the app
+
+```bash
+# 1. See all connected devices and simulators
+flutter devices
+
+# 2. Run on the default device (usually the open simulator)
+flutter run
+
+# 3. Run on a specific device
+flutter run -d <device-id>     # e.g. flutter run -d iPhone16
+
+# 4. Run in release mode (no debug overlay, better performance)
+flutter run --release
+```
+
+> **First time?** Make sure you ran `flutter pub get` and created your `.env` file. See [Getting Started](#getting-started).
+
+---
+
+### Hot Reload vs Hot Restart vs Full Restart
+
+These are three different ways to apply changes while the app is running. Use the keyboard shortcuts in the terminal where `flutter run` is active.
+
+| Command | Key | What it does | Keeps app state? | Speed |
+|---|---|---|---|---|
+| **Hot Reload** | `r` | Injects new Dart code into the running VM. UI rebuilds instantly. | **Yes** — you stay on the same screen, logged in, same scroll position | Fastest (~1 s) |
+| **Hot Restart** | `R` | Restarts the Dart VM from scratch, re-runs `main()`. | **No** — app resets to initial state (like opening it fresh) | Fast (~3–5 s) |
+| **Full Restart** | Stop (`q`) then `flutter run` again | Kills the process, rebuilds if needed, relaunches. | **No** | Slowest |
+
+#### When to use which
+
+- **Hot Reload (`r`)** — your go-to for 99% of UI tweaks: changing a color, adjusting padding, fixing a text label. The widget tree rebuilds without losing your place in the app.
+
+- **Hot Restart (`R`)** — use this when:
+  - You changed code that runs at startup (`main()`, `initState()`, `AppState._init()`)
+  - You added or removed a `Provider`
+  - Hot reload didn't pick up your changes correctly
+  - You changed the app theme or `MaterialApp` config
+
+- **Full Restart** — use this when:
+  - You changed native code (Swift/Kotlin files, `Info.plist`, `AndroidManifest.xml`)
+  - You added a new Flutter package (`flutter pub get` + full restart)
+  - You changed assets in `pubspec.yaml`
+  - Something is behaving strangely and you want a clean slate
+
+#### Other useful keys while `flutter run` is active
+
+| Key | Action |
+|---|---|
+| `r` | Hot reload |
+| `R` | Hot restart |
+| `p` | Toggle widget paint bounds (debug overlay) |
+| `o` | Switch between iOS and Android rendering (debug only) |
+| `d` | Detach — leave app running, exit terminal |
+| `q` | Quit — stop the app and exit |
+| `?` | Show all available commands |
+
+---
+
 ## Table of Contents
 
+- [Development Quick Reference](#development-quick-reference)
 - [About the App](#about-the-app)
 - [Features](#features)
 - [Localization](#localization)

@@ -466,4 +466,39 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get confirmDelete => 'تأكيد وحذف';
+
+  @override
+  String get editPost => 'تعديل المنشور';
+
+  @override
+  String get editPostTitle => 'تعديل المنشور';
+
+  @override
+  String get update => 'تحديث';
+
+  @override
+  String get postUpdated => 'تم تحديث المنشور بنجاح.';
+
+  @override
+  String get filterByCategory => 'الفئة';
+
+  @override
+  String get allCategories => 'الكل';
+
+  @override
+  String get categoryElectronics => 'إلكترونيات';
+
+  @override
+  String get categoryDocuments => 'وثائق';
+
+  @override
+  String get categoryPersonalItems => 'أشياء شخصية';
+
+  @override
+  String get categoryPets => 'حيوانات أليفة';
+
+  @override
+  String viewsCount(int count) {
+    return '$count مشاهدة';
+  }
 }

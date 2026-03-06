@@ -206,5 +206,22 @@
     }
   },
   "sendingCode": "Sending code…",
-  "confirmDelete": "Confirm & Delete"
+  "confirmDelete": "Confirm & Delete",
+
+  "editPost": "Edit Post",
+  "editPostTitle": "Edit Post",
+  "update": "Update",
+  "postUpdated": "Post updated successfully.",
+  "filterByCategory": "Category",
+  "allCategories": "All",
+  "categoryElectronics": "Electronics",
+  "categoryDocuments": "Documents",
+  "categoryPersonalItems": "Personal Items",
+  "categoryPets": "Pets",
+  "viewsCount": "{count} views",
+  "@viewsCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  }
 }

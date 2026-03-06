@@ -467,4 +467,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get confirmDelete => 'Confirm & Delete';
+
+  @override
+  String get editPost => 'Edit Post';
+
+  @override
+  String get editPostTitle => 'Edit Post';
+
+  @override
+  String get update => 'Update';
+
+  @override
+  String get postUpdated => 'Post updated successfully.';
+
+  @override
+  String get filterByCategory => 'Category';
+
+  @override
+  String get allCategories => 'All';
+
+  @override
+  String get categoryElectronics => 'Electronics';
+
+  @override
+  String get categoryDocuments => 'Documents';
+
+  @override
+  String get categoryPersonalItems => 'Personal Items';
+
+  @override
+  String get categoryPets => 'Pets';
+
+  @override
+  String viewsCount(int count) {
+    return '$count views';
+  }
 }

@@ -422,19 +422,15 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> addPost(Post post, List<String> localImagePaths) async {
-    final uploadedUrls = <String>[];
-
-    for (final path in localImagePaths) {
-      if (path.startsWith('http')) {
-        uploadedUrls.add(path);
-        continue;
-      }
-      final url = await _uploadToImgBB(
+    final futures = localImagePaths.map((path) async {
+      if (path.startsWith('http')) return path;
+      return await _uploadToImgBB(
         path,
         name: '${post.itemName}_${post.userPhone}',
       );
-      if (url != null) uploadedUrls.add(url);
-    }
+    });
+    final results = await Future.wait(futures);
+    final uploadedUrls = results.whereType<String>().toList();
 
     final postToSave = post.copyWith(imageUrls: uploadedUrls);
     final data = postToSave.toJson();
@@ -443,6 +439,23 @@ class AppState extends ChangeNotifier {
     if ((data['reports'] as List?)?.isEmpty ?? true) data.remove('reports');
 
     await _firestore.collection('posts').doc(post.id).set(data);
+  }
+
+  Future<void> updatePost(Post post) async {
+    await _firestore.collection('posts').doc(post.id).update({
+      'type': post.type.name,
+      'category': post.category.name,
+      'itemName': post.itemName,
+      'description': post.description,
+      'street': post.street,
+      'city': post.city,
+    });
+  }
+
+  Future<void> incrementViewCount(String postId) async {
+    await _firestore.collection('posts').doc(postId).update({
+      'viewCount': FieldValue.increment(1),
+    });
   }
 
   Future<void> deletePost(String postId) async {

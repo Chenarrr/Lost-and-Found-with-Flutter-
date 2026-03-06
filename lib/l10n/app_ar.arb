@@ -206,5 +206,22 @@
     }
   },
   "sendingCode": "جارٍ الإرسال…",
-  "confirmDelete": "تأكيد وحذف"
+  "confirmDelete": "تأكيد وحذف",
+
+  "editPost": "تعديل المنشور",
+  "editPostTitle": "تعديل المنشور",
+  "update": "تحديث",
+  "postUpdated": "تم تحديث المنشور بنجاح.",
+  "filterByCategory": "الفئة",
+  "allCategories": "الكل",
+  "categoryElectronics": "إلكترونيات",
+  "categoryDocuments": "وثائق",
+  "categoryPersonalItems": "أشياء شخصية",
+  "categoryPets": "حيوانات أليفة",
+  "viewsCount": "{count} مشاهدة",
+  "@viewsCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  }
 }

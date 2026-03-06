@@ -12,9 +12,10 @@ import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 class CreatePostSheet extends StatefulWidget {
-  const CreatePostSheet({super.key, this.onGoHome});
+  const CreatePostSheet({super.key, this.onGoHome, this.existingPost});
 
   final VoidCallback? onGoHome;
+  final Post? existingPost;
 
   @override
   State<CreatePostSheet> createState() => _CreatePostSheetState();
@@ -42,6 +43,23 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
   PostCategory _category = PostCategory.electronics;
   String? _selectedCity;
   bool _isLoading = false;
+
+  bool get _isEditing => widget.existingPost != null;
+
+  @override
+  void initState() {
+    super.initState();
+    final post = widget.existingPost;
+    if (post != null) {
+      _itemNameController.text = post.itemName;
+      _descriptionController.text = post.description ?? '';
+      _streetController.text = post.street;
+      _postType = post.type;
+      _category = post.category;
+      _selectedCity = post.city;
+      _imagePaths.addAll(post.imageUrls);
+    }
+  }
 
   @override
   void dispose() {
@@ -134,42 +152,67 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
 
     final app = Provider.of<AppState>(context, listen: false);
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     final currentUser = app.currentUser;
     if (currentUser == null) {
-      _showMessage(context.l10n.loginToPost, isError: true);
+      _showMessage(l10n.loginToPost, isError: true);
       return;
     }
 
     setState(() => _isLoading = true);
 
-    final newPost = Post(
-      id: _uuid.v4(),
-      type: _postType,
-      category: _category,
-      itemName: _itemNameController.text.trim(),
-      description: _descriptionController.text.trim().isEmpty
-          ? null
-          : _descriptionController.text.trim(),
-      street: _streetController.text.trim(),
-      city: _selectedCity!,
-      imageUrls: List.from(_imagePaths),
-      userName: currentUser.name,
-      userPhone: currentUser.phone,
-      createdAt: DateTime.now(),
-      userId: currentUser.id,
-    );
+    if (_isEditing) {
+      final updated = widget.existingPost!.copyWith(
+        type: _postType,
+        category: _category,
+        itemName: _itemNameController.text.trim(),
+        description: _descriptionController.text.trim().isEmpty
+            ? null
+            : _descriptionController.text.trim(),
+        street: _streetController.text.trim(),
+        city: _selectedCity!,
+      );
+      await app.updatePost(updated);
 
-    await app.addPost(newPost, _imagePaths);
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      Navigator.of(context).pop();
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(l10n.postUpdated),
+          backgroundColor: AppColors.primaryBlueDark,
+        ),
+      );
+    } else {
+      final newPost = Post(
+        id: _uuid.v4(),
+        type: _postType,
+        category: _category,
+        itemName: _itemNameController.text.trim(),
+        description: _descriptionController.text.trim().isEmpty
+            ? null
+            : _descriptionController.text.trim(),
+        street: _streetController.text.trim(),
+        city: _selectedCity!,
+        imageUrls: List.from(_imagePaths),
+        userName: currentUser.name,
+        userPhone: currentUser.phone,
+        createdAt: DateTime.now(),
+        userId: currentUser.id,
+      );
 
-    if (!mounted) return;
-    setState(() => _isLoading = false);
-    Navigator.of(context).pop();
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text(context.l10n.postCreated),
-        backgroundColor: AppColors.primaryBlueDark,
-      ),
-    );
+      await app.addPost(newPost, _imagePaths);
+
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      Navigator.of(context).pop();
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(l10n.postCreated),
+          backgroundColor: AppColors.primaryBlueDark,
+        ),
+      );
+    }
   }
 
   @override
@@ -178,7 +221,10 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
     final cs = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.createPost, style: GoogleFonts.inter()),
+        title: Text(
+          _isEditing ? l10n.editPostTitle : l10n.createPost,
+          style: GoogleFonts.inter(),
+        ),
         actions: [
           IconButton(
             onPressed: _goHome,
@@ -340,6 +386,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                   decoration: InputDecoration(labelText: l10n.street),
                 ),
                 const SizedBox(height: 16),
+                if (!_isEditing) ...[
                 Text(
                   l10n.imagesSection(_imagePaths.length),
                   style: GoogleFonts.inter(
@@ -411,6 +458,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                       ),
                     ),
                   ),
+                ], // end if (!_isEditing)
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
@@ -429,7 +477,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                             ),
                           )
                         : Text(
-                            l10n.submit,
+                            _isEditing ? l10n.update : l10n.submit,
                             style: GoogleFonts.inter(fontSize: 16),
                           ),
                   ),

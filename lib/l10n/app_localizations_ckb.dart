@@ -469,4 +469,39 @@ class AppLocalizationsCkb extends AppLocalizations {
 
   @override
   String get confirmDelete => 'دووپاتکردنەوە و سڕینەوە';
+
+  @override
+  String get editPost => 'دەستکاریکردنی پۆست';
+
+  @override
+  String get editPostTitle => 'دەستکاریکردنی پۆست';
+
+  @override
+  String get update => 'نوێکردنەوە';
+
+  @override
+  String get postUpdated => 'پۆستەکە بە سەرکەوتوویی نوێکرایەوە.';
+
+  @override
+  String get filterByCategory => 'جۆر';
+
+  @override
+  String get allCategories => 'هەموو';
+
+  @override
+  String get categoryElectronics => 'ئەلیکترۆنی';
+
+  @override
+  String get categoryDocuments => 'بەڵگەنامە';
+
+  @override
+  String get categoryPersonalItems => 'شتی کەسی';
+
+  @override
+  String get categoryPets => 'ئاژەڵ';
+
+  @override
+  String viewsCount(int count) {
+    return '$count بینین';
+  }
 }

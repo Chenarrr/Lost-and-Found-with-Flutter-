@@ -7,6 +7,7 @@ import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/models/comment.dart';
 import 'package:flutter_application/models/post.dart';
 import 'package:flutter_application/providers/app_state.dart';
+import 'package:flutter_application/screens/post/create_post_sheet.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -27,11 +28,18 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   static const _uuid = Uuid();
 
   final TextEditingController _commentController = TextEditingController();
+  bool _viewCounted = false;
 
   @override
   void dispose() {
     _commentController.dispose();
     super.dispose();
+  }
+
+  void _incrementViewIfNeeded(AppState app) {
+    if (_viewCounted) return;
+    _viewCounted = true;
+    app.incrementViewCount(widget.postId);
   }
 
   void _showMessage(String message, {bool isError = false}) {
@@ -264,6 +272,8 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     final isLost = post.type == PostType.lost;
     final typeColor = isLost ? AppColors.lostPrimary : AppColors.foundPrimary;
 
+    _incrementViewIfNeeded(app);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.postDetails, style: GoogleFonts.inter()),
@@ -432,6 +442,20 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                     const SizedBox(width: 4),
                     Text(
                       post.userName,
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: cs.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Icon(
+                      Icons.visibility_outlined,
+                      size: 14,
+                      color: cs.onSurfaceVariant,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      l10n.viewsCount(post.viewCount),
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         color: cs.onSurfaceVariant,
@@ -645,6 +669,33 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                         ],
                       ),
                     ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => CreatePostSheet(
+                              existingPost: post,
+                            ),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.edit_outlined),
+                      label: Text(
+                        l10n.editPost,
+                        style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.primaryBlue,
+                        side: const BorderSide(color: AppColors.primaryBlue),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 8),
                   SizedBox(
                     width: double.infinity,

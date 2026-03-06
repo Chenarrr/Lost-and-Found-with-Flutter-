@@ -206,5 +206,22 @@
     }
   },
   "sendingCode": "کۆد دەنێردرێت…",
-  "confirmDelete": "دووپاتکردنەوە و سڕینەوە"
+  "confirmDelete": "دووپاتکردنەوە و سڕینەوە",
+
+  "editPost": "دەستکاریکردنی پۆست",
+  "editPostTitle": "دەستکاریکردنی پۆست",
+  "update": "نوێکردنەوە",
+  "postUpdated": "پۆستەکە بە سەرکەوتوویی نوێکرایەوە.",
+  "filterByCategory": "جۆر",
+  "allCategories": "هەموو",
+  "categoryElectronics": "ئەلیکترۆنی",
+  "categoryDocuments": "بەڵگەنامە",
+  "categoryPersonalItems": "شتی کەسی",
+  "categoryPets": "ئاژەڵ",
+  "viewsCount": "{count} بینین",
+  "@viewsCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  }
 }

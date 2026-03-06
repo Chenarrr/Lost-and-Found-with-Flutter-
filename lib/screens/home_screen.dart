@@ -22,6 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String _searchQuery = '';
   String _cityFilter = 'All Cities';
   PostType? _typeFilter;
+  PostCategory? _categoryFilter;
   final List<String> _cities = [
     'All Cities',
     'Erbil',
@@ -102,6 +103,28 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _categoryChip(String label, PostCategory? category) {
+    final cs = Theme.of(context).colorScheme;
+    final isActive = _categoryFilter == category;
+    return ChoiceChip(
+      label: Text(
+        label,
+        style: GoogleFonts.inter(
+          color: isActive ? Colors.white : cs.onSurface,
+          fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+          fontSize: 13,
+        ),
+      ),
+      selected: isActive,
+      showCheckmark: false,
+      onSelected: (_) => setState(() => _categoryFilter = category),
+      selectedColor: AppColors.primaryBlue,
+      backgroundColor: cs.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+      side: BorderSide(color: cs.outlineVariant),
+    );
+  }
+
   Widget _statBadge(String label, Color textColor, Color bgColor) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -137,7 +160,9 @@ class _HomeScreenState extends State<HomeScreen> {
           post.city.toLowerCase().contains(_searchQuery) ||
           post.street.toLowerCase().contains(_searchQuery);
       final matchesType = _typeFilter == null || post.type == _typeFilter;
-      return matchesCity && matchesSearch && matchesType;
+      final matchesCategory =
+          _categoryFilter == null || post.category == _categoryFilter;
+      return matchesCity && matchesSearch && matchesType && matchesCategory;
     }).toList();
     final lostCount = posts.where((post) => post.type == PostType.lost).length;
     final foundCount = posts.length - lostCount;
@@ -343,6 +368,23 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(width: 8),
               _typeChip(l10n.found, PostType.found),
             ],
+          ),
+          const SizedBox(height: 8),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _categoryChip(l10n.allCategories, null),
+                const SizedBox(width: 8),
+                _categoryChip(l10n.categoryElectronics, PostCategory.electronics),
+                const SizedBox(width: 8),
+                _categoryChip(l10n.categoryDocuments, PostCategory.documents),
+                const SizedBox(width: 8),
+                _categoryChip(l10n.categoryPersonalItems, PostCategory.personalItems),
+                const SizedBox(width: 8),
+                _categoryChip(l10n.categoryPets, PostCategory.pets),
+              ],
+            ),
           ),
           const SizedBox(height: 14),
           if (posts.isEmpty)

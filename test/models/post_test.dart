@@ -195,5 +195,50 @@ void main() {
       expect(updated.comments.length, 1);
       expect(updated.comments.first.text, 'Found it!');
     });
+
+    test('viewCount defaults to 0', () {
+      final post = makePost();
+      expect(post.viewCount, 0);
+    });
+
+    test('viewCount serializes and deserializes', () {
+      final post = makePost().copyWith(viewCount: 42);
+      final json = post.toJson();
+      expect(json['viewCount'], 42);
+
+      final restored = Post.fromJson(json);
+      expect(restored.viewCount, 42);
+    });
+
+    test('viewCount defaults to 0 when missing in JSON', () {
+      final json = {
+        'id': 'p1',
+        'type': 'lost',
+        'category': 'pets',
+        'itemName': 'Dog',
+        'street': 'Main',
+        'city': 'Erbil',
+        'imageUrls': <dynamic>[],
+        'userName': 'User',
+        'userPhone': '000',
+        'createdAt': baseDate.toIso8601String(),
+        'userId': 'u1',
+      };
+      final post = Post.fromJson(json);
+      expect(post.viewCount, 0);
+    });
+
+    test('isResolved and isHidden default correctly', () {
+      final post = makePost();
+      expect(post.isResolved, false);
+      expect(post.isHidden, false);
+    });
+
+    test('copyWith updates isResolved', () {
+      final post = makePost();
+      final resolved = post.copyWith(isResolved: true);
+      expect(resolved.isResolved, true);
+      expect(resolved.itemName, post.itemName);
+    });
   });
 }

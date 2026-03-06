@@ -360,9 +360,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                     child: Center(
                       child: Text(
                         l10n.noImagesSelected,
-                        style: GoogleFonts.inter(
-                          color: cs.onSurfaceVariant,
-                        ),
+                        style: GoogleFonts.inter(color: cs.onSurfaceVariant),
                       ),
                     ),
                   )

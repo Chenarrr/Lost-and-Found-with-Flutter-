@@ -68,13 +68,12 @@ class PostCard extends StatelessWidget {
                                             height: 88,
                                             fit: BoxFit.cover,
                                             placeholder: (_, __) => ColoredBox(
-                                              color:
-                                                  cs.surfaceContainerHighest,
+                                              color: cs.surfaceContainerHighest,
                                             ),
                                             errorWidget: (_, __, ___) =>
                                                 ColoredBox(
-                                                  color:
-                                                      cs.surfaceContainerHighest,
+                                                  color: cs
+                                                      .surfaceContainerHighest,
                                                   child: Center(
                                                     child: Icon(
                                                       Icons.broken_image,

@@ -638,9 +638,7 @@ class SettingsScreen extends StatelessWidget {
               ),
               leading: _leadingIcon(
                 Icons.language_rounded,
-                isDark
-                    ? AppColors.primaryBlue.withAlpha(40)
-                    : AppColors.skyTop,
+                isDark ? AppColors.primaryBlue.withAlpha(40) : AppColors.skyTop,
                 AppColors.primaryBlue,
               ),
               title: Text(

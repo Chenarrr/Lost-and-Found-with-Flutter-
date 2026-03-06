@@ -57,7 +57,9 @@ class ActivityScreen extends StatelessWidget {
             ),
             indicatorColor: AppColors.primaryBlue,
             labelColor: AppColors.primaryBlue,
-            unselectedLabelColor: Theme.of(context).colorScheme.onSurfaceVariant,
+            unselectedLabelColor: Theme.of(
+              context,
+            ).colorScheme.onSurfaceVariant,
             tabs: [
               Tab(text: l10n.myPostsTab(userPosts.length)),
               Tab(text: l10n.myCommentsTab(userComments.length)),
@@ -138,11 +140,11 @@ class ActivityScreen extends StatelessWidget {
                               decoration: BoxDecoration(
                                 color: isLost
                                     ? (isDark
-                                        ? AppColors.lostPrimary.withAlpha(40)
-                                        : AppColors.lostLight)
+                                          ? AppColors.lostPrimary.withAlpha(40)
+                                          : AppColors.lostLight)
                                     : (isDark
-                                        ? AppColors.foundPrimary.withAlpha(40)
-                                        : AppColors.foundLight),
+                                          ? AppColors.foundPrimary.withAlpha(40)
+                                          : AppColors.foundLight),
                                 borderRadius: BorderRadius.circular(999),
                               ),
                               child: Text(

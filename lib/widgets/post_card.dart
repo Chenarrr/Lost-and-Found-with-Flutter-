@@ -26,8 +26,8 @@ class PostCard extends StatelessWidget {
     return GestureDetector(
       onTap: () => Navigator.of(context).push(
         PageRouteBuilder(
-          pageBuilder: (_, __, ___) => PostDetailScreen(postId: post.id),
-          transitionsBuilder: (_, animation, __, child) =>
+          pageBuilder: (_, _, _) => PostDetailScreen(postId: post.id),
+          transitionsBuilder: (_, animation, _, child) =>
               FadeTransition(opacity: animation, child: child),
         ),
       ),
@@ -67,10 +67,10 @@ class PostCard extends StatelessWidget {
                                             width: 88,
                                             height: 88,
                                             fit: BoxFit.cover,
-                                            placeholder: (_, __) => ColoredBox(
+                                            placeholder: (_, _) => ColoredBox(
                                               color: cs.surfaceContainerHighest,
                                             ),
-                                            errorWidget: (_, __, ___) =>
+                                            errorWidget: (_, _, _) =>
                                                 ColoredBox(
                                                   color: cs
                                                       .surfaceContainerHighest,

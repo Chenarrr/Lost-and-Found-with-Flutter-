@@ -219,8 +219,8 @@ Find It was built to solve a simple but common problem in Kurdish communities: w
 | Authentication | Firebase Authentication (Phone / OTP) | Passwordless SMS login |
 | Database | Cloud Firestore | Real-time NoSQL database |
 | Image Hosting | ImgBB REST API | Free image CDN (no billing required) |
-| HTTP Client | `http` package | ImgBB upload requests |
-| Environment Variables | `flutter_dotenv` | Keeps API keys out of source code |
+| HTTP Client | `http` ^1.6.0 | ImgBB upload requests |
+| Environment Variables | `flutter_dotenv` ^6.0.0 | Keeps API keys out of source code |
 | Fonts | Google Fonts — Inter | Clean, modern typography |
 | Deep Links | `url_launcher` | WhatsApp deep link + web fallback |
 | Image Picking | `image_picker` | Gallery and camera access |

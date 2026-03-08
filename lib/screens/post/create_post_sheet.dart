@@ -95,8 +95,8 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
         width: double.infinity,
         height: 120,
         fit: BoxFit.cover,
-        placeholder: (_, __) => placeholder,
-        errorWidget: (_, __, ___) => placeholder,
+        placeholder: (_, _) => placeholder,
+        errorWidget: (_, _, _) => placeholder,
       );
     }
     return Image.file(
@@ -104,7 +104,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
       width: double.infinity,
       height: 120,
       fit: BoxFit.cover,
-      errorBuilder: (_, __, ___) => placeholder,
+      errorBuilder: (_, _, _) => placeholder,
     );
   }
 
@@ -387,77 +387,77 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                 ),
                 const SizedBox(height: 16),
                 if (!_isEditing) ...[
-                Text(
-                  l10n.imagesSection(_imagePaths.length),
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: cs.onSurface,
+                  Text(
+                    l10n.imagesSection(_imagePaths.length),
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: cs.onSurface,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 8),
-                if (_imagePaths.isEmpty)
-                  Container(
-                    height: 120,
-                    decoration: BoxDecoration(
-                      color: cs.surface,
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: cs.outlineVariant),
-                    ),
-                    child: Center(
-                      child: Text(
-                        l10n.noImagesSelected,
-                        style: GoogleFonts.inter(color: cs.onSurfaceVariant),
+                  const SizedBox(height: 8),
+                  if (_imagePaths.isEmpty)
+                    Container(
+                      height: 120,
+                      decoration: BoxDecoration(
+                        color: cs.surface,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: cs.outlineVariant),
                       ),
-                    ),
-                  )
-                else
-                  Column(
-                    children: _imagePaths.map((path) {
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        child: Stack(
-                          alignment: Alignment.topRight,
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: _buildImagePreview(path),
-                            ),
-                            IconButton(
-                              onPressed: () =>
-                                  setState(() => _imagePaths.remove(path)),
-                              icon: Container(
-                                padding: const EdgeInsets.all(2),
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  Icons.close,
-                                  color: AppColors.lostPrimary,
-                                  size: 18,
+                      child: Center(
+                        child: Text(
+                          l10n.noImagesSelected,
+                          style: GoogleFonts.inter(color: cs.onSurfaceVariant),
+                        ),
+                      ),
+                    )
+                  else
+                    Column(
+                      children: _imagePaths.map((path) {
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          child: Stack(
+                            alignment: Alignment.topRight,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: _buildImagePreview(path),
+                              ),
+                              IconButton(
+                                onPressed: () =>
+                                    setState(() => _imagePaths.remove(path)),
+                                icon: Container(
+                                  padding: const EdgeInsets.all(2),
+                                  decoration: const BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.close,
+                                    color: AppColors.lostPrimary,
+                                    size: 18,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  const SizedBox(height: 8),
+                  if (_imagePaths.length < 3)
+                    OutlinedButton.icon(
+                      onPressed: _pickImage,
+                      icon: const Icon(Icons.add_photo_alternate_outlined),
+                      label: Text(l10n.addImage, style: GoogleFonts.inter()),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.primaryBlue,
+                        side: const BorderSide(color: AppColors.primaryBlue),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                      );
-                    }).toList(),
-                  ),
-                const SizedBox(height: 8),
-                if (_imagePaths.length < 3)
-                  OutlinedButton.icon(
-                    onPressed: _pickImage,
-                    icon: const Icon(Icons.add_photo_alternate_outlined),
-                    label: Text(l10n.addImage, style: GoogleFonts.inter()),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.primaryBlue,
-                      side: const BorderSide(color: AppColors.primaryBlue),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                  ),
                 ], // end if (!_isEditing)
                 const SizedBox(height: 16),
                 SizedBox(

@@ -376,11 +376,17 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 _categoryChip(l10n.allCategories, null),
                 const SizedBox(width: 8),
-                _categoryChip(l10n.categoryElectronics, PostCategory.electronics),
+                _categoryChip(
+                  l10n.categoryElectronics,
+                  PostCategory.electronics,
+                ),
                 const SizedBox(width: 8),
                 _categoryChip(l10n.categoryDocuments, PostCategory.documents),
                 const SizedBox(width: 8),
-                _categoryChip(l10n.categoryPersonalItems, PostCategory.personalItems),
+                _categoryChip(
+                  l10n.categoryPersonalItems,
+                  PostCategory.personalItems,
+                ),
                 const SizedBox(width: 8),
                 _categoryChip(l10n.categoryPets, PostCategory.pets),
               ],

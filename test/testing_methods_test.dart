@@ -12,7 +12,6 @@
 //   5. Widget / UI Testing (mobile-specific)
 // =============================================================================
 
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_application/models/post.dart';
@@ -301,23 +300,31 @@ void main() {
 
     // ── BVA: Report threshold [0, 2] visible vs [3+] hidden ─────────────
     test('BVA-RPT-01: 0 reports → visible', () {
-      expect(postVisibility(reportCount: 0, isResolved: false, isOwner: false),
-          'VISIBLE');
+      expect(
+        postVisibility(reportCount: 0, isResolved: false, isOwner: false),
+        'VISIBLE',
+      );
     });
 
     test('BVA-RPT-02: 2 reports → still visible (below threshold)', () {
-      expect(postVisibility(reportCount: 2, isResolved: false, isOwner: false),
-          'VISIBLE');
+      expect(
+        postVisibility(reportCount: 2, isResolved: false, isOwner: false),
+        'VISIBLE',
+      );
     });
 
     test('BVA-RPT-03: 3 reports → HIDDEN (at threshold)', () {
-      expect(postVisibility(reportCount: 3, isResolved: false, isOwner: false),
-          'HIDDEN');
+      expect(
+        postVisibility(reportCount: 3, isResolved: false, isOwner: false),
+        'HIDDEN',
+      );
     });
 
     test('BVA-RPT-04: 4 reports → HIDDEN (above threshold)', () {
-      expect(postVisibility(reportCount: 4, isResolved: false, isOwner: false),
-          'HIDDEN');
+      expect(
+        postVisibility(reportCount: 4, isResolved: false, isOwner: false),
+        'HIDDEN',
+      );
     });
   });
 
@@ -345,44 +352,62 @@ void main() {
     // └────────────┴───────────┴─────────┴──────────────────────────┘
 
     test('DT-01: No reports, not resolved, not owner → VISIBLE', () {
-      expect(postVisibility(reportCount: 0, isResolved: false, isOwner: false),
-          'VISIBLE');
+      expect(
+        postVisibility(reportCount: 0, isResolved: false, isOwner: false),
+        'VISIBLE',
+      );
     });
 
     test('DT-02: No reports, not resolved, is owner → VISIBLE', () {
-      expect(postVisibility(reportCount: 0, isResolved: false, isOwner: true),
-          'VISIBLE');
+      expect(
+        postVisibility(reportCount: 0, isResolved: false, isOwner: true),
+        'VISIBLE',
+      );
     });
 
     test('DT-03: No reports, resolved, not owner → RESOLVED_VISIBLE', () {
-      expect(postVisibility(reportCount: 0, isResolved: true, isOwner: false),
-          'RESOLVED_VISIBLE');
+      expect(
+        postVisibility(reportCount: 0, isResolved: true, isOwner: false),
+        'RESOLVED_VISIBLE',
+      );
     });
 
     test('DT-04: No reports, resolved, is owner → RESOLVED_VISIBLE', () {
-      expect(postVisibility(reportCount: 0, isResolved: true, isOwner: true),
-          'RESOLVED_VISIBLE');
+      expect(
+        postVisibility(reportCount: 0, isResolved: true, isOwner: true),
+        'RESOLVED_VISIBLE',
+      );
     });
 
     test('DT-05: 3+ reports, not resolved, not owner → HIDDEN', () {
-      expect(postVisibility(reportCount: 5, isResolved: false, isOwner: false),
-          'HIDDEN');
+      expect(
+        postVisibility(reportCount: 5, isResolved: false, isOwner: false),
+        'HIDDEN',
+      );
     });
 
-    test('DT-06: 3+ reports, not resolved, is owner → HIDDEN_OWNER_VISIBLE',
-        () {
-      expect(postVisibility(reportCount: 5, isResolved: false, isOwner: true),
-          'HIDDEN_OWNER_VISIBLE');
-    });
+    test(
+      'DT-06: 3+ reports, not resolved, is owner → HIDDEN_OWNER_VISIBLE',
+      () {
+        expect(
+          postVisibility(reportCount: 5, isResolved: false, isOwner: true),
+          'HIDDEN_OWNER_VISIBLE',
+        );
+      },
+    );
 
     test('DT-07: 3+ reports, resolved, not owner → HIDDEN', () {
-      expect(postVisibility(reportCount: 3, isResolved: true, isOwner: false),
-          'HIDDEN');
+      expect(
+        postVisibility(reportCount: 3, isResolved: true, isOwner: false),
+        'HIDDEN',
+      );
     });
 
     test('DT-08: 3+ reports, resolved, is owner → HIDDEN_OWNER_VISIBLE', () {
-      expect(postVisibility(reportCount: 3, isResolved: true, isOwner: true),
-          'HIDDEN_OWNER_VISIBLE');
+      expect(
+        postVisibility(reportCount: 3, isResolved: true, isOwner: true),
+        'HIDDEN_OWNER_VISIBLE',
+      );
     });
   });
 
@@ -497,7 +522,11 @@ void main() {
     });
 
     test('DM-02: Post with 3 images round-trips', () {
-      final urls = ['http://a.com/1.jpg', 'http://a.com/2.jpg', 'http://a.com/3.jpg'];
+      final urls = [
+        'http://a.com/1.jpg',
+        'http://a.com/2.jpg',
+        'http://a.com/3.jpg',
+      ];
       final json = _baseJson(imageUrls: urls);
       final p = Post.fromJson(json);
       expect(p.imageUrls.length, 3);
@@ -519,8 +548,22 @@ void main() {
     });
 
     test('DM-05: Post with multiple comments preserves order', () {
-      final c1 = {'id': 'c1', 'postId': 'p1', 'userId': 'u1', 'userName': 'A', 'text': 'First', 'createdAt': '2026-01-01T00:00:00.000'};
-      final c2 = {'id': 'c2', 'postId': 'p1', 'userId': 'u2', 'userName': 'B', 'text': 'Second', 'createdAt': '2026-01-02T00:00:00.000'};
+      final c1 = {
+        'id': 'c1',
+        'postId': 'p1',
+        'userId': 'u1',
+        'userName': 'A',
+        'text': 'First',
+        'createdAt': '2026-01-01T00:00:00.000',
+      };
+      final c2 = {
+        'id': 'c2',
+        'postId': 'p1',
+        'userId': 'u2',
+        'userName': 'B',
+        'text': 'Second',
+        'createdAt': '2026-01-02T00:00:00.000',
+      };
       final json = _baseJson(comments: [c1, c2]);
       final p = Post.fromJson(json);
       expect(p.comments.length, 2);
@@ -530,8 +573,13 @@ void main() {
 
     test('DM-06: User with all optional fields null', () {
       final u = User(
-        id: 'u1', name: 'Test', phone: '+9647501234567',
-        createdAt: DateTime(2026), email: null, gender: null, age: null,
+        id: 'u1',
+        name: 'Test',
+        phone: '+9647501234567',
+        createdAt: DateTime(2026),
+        email: null,
+        gender: null,
+        age: null,
       );
       final json = u.toJson();
       expect(json['email'], isNull);
@@ -543,8 +591,11 @@ void main() {
 
     test('DM-07: Comment round-trip preserves all fields', () {
       final comment = Comment(
-        id: 'c1', postId: 'p1', userId: 'u1',
-        userName: 'Ali', text: 'Great find!',
+        id: 'c1',
+        postId: 'p1',
+        userId: 'u1',
+        userName: 'Ali',
+        text: 'Great find!',
         createdAt: DateTime(2026, 3, 7, 10, 30),
       );
       final json = comment.toJson();

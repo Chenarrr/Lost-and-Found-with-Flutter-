@@ -1,124 +1,44 @@
-# ============================================================
-# CD Pipeline - Builds release artifacts
-# Runs when you create a new release/tag in GitHub
-# You can download APK/Web builds from the Actions tab
-# ============================================================
+name: CD
 
-name: CD                                      # Name shown in GitHub Actions tab
-
-on:                                           # Triggers
-  release:                                    # Run when a GitHub Release is created
-    types: [published]                        # Only when release is published
-  workflow_dispatch:                          # Allow manual trigger from GitHub UI
-    inputs:                                   # Optional inputs when manually triggered
-      build_android:
-        description: 'Build Android APK'
-        type: boolean
-        default: true
-      build_web:
-        description: 'Build Web App'
+# Manual trigger only — run from the GitHub Actions tab
+on:
+  workflow_dispatch:
+    inputs:
+      build_ios:
+        description: 'Build iOS archive'
         type: boolean
         default: true
 
 jobs:
-  # ============================================================
-  # Job 1: Build Android APK
-  # ============================================================
-  build-android:
-    name: Build Android APK
-    runs-on: ubuntu-latest                    # Ubuntu has Android SDK pre-installed
-    if: ${{ github.event_name == 'release' || inputs.build_android }}  # Skip if unchecked
+  build-ios:
+    name: Build iOS Archive
+    runs-on: macos-latest
+    if: ${{ inputs.build_ios }}
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - name: Setup Java                      # Android needs Java to build
-        uses: actions/setup-java@v4
+      - uses: subosito/flutter-action@v2
         with:
-          distribution: 'zulu'                # Zulu OpenJDK (free, reliable)
-          java-version: '17'                  # Java 17 required for latest Android
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.38.7'           # Has Dart SDK 3.9.2+
-          channel: 'stable'
+          flutter-version: '3.38.7'
+          channel: stable
           cache: true
 
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build APK                       # Build release APK
-        run: flutter build apk --release      # Creates build/app/outputs/flutter-apk/
+      - name: Create .env
+        run: echo "IMGBB_API_KEY=placeholder" > .env
 
-      # Upload APK so you can download it from GitHub Actions
-      - name: Upload APK
-        uses: actions/upload-artifact@v4      # Save file as downloadable artifact
+      # Builds the Xcode archive without code signing.
+      # To submit to the App Store, add your signing certificate +
+      # provisioning profile as GitHub secrets and remove --no-codesign.
+      - name: Build iOS archive
+        run: flutter build ipa --no-codesign
+
+      - name: Upload archive
+        uses: actions/upload-artifact@v7
         with:
-          name: android-apk                   # Name of the artifact
-          path: build/app/outputs/flutter-apk/app-release.apk  # Path to APK
-          retention-days: 30                  # Keep for 30 days
-
-  # ============================================================
-  # Job 2: Build Web App
-  # ============================================================
-  build-web:
-    name: Build Web App
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'release' || inputs.build_web }}
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.38.7'           # Has Dart SDK 3.9.2+
-          channel: 'stable'
-          cache: true
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Build Web                       # Build web version
-        run: flutter build web --release      # Creates build/web/ folder
-
-      # Upload web build as artifact
-      - name: Upload Web Build
-        uses: actions/upload-artifact@v4
-        with:
-          name: web-build                     # Artifact name
-          path: build/web                     # Entire web folder
+          name: ios-archive
+          path: build/ios/archive/Runner.xcarchive
           retention-days: 30
-
-  # ============================================================
-  # Job 3: (Optional) Deploy Web to GitHub Pages
-  # Uncomment this section when you're ready to deploy
-  # ============================================================
-  # deploy-web:
-  #   name: Deploy to GitHub Pages
-  #   runs-on: ubuntu-latest
-  #   needs: build-web                        # Wait for build-web to complete
-  #   permissions:
-  #     pages: write                          # Permission to deploy to Pages
-  #     id-token: write
-  #
-  #   steps:
-  #     - name: Download web build
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: web-build
-  #         path: build/web
-  #
-  #     - name: Setup Pages
-  #       uses: actions/configure-pages@v4
-  #
-  #     - name: Upload to Pages
-  #       uses: actions/upload-pages-artifact@v3
-  #       with:
-  #         path: build/web
-  #
-  #     - name: Deploy to Pages
-  #       uses: actions/deploy-pages@v4

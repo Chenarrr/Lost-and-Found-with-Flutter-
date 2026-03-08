@@ -83,12 +83,15 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     final desc = post.description?.isNotEmpty == true
         ? '\n\n${post.description}'
         : '';
-    Share.share(
-      '$type: ${post.itemName}\n'
-      '📍 ${post.city}, ${post.street}\n'
-      '👤 ${post.userName}  📞 ${post.userPhone}'
-      '$desc\n\n'
-      '${l10n.sharedVia}',
+    SharePlus.instance.share(
+      ShareParams(
+        text:
+            '$type: ${post.itemName}\n'
+            '📍 ${post.city}, ${post.street}\n'
+            '👤 ${post.userName}  📞 ${post.userPhone}'
+            '$desc\n\n'
+            '${l10n.sharedVia}',
+      ),
     );
   }
 
@@ -233,15 +236,15 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
       return CachedNetworkImage(
         imageUrl: url,
         fit: BoxFit.cover,
-        placeholder: (_, __) => placeholder,
-        errorWidget: (_, __, ___) => placeholder,
+        placeholder: (_, _) => placeholder,
+        errorWidget: (_, _, _) => placeholder,
       );
     }
 
     return Image.file(
       File(url),
       fit: BoxFit.cover,
-      errorBuilder: (_, __, ___) => placeholder,
+      errorBuilder: (_, _, _) => placeholder,
     );
   }
 
@@ -676,9 +679,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                       onPressed: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (_) => CreatePostSheet(
-                              existingPost: post,
-                            ),
+                            builder: (_) => CreatePostSheet(existingPost: post),
                           ),
                         );
                       },

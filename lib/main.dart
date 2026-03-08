@@ -240,7 +240,7 @@ class FindItApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => appState ?? AppState(),
       child: Consumer<AppState>(
-        builder: (_, app, __) => MaterialApp(
+        builder: (_, app, _) => MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Find It',
           locale: app.locale,

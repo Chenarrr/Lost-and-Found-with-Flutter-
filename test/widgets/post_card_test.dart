@@ -15,7 +15,7 @@ class _TestHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)
-      ..badCertificateCallback = (_, __, ___) => true;
+      ..badCertificateCallback = (_, _, _) => true;
   }
 }
 
@@ -28,9 +28,7 @@ Widget _buildTestApp(Post post) {
       supportedLocales: AppLocalizations.supportedLocales,
       locale: const Locale('en'),
       home: Scaffold(
-        body: SingleChildScrollView(
-          child: PostCard(post: post),
-        ),
+        body: SingleChildScrollView(child: PostCard(post: post)),
       ),
     ),
   );
@@ -127,8 +125,9 @@ void main() {
       expect(find.byIcon(Icons.search_rounded), findsOneWidget);
     });
 
-    testWidgets('shows volunteer icon for found post with no images',
-        (tester) async {
+    testWidgets('shows volunteer icon for found post with no images', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         _buildTestApp(_makePost(type: PostType.found, imageUrls: [])),
       );
@@ -137,21 +136,19 @@ void main() {
       expect(find.byIcon(Icons.volunteer_activism_rounded), findsOneWidget);
     });
 
-    testWidgets('shows resolved check icon when post is resolved',
-        (tester) async {
-      await tester.pumpWidget(
-        _buildTestApp(_makePost(isResolved: true)),
-      );
+    testWidgets('shows resolved check icon when post is resolved', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_buildTestApp(_makePost(isResolved: true)));
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
     });
 
-    testWidgets('hides resolved icon when post is not resolved',
-        (tester) async {
-      await tester.pumpWidget(
-        _buildTestApp(_makePost(isResolved: false)),
-      );
+    testWidgets('hides resolved icon when post is not resolved', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_buildTestApp(_makePost(isResolved: false)));
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.check_circle_rounded), findsNothing);
@@ -176,9 +173,7 @@ void main() {
           createdAt: DateTime.now(),
         ),
       ];
-      await tester.pumpWidget(
-        _buildTestApp(_makePost(comments: comments)),
-      );
+      await tester.pumpWidget(_buildTestApp(_makePost(comments: comments)));
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.chat_bubble_outline_rounded), findsOneWidget);
@@ -208,8 +203,9 @@ void main() {
       expect(find.byIcon(Icons.access_time_rounded), findsOneWidget);
     });
 
-    testWidgets('all category displayNames are shown correctly',
-        (tester) async {
+    testWidgets('all category displayNames are shown correctly', (
+      tester,
+    ) async {
       for (final cat in PostCategory.values) {
         await tester.pumpWidget(_buildTestApp(_makePost(category: cat)));
         await tester.pumpAndSettle();

@@ -59,8 +59,9 @@ void main() {
       expect(appState.locale.languageCode, 'ckb');
     });
 
-    testWidgets('tapping English after switching returns to en',
-        (tester) async {
+    testWidgets('tapping English after switching returns to en', (
+      tester,
+    ) async {
       appState.setLocale(const Locale('ar'));
       await tester.pumpWidget(_buildTestApp(appState));
       await tester.pumpAndSettle();
@@ -71,8 +72,9 @@ void main() {
       expect(appState.locale.languageCode, 'en');
     });
 
-    testWidgets('all three chips are present as GestureDetectors',
-        (tester) async {
+    testWidgets('all three chips are present as GestureDetectors', (
+      tester,
+    ) async {
       await tester.pumpWidget(_buildTestApp(appState));
       await tester.pumpAndSettle();
 

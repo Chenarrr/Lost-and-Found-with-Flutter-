@@ -355,36 +355,3 @@ Run from **GitHub Actions → CD → Run workflow**. Builds an iOS `.xcarchive` 
 
 To ship to the App Store: add your distribution certificate + provisioning profile as GitHub secrets and remove `--no-codesign`.
 
----
-
-## Project Conventions
-
-- **Typed selectors** — always `context.select<AppState, T>()` with explicit `T`; `dynamic` causes assertion failures during navigation.
-- **Immutable models** — `Post`, `User`, `Comment` are value types with `copyWith`.
-- **Wildcard params** — use `_` for all unused callback parameters (`Dart 3` allows repeated wildcards).
-- **Subscription disposal** — `AppState.dispose()` cancels `_authSubscription` and `_postsSubscription`.
-- **ValueKey on list items** — `PostCard` uses `ValueKey(post.id)` for efficient list diffing.
-- **No secrets in source** — API keys in `.env`, Firebase config in `firebase_options.dart`.
-- **Format before commit** — `dart format lib/ test/`
-
----
-
-## Contributing
-
-```bash
-git checkout -b feature/your-feature
-# make changes
-dart format lib/ test/
-flutter analyze --fatal-warnings
-flutter test
-git commit -m "feat: describe your change"
-# open PR against main
-```
-
-Do not commit: `.env`, `GoogleService-Info.plist`, `google-services.json`, build outputs.
-
----
-
-## License
-
-MIT — see [LICENSE](LICENSE).

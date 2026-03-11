@@ -7,12 +7,17 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:400649966615:android:81f34330bc019d3d6e3852",
+        "mobilesdk_app_id": "1:400649966615:android:8703f54137e90eba6e3852",
         "android_client_info": {
-          "package_name": "com.example.flutter_application"
+          "package_name": "com.FindIt.KRD"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "400649966615-7faj0hatq2irjlqi1r0ppu8pg9f9ed0i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBfE5ht7uZ09wnlaeFJTKu1woutlkdd-iw"
@@ -20,7 +25,55 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "400649966615-7faj0hatq2irjlqi1r0ppu8pg9f9ed0i.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "400649966615-dko9l423scmjpnhhrpa0qtdv1j0vs1t6.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.FindIt.KRD"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:400649966615:android:81f34330bc019d3d6e3852",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "400649966615-7faj0hatq2irjlqi1r0ppu8pg9f9ed0i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBfE5ht7uZ09wnlaeFJTKu1woutlkdd-iw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "400649966615-7faj0hatq2irjlqi1r0ppu8pg9f9ed0i.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "400649966615-dko9l423scmjpnhhrpa0qtdv1j0vs1t6.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.FindIt.KRD"
+              }
+            }
+          ]
         }
       }
     }

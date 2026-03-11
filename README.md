@@ -99,7 +99,7 @@ lib/
 │   └── comment.dart                 # Comment model
 ├── providers/
 │   └── app_state.dart               # Single ChangeNotifier — auth, posts, all mutations
-├── routes/
+├── navigation/
 │   ├── root_router.dart             # Auth guard: WelcomeScreen ↔ MainPage
 │   └── main_page.dart               # Bottom nav shell (Home / Activity / Profile)
 ├── screens/
@@ -188,7 +188,7 @@ Other keys while running: `p` paint bounds · `d` detach · `q` quit · `?` all 
 
 1. Firebase Console → **Authentication → Sign-in method → Phone → Enable**
 2. Firebase Console → **Firestore Database → Create database** (test mode, then add rules)
-3. Register iOS app with bundle ID `com.example.flutterApplication`
+3. Register iOS app with bundle ID `com.FindIt.KRD`
 4. Download `GoogleService-Info.plist` → `ios/Runner/`
 5. Regenerate `firebase_options.dart` if needed:
    ```bash
@@ -244,7 +244,7 @@ service cloud.firestore {
       allow update: if isAuthenticated() && (
         resource.data.userId == request.auth.uid
         || request.resource.data.diff(resource.data).affectedKeys()
-             .hasOnly(['comments', 'reports'])
+             .hasOnly(['comments', 'reports', 'viewCount', 'isResolved', 'isHidden'])
       );
       allow delete: if isOwner(resource.data.userId);
     }

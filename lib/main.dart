@@ -239,30 +239,31 @@ class FindItApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => appState ?? AppState(),
-      child: Consumer<AppState>(
-        builder: (_, app, _) => MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'Find It',
-          locale: app.locale,
-          localizationsDelegates: const [
-            _CkbMaterialLocalizationsDelegate(),
-            ...AppLocalizations.localizationsDelegates,
-          ],
-          supportedLocales: AppLocalizations.supportedLocales,
-          themeMode: app.themeMode,
-          builder: (context, child) {
-            final isRtl =
-                app.locale.languageCode == 'ar' ||
-                app.locale.languageCode == 'ckb';
-            return Directionality(
+      child: Selector<AppState, (Locale, ThemeMode)>(
+        selector: (_, app) => (app.locale, app.themeMode),
+        builder: (_, record, _) {
+          final (locale, themeMode) = record;
+          final isRtl =
+              locale.languageCode == 'ar' || locale.languageCode == 'ckb';
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'Find It',
+            locale: locale,
+            localizationsDelegates: const [
+              _CkbMaterialLocalizationsDelegate(),
+              ...AppLocalizations.localizationsDelegates,
+            ],
+            supportedLocales: AppLocalizations.supportedLocales,
+            themeMode: themeMode,
+            builder: (context, child) => Directionality(
               textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
               child: child!,
-            );
-          },
-          theme: _lightTheme(),
-          darkTheme: _darkTheme(),
-          home: const RootRouter(),
-        ),
+            ),
+            theme: _lightTheme(),
+            darkTheme: _darkTheme(),
+            home: const RootRouter(),
+          );
+        },
       ),
     );
   }

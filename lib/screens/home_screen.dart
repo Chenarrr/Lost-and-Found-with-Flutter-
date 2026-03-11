@@ -41,7 +41,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _onRefresh() async {
-    await Future.delayed(const Duration(milliseconds: 800));
+    // Posts use a real-time Firestore stream, so they auto-update.
+    // This delay gives visual feedback that the refresh happened.
+    await Future.delayed(const Duration(milliseconds: 500));
   }
 
   void _onSearchChanged(String value) {

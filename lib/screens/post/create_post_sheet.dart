@@ -138,6 +138,8 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
       final picked = await picker.pickImage(
         source: ImageSource.gallery,
         imageQuality: 85,
+        maxWidth: 1200,
+        maxHeight: 1200,
       );
       if (picked == null || !mounted) return;
       setState(() => _imagePaths.add(picked.path));
@@ -161,57 +163,63 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
 
     setState(() => _isLoading = true);
 
-    if (_isEditing) {
-      final updated = widget.existingPost!.copyWith(
-        type: _postType,
-        category: _category,
-        itemName: _itemNameController.text.trim(),
-        description: _descriptionController.text.trim().isEmpty
-            ? null
-            : _descriptionController.text.trim(),
-        street: _streetController.text.trim(),
-        city: _selectedCity!,
-      );
-      await app.updatePost(updated);
+    try {
+      if (_isEditing) {
+        final updated = widget.existingPost!.copyWith(
+          type: _postType,
+          category: _category,
+          itemName: _itemNameController.text.trim(),
+          description: _descriptionController.text.trim().isEmpty
+              ? null
+              : _descriptionController.text.trim(),
+          street: _streetController.text.trim(),
+          city: _selectedCity!,
+        );
+        await app.updatePost(updated);
 
+        if (!mounted) return;
+        setState(() => _isLoading = false);
+        Navigator.of(context).pop();
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(l10n.postUpdated),
+            backgroundColor: AppColors.primaryBlueDark,
+          ),
+        );
+      } else {
+        final newPost = Post(
+          id: _uuid.v4(),
+          type: _postType,
+          category: _category,
+          itemName: _itemNameController.text.trim(),
+          description: _descriptionController.text.trim().isEmpty
+              ? null
+              : _descriptionController.text.trim(),
+          street: _streetController.text.trim(),
+          city: _selectedCity!,
+          imageUrls: List.from(_imagePaths),
+          userName: currentUser.name,
+          userPhone: currentUser.phone,
+          createdAt: DateTime.now(),
+          userId: currentUser.id,
+        );
+
+        await app.addPost(newPost, _imagePaths);
+
+        if (!mounted) return;
+        setState(() => _isLoading = false);
+        Navigator.of(context).pop();
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(l10n.postCreated),
+            backgroundColor: AppColors.primaryBlueDark,
+          ),
+        );
+      }
+    } catch (e) {
       if (!mounted) return;
       setState(() => _isLoading = false);
-      Navigator.of(context).pop();
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(l10n.postUpdated),
-          backgroundColor: AppColors.primaryBlueDark,
-        ),
-      );
-    } else {
-      final newPost = Post(
-        id: _uuid.v4(),
-        type: _postType,
-        category: _category,
-        itemName: _itemNameController.text.trim(),
-        description: _descriptionController.text.trim().isEmpty
-            ? null
-            : _descriptionController.text.trim(),
-        street: _streetController.text.trim(),
-        city: _selectedCity!,
-        imageUrls: List.from(_imagePaths),
-        userName: currentUser.name,
-        userPhone: currentUser.phone,
-        createdAt: DateTime.now(),
-        userId: currentUser.id,
-      );
-
-      await app.addPost(newPost, _imagePaths);
-
-      if (!mounted) return;
-      setState(() => _isLoading = false);
-      Navigator.of(context).pop();
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(l10n.postCreated),
-          backgroundColor: AppColors.primaryBlueDark,
-        ),
-      );
+      _showMessage(l10n.requiredField, isError: true);
     }
   }
 

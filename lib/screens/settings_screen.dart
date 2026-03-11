@@ -7,8 +7,23 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  String _appVersion = '';
+
+  @override
+  void initState() {
+    super.initState();
+    PackageInfo.fromPlatform().then((info) {
+      if (mounted) setState(() => _appVersion = 'FindIt  v${info.version}');
+    });
+  }
 
   // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -666,22 +681,14 @@ class SettingsScreen extends StatelessWidget {
           const SizedBox(height: 32),
 
           // ── App version footer ────────────────────────────────────────
-          FutureBuilder<PackageInfo>(
-            future: PackageInfo.fromPlatform(),
-            builder: (context, snap) {
-              final version = snap.data != null
-                  ? 'Find It  v${snap.data!.version}'
-                  : '';
-              return Center(
-                child: Text(
-                  version,
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: cs.onSurfaceVariant,
-                  ),
-                ),
-              );
-            },
+          Center(
+            child: Text(
+              _appVersion,
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                color: cs.onSurfaceVariant,
+              ),
+            ),
           ),
 
           const SizedBox(height: 24),

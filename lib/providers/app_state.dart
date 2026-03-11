@@ -109,11 +109,14 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  static const int _postsPageSize = 50;
+
   void _listenToPosts() {
     _postsSubscription?.cancel();
     _postsSubscription = _firestore
         .collection('posts')
         .orderBy('createdAt', descending: true)
+        .limit(_postsPageSize)
         .snapshots()
         .listen(
           (snapshot) {
@@ -299,9 +302,13 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> markPostResolved(String postId) async {
-    await _firestore.collection('posts').doc(postId).update({
-      'isResolved': true,
-    });
+    try {
+      await _firestore.collection('posts').doc(postId).update({
+        'isResolved': true,
+      });
+    } catch (e) {
+      debugPrint('Error marking post resolved: $e');
+    }
   }
 
   Future<void> resendOtp(Function(String?) onCodeSent) async {
@@ -320,10 +327,12 @@ class AppState extends ChangeNotifier {
           .collection('posts')
           .where('userId', isEqualTo: uid)
           .get();
+      final batch = _firestore.batch();
       for (final doc in snap.docs) {
-        await doc.reference.delete();
+        batch.delete(doc.reference);
       }
-      await _firestore.collection('users').doc(uid).delete();
+      batch.delete(_firestore.collection('users').doc(uid));
+      await batch.commit();
       await _auth.currentUser!.delete();
       return null;
     } on FirebaseAuthException catch (e) {
@@ -365,10 +374,12 @@ class AppState extends ChangeNotifier {
           .collection('posts')
           .where('userId', isEqualTo: uid)
           .get();
+      final batch = _firestore.batch();
       for (final doc in snap.docs) {
-        await doc.reference.delete();
+        batch.delete(doc.reference);
       }
-      await _firestore.collection('users').doc(uid).delete();
+      batch.delete(_firestore.collection('users').doc(uid));
+      await batch.commit();
       await user.delete();
       return null;
     } on FirebaseAuthException catch (e) {
@@ -422,53 +433,81 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> addPost(Post post, List<String> localImagePaths) async {
-    final futures = localImagePaths.map((path) async {
-      if (path.startsWith('http')) return path;
-      return await _uploadToImgBB(
-        path,
-        name: '${post.itemName}_${post.userPhone}',
-      );
-    });
-    final results = await Future.wait(futures);
-    final uploadedUrls = results.whereType<String>().toList();
+    try {
+      final futures = localImagePaths.map((path) async {
+        if (path.startsWith('http')) return path;
+        return await _uploadToImgBB(
+          path,
+          name: '${post.itemName}_${post.userPhone}',
+        );
+      });
+      final results = await Future.wait(futures);
+      final uploadedUrls = results.whereType<String>().toList();
 
-    final postToSave = post.copyWith(imageUrls: uploadedUrls);
-    final data = postToSave.toJson();
-    data['createdAt'] = FieldValue.serverTimestamp();
-    if ((data['comments'] as List?)?.isEmpty ?? true) data.remove('comments');
-    if ((data['reports'] as List?)?.isEmpty ?? true) data.remove('reports');
+      final postToSave = post.copyWith(imageUrls: uploadedUrls);
+      final data = postToSave.toJson();
+      data['createdAt'] = FieldValue.serverTimestamp();
+      if ((data['comments'] as List?)?.isEmpty ?? true) {
+        data.remove('comments');
+      }
+      if ((data['reports'] as List?)?.isEmpty ?? true) {
+        data.remove('reports');
+      }
 
-    await _firestore.collection('posts').doc(post.id).set(data);
+      await _firestore.collection('posts').doc(post.id).set(data);
+    } catch (e) {
+      debugPrint('Error adding post: $e');
+      rethrow;
+    }
   }
 
   Future<void> updatePost(Post post) async {
-    await _firestore.collection('posts').doc(post.id).update({
-      'type': post.type.name,
-      'category': post.category.name,
-      'itemName': post.itemName,
-      'description': post.description,
-      'street': post.street,
-      'city': post.city,
-    });
+    try {
+      await _firestore.collection('posts').doc(post.id).update({
+        'type': post.type.name,
+        'category': post.category.name,
+        'itemName': post.itemName,
+        'description': post.description,
+        'street': post.street,
+        'city': post.city,
+      });
+    } catch (e) {
+      debugPrint('Error updating post: $e');
+      rethrow;
+    }
   }
 
   Future<void> incrementViewCount(String postId) async {
-    await _firestore.collection('posts').doc(postId).update({
-      'viewCount': FieldValue.increment(1),
-    });
+    try {
+      await _firestore.collection('posts').doc(postId).update({
+        'viewCount': FieldValue.increment(1),
+      });
+    } catch (e) {
+      debugPrint('Error incrementing view count: $e');
+    }
   }
 
   Future<void> deletePost(String postId) async {
-    await _firestore.collection('posts').doc(postId).delete();
+    try {
+      await _firestore.collection('posts').doc(postId).delete();
+    } catch (e) {
+      debugPrint('Error deleting post: $e');
+      rethrow;
+    }
   }
 
   Future<void> addComment(String postId, Comment comment) async {
-    final commentData = comment.toJson();
-    commentData['createdAt'] = Timestamp.fromDate(comment.createdAt);
+    try {
+      final commentData = comment.toJson();
+      commentData['createdAt'] = Timestamp.fromDate(comment.createdAt);
 
-    await _firestore.collection('posts').doc(postId).update({
-      'comments': FieldValue.arrayUnion([commentData]),
-    });
+      await _firestore.collection('posts').doc(postId).update({
+        'comments': FieldValue.arrayUnion([commentData]),
+      });
+    } catch (e) {
+      debugPrint('Error adding comment: $e');
+      rethrow;
+    }
   }
 
   Future<void> reportPost(String postId, String userId) async {

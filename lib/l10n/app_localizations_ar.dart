@@ -501,4 +501,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String viewsCount(int count) {
     return '$count مشاهدة';
   }
+
+  @override
+  String memberSince(String date) {
+    return 'عضو منذ $date';
+  }
 }

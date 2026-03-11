@@ -504,4 +504,9 @@ class AppLocalizationsCkb extends AppLocalizations {
   String viewsCount(int count) {
     return '$count بینین';
   }
+
+  @override
+  String memberSince(String date) {
+    return 'ئەندام لە $date';
+  }
 }

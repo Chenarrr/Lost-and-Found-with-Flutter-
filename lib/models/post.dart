@@ -39,8 +39,8 @@ class Post {
        reports = List.unmodifiable(reports ?? []);
 
   factory Post.fromJson(Map<String, dynamic> json) => Post(
-    id: json['id'] as String,
-    type: switch (json['type'] as String) {
+    id: json['id'] as String? ?? '',
+    type: switch (json['type'] as String?) {
       'found' => PostType.found,
       _ => PostType.lost,
     },
@@ -50,17 +50,17 @@ class Post {
       'pets' => PostCategory.pets,
       _ => PostCategory.electronics,
     },
-    itemName: json['itemName'] as String,
+    itemName: json['itemName'] as String? ?? '',
     description: json['description'] as String?,
-    street: json['street'] as String,
-    city: json['city'] as String,
+    street: json['street'] as String? ?? '',
+    city: json['city'] as String? ?? '',
     imageUrls: List<String>.from(json['imageUrls'] as List? ?? []),
-    userName: json['userName'] as String,
-    userPhone: json['userPhone'] as String,
+    userName: json['userName'] as String? ?? 'Unknown',
+    userPhone: json['userPhone'] as String? ?? '',
     createdAt: json['createdAt'] != null
-        ? DateTime.parse(json['createdAt'] as String)
+        ? DateTime.tryParse(json['createdAt'] as String) ?? DateTime.now()
         : DateTime.now(),
-    userId: json['userId'] as String,
+    userId: json['userId'] as String? ?? '',
     comments: (json['comments'] as List<dynamic>? ?? [])
         .map((c) => Comment.fromJson(c as Map<String, dynamic>))
         .toList(),

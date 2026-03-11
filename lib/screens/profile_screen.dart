@@ -172,7 +172,7 @@ class ProfileScreen extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            'Member since ${_memberSince(user.createdAt)}',
+                            l10n.memberSince(_memberSince(user.createdAt)),
                             style: GoogleFonts.inter(
                               color: Colors.white60,
                               fontSize: 12,

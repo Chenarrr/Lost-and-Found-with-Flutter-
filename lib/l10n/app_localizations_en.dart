@@ -502,4 +502,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String viewsCount(int count) {
     return '$count views';
   }
+
+  @override
+  String memberSince(String date) {
+    return 'Member since $date';
+  }
 }

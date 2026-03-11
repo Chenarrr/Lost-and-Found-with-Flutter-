@@ -9,12 +9,14 @@ class Comment {
   });
 
   factory Comment.fromJson(Map<String, dynamic> json) => Comment(
-    id: json['id'] as String,
-    postId: json['postId'] as String,
-    userId: json['userId'] as String,
-    userName: json['userName'] as String,
-    text: json['text'] as String,
-    createdAt: DateTime.parse(json['createdAt'] as String),
+    id: json['id'] as String? ?? '',
+    postId: json['postId'] as String? ?? '',
+    userId: json['userId'] as String? ?? '',
+    userName: json['userName'] as String? ?? 'Unknown',
+    text: json['text'] as String? ?? '',
+    createdAt: json['createdAt'] != null
+        ? DateTime.tryParse(json['createdAt'] as String) ?? DateTime.now()
+        : DateTime.now(),
   );
 
   final String id;

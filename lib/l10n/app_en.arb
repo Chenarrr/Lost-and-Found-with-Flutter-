@@ -223,5 +223,11 @@
     "placeholders": {
       "count": { "type": "int" }
     }
+  },
+  "memberSince": "Member since {date}",
+  "@memberSince": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
   }
 }

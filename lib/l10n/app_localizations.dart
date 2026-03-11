@@ -1035,6 +1035,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} views'**
   String viewsCount(int count);
+
+  /// No description provided for @memberSince.
+  ///
+  /// In en, this message translates to:
+  /// **'Member since {date}'**
+  String memberSince(String date);
 }
 
 class _AppLocalizationsDelegate

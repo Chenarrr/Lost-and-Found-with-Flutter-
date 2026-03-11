@@ -29,8 +29,8 @@ service cloud.firestore {
     // Anyone can read posts (public feed).
     // Only authenticated users can create, and they must set userId = their own UID.
     // Owner can update/delete freely.
-    // Other authenticated users can ONLY touch the 'comments' or 'reports' fields
-    //   (so they can add a comment or report the post).
+    // Other authenticated users can touch comments, reports, viewCount,
+    //   isResolved, or isHidden — nothing else.
     match /posts/{postId} {
       allow read: if true;
 
@@ -43,9 +43,9 @@ service cloud.firestore {
         // Post owner can change anything
         resource.data.userId == request.auth.uid
         ||
-        // Anyone authenticated can only add a comment or report (nothing else)
+        // Non-owners can only modify these specific fields
         request.resource.data.diff(resource.data).affectedKeys()
-          .hasOnly(['comments', 'reports'])
+          .hasOnly(['comments', 'reports', 'viewCount', 'isResolved', 'isHidden'])
       );
 
       allow delete: if isOwner(resource.data.userId);

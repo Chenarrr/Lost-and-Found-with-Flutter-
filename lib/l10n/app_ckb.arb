@@ -223,5 +223,11 @@
     "placeholders": {
       "count": { "type": "int" }
     }
+  },
+  "memberSince": "ئەندام لە {date}",
+  "@memberSince": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
   }
 }

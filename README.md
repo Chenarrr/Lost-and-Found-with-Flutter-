@@ -257,7 +257,21 @@ service cloud.firestore {
 ### Test phone numbers (simulator)
 
 Firebase Console → Authentication → Sign-in method → Phone → **Phone numbers for testing**.
-Add e.g. `+9647501234567` with code `123456` — Firebase bypasses reCAPTCHA instantly.
+Firebase bypasses reCAPTCHA instantly for these numbers — no real SMS is sent.
+
+The following test numbers are registered in this project (all use code `123456`):
+
+| Phone | User | Language |
+|---|---|---|
+| `+9647501111001` | کارزان عومەر | Kurdish |
+| `+9647701111002` | دیلان ڕەشید | Kurdish |
+| `+9647501111003` | سۆران عەزیز | Kurdish |
+| `+9647771111004` | شنۆ کەریم | Kurdish |
+| `+9647811111005` | هنا بكر | Arabic |
+| `+9647901111006` | أرز جلال | Arabic |
+| `+9647501111007` | Nian Mustafa | English |
+| `+9647701111008` | Bryar Tahir | English |
+| `+9647801111009` | Lava Said | English |
 
 ---
 
@@ -312,8 +326,10 @@ flutter gen-l10n
 
 ## Testing
 
+### Unit tests
+
 ```bash
-flutter test                  # all tests
+flutter test                  # all unit tests
 flutter test --coverage       # with lcov coverage report
 ```
 
@@ -333,6 +349,40 @@ test/
 `AppState` accepts injected `FirebaseAuth` and `FirebaseFirestore` for unit testing:
 ```dart
 final state = AppState(auth: mockAuth, firestore: mockFirestore);
+```
+
+### Integration tests
+
+Two integration test suites are provided. Both run on the iOS Simulator and drive the **real app UI** end-to-end.
+
+| File | Firebase | Purpose |
+|---|---|---|
+| `integration_test/seed_users_test.dart` | Local emulator | Safe development testing — data stays on your Mac |
+| `integration_test/seed_real_test.dart` | Real Firebase | Seeds 9 demo users + posts into production Firestore |
+
+#### Run against the Firebase emulator (development)
+
+```bash
+# 1. Start emulators (requires Java)
+firebase emulators:start --only auth,firestore
+
+# 2. Run test on simulator
+flutter test integration_test/seed_users_test.dart -d <simulator-id>
+```
+
+#### Seed real Firebase with demo data (one-time setup)
+
+Requires the 9 test phone numbers to be registered in Firebase Console (already done — see table above).
+
+```bash
+flutter test integration_test/seed_real_test.dart -d <simulator-id>
+```
+
+The test signs up each user through the real app UI (name, phone, gender, age → OTP → post creation), so all data is structured exactly as the app expects it.
+
+Get your simulator ID with:
+```bash
+xcrun simctl list devices | grep Booted
 ```
 
 ---

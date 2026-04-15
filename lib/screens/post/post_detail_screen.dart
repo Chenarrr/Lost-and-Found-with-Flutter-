@@ -8,6 +8,8 @@ import 'package:flutter_application/models/comment.dart';
 import 'package:flutter_application/models/post.dart';
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/screens/post/create_post_sheet.dart';
+import 'package:flutter_application/widgets/app_backdrop.dart';
+import 'package:flutter_application/widgets/app_panel.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -114,20 +116,20 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text(l10n.reportPost, style: GoogleFonts.inter()),
-        content: Text(l10n.reportConfirm, style: GoogleFonts.inter()),
+        title: Text(l10n.reportPost, style: GoogleFonts.spaceGrotesk()),
+        content: Text(l10n.reportConfirm, style: GoogleFonts.manrope()),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.cancel, style: GoogleFonts.inter()),
+            child: Text(l10n.cancel, style: GoogleFonts.manrope()),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             child: Text(
               l10n.report,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.manrope(
                 color: AppColors.lostPrimary,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w800,
               ),
             ),
           ),
@@ -146,20 +148,20 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text(l10n.markAsResolved, style: GoogleFonts.inter()),
-        content: Text(l10n.markResolvedConfirm, style: GoogleFonts.inter()),
+        title: Text(l10n.markAsResolved, style: GoogleFonts.spaceGrotesk()),
+        content: Text(l10n.markResolvedConfirm, style: GoogleFonts.manrope()),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.cancel, style: GoogleFonts.inter()),
+            child: Text(l10n.cancel, style: GoogleFonts.manrope()),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             child: Text(
               l10n.markResolved,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.manrope(
                 color: AppColors.foundPrimary,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w800,
               ),
             ),
           ),
@@ -203,20 +205,20 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text(l10n.deletePost, style: GoogleFonts.inter()),
-        content: Text(l10n.deletePostConfirm, style: GoogleFonts.inter()),
+        title: Text(l10n.deletePost, style: GoogleFonts.spaceGrotesk()),
+        content: Text(l10n.deletePostConfirm, style: GoogleFonts.manrope()),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.cancel, style: GoogleFonts.inter()),
+            child: Text(l10n.cancel, style: GoogleFonts.manrope()),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             child: Text(
               l10n.delete,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.manrope(
                 color: AppColors.lostPrimary,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w800,
               ),
             ),
           ),
@@ -258,13 +260,14 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
     if (postIndex == -1) {
       return Scaffold(
-        appBar: AppBar(
-          title: Text(l10n.postDetails, style: GoogleFonts.inter()),
-        ),
-        body: Center(
-          child: Text(
-            l10n.postNotFound,
-            style: GoogleFonts.inter(color: cs.onSurfaceVariant),
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(title: Text(l10n.postDetails)),
+        body: AppBackdrop(
+          child: Center(
+            child: Text(
+              l10n.postNotFound,
+              style: GoogleFonts.manrope(color: cs.onSurfaceVariant),
+            ),
           ),
         ),
       );
@@ -274,12 +277,15 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     final isOwner = app.currentUser?.id == post.userId;
     final isLost = post.type == PostType.lost;
     final typeColor = isLost ? AppColors.lostPrimary : AppColors.foundPrimary;
+    final softColor = isLost ? AppColors.lostLight : AppColors.foundLight;
+    final adaptedSoftColor = isDark ? typeColor.withAlpha(28) : softColor;
 
     _incrementViewIfNeeded(app);
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: Text(l10n.postDetails, style: GoogleFonts.inter()),
+        title: Text(l10n.postDetails),
         actions: [
           IconButton(
             icon: const Icon(Icons.share_outlined),
@@ -288,435 +294,448 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          // ── Image ────────────────────────────────────────────────────
-          ClipRRect(
-            borderRadius: BorderRadius.circular(18),
-            child: SizedBox(
-              height: 240,
-              child: post.imageUrls.isNotEmpty
-                  ? _buildImage(post.imageUrls.first, cs)
-                  : ColoredBox(color: cs.surfaceContainerHighest),
-            ),
-          ),
-          const SizedBox(height: 14),
-
-          // ── Main info card ────────────────────────────────────────────
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: cs.surface,
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: cs.outlineVariant),
-              boxShadow: isDark
-                  ? null
-                  : [
-                      BoxShadow(
-                        color: Colors.black.withAlpha(16),
-                        blurRadius: 14,
-                        offset: const Offset(0, 6),
-                      ),
-                    ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    // Type badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: typeColor,
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                      child: Text(
-                        isLost ? l10n.typeLostUpper : l10n.typeFoundUpper,
-                        style: GoogleFonts.inter(
-                          color: Colors.white,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    // Category badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? cs.surfaceContainerHighest
-                            : AppColors.skyTop,
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                      child: Text(
-                        post.category.displayName,
-                        style: GoogleFonts.inter(
-                          color: cs.onSurfaceVariant,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    if (post.isResolved) ...[
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? AppColors.foundPrimary.withAlpha(40)
-                              : AppColors.foundLight,
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                        child: Text(
-                          l10n.resolvedBadge,
-                          style: GoogleFonts.inter(
-                            color: AppColors.foundDark,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
+      body: AppBackdrop(
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(18, 10, 18, 120),
+          children: [
+            AppPanel(
+              padding: EdgeInsets.zero,
+              clipBehavior: Clip.antiAlias,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 280,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        post.imageUrls.isNotEmpty
+                            ? _buildImage(post.imageUrls.first, cs)
+                            : ColoredBox(
+                                color: adaptedSoftColor,
+                                child: Icon(
+                                  isLost
+                                      ? Icons.search_rounded
+                                      : Icons.volunteer_activism_rounded,
+                                  size: 56,
+                                  color: typeColor,
+                                ),
+                              ),
+                        DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.black.withAlpha(10),
+                                Colors.black.withAlpha(150),
+                              ],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                    const Spacer(),
-                    TextButton(
-                      onPressed: () => _confirmReport(app, post),
-                      child: Text(
-                        post.reports.contains(app.currentUser?.id)
-                            ? l10n.reported
-                            : l10n.report,
-                        style: GoogleFonts.inter(
-                          color: post.reports.contains(app.currentUser?.id)
-                              ? cs.onSurfaceVariant
-                              : AppColors.lostPrimary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  post.itemName,
-                  style: GoogleFonts.inter(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: cs.onSurface,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${post.city}, ${post.street}',
-                  style: GoogleFonts.inter(color: cs.onSurfaceVariant),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.access_time,
-                      size: 14,
-                      color: cs.onSurfaceVariant,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      timeago.format(post.createdAt, locale: l10n.localeName),
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        color: cs.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Icon(
-                      Icons.person_outline,
-                      size: 14,
-                      color: cs.onSurfaceVariant,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      post.userName,
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        color: cs.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Icon(
-                      Icons.visibility_outlined,
-                      size: 14,
-                      color: cs.onSurfaceVariant,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      l10n.viewsCount(post.viewCount),
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        color: cs.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 14),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: () =>
-                        _contactViaWhatsApp(post.userPhone, post.itemName),
-                    icon: const Icon(Icons.chat_rounded),
-                    label: Text(
-                      l10n.contactWhatsapp,
-                      style: GoogleFonts.inter(fontWeight: FontWeight.w600),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.whatsappGreen,
-                      foregroundColor: Colors.white,
-                      shadowColor: AppColors.whatsappDark.withAlpha(80),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  l10n.description,
-                  style: GoogleFonts.inter(
-                    fontWeight: FontWeight.w700,
-                    color: cs.onSurface,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  post.description ?? l10n.noDescription,
-                  style: GoogleFonts.inter(color: cs.onSurfaceVariant),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 14),
-
-          // ── Comments card ─────────────────────────────────────────────
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: cs.surface,
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: cs.outlineVariant),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.commentsSection(post.comments.length),
-                  style: GoogleFonts.inter(
-                    fontWeight: FontWeight.w700,
-                    color: cs.onSurface,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                if (post.comments.isEmpty)
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: cs.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      l10n.noCommentsSection,
-                      style: GoogleFonts.inter(
-                        color: cs.onSurfaceVariant,
-                        fontSize: 13,
-                      ),
-                    ),
-                  )
-                else
-                  ...post.comments.map(
-                    (comment) => Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: cs.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: cs.outlineVariant),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
+                        Positioned(
+                          left: 18,
+                          right: 18,
+                          bottom: 18,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              CircleAvatar(
-                                radius: 14,
-                                backgroundColor: AppColors.primaryBlue,
-                                child: Text(
-                                  comment.userName.isNotEmpty
-                                      ? comment.userName[0].toUpperCase()
-                                      : '?',
-                                  style: GoogleFonts.inter(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: [
+                                  _OverlayPill(
+                                    text: isLost
+                                        ? l10n.typeLostUpper
+                                        : l10n.typeFoundUpper,
+                                    color: typeColor,
                                   ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  comment.userName,
-                                  style: GoogleFonts.inter(
-                                    fontWeight: FontWeight.w600,
-                                    color: cs.onSurface,
+                                  _OverlayPill(
+                                    text: post.category.displayName,
+                                    color: Colors.white.withAlpha(36),
                                   ),
-                                ),
+                                  if (post.isResolved)
+                                    _OverlayPill(
+                                      text: l10n.resolvedBadge,
+                                      color: AppColors.foundPrimary,
+                                    ),
+                                ],
                               ),
+                              const SizedBox(height: 12),
                               Text(
-                                timeago.format(
-                                  comment.createdAt,
-                                  locale: l10n.localeName,
+                                post.itemName,
+                                style: GoogleFonts.spaceGrotesk(
+                                  color: Colors.white,
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.w700,
+                                  height: 1,
                                 ),
-                                style: GoogleFonts.inter(
-                                  fontSize: 11,
-                                  color: cs.onSurfaceVariant,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                '${post.city}, ${post.street}',
+                                style: GoogleFonts.manrope(
+                                  color: Colors.white.withAlpha(215),
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 8),
-                          Text(
-                            comment.text,
-                            style: GoogleFonts.inter(
-                              color: cs.onSurfaceVariant,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(18),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            _MetaPill(
+                              icon: Icons.access_time_rounded,
+                              label: timeago.format(
+                                post.createdAt,
+                                locale: l10n.localeName,
+                              ),
+                            ),
+                            _MetaPill(
+                              icon: Icons.person_rounded,
+                              label: post.userName,
+                            ),
+                            _MetaPill(
+                              icon: Icons.visibility_outlined,
+                              label: l10n.viewsCount(post.viewCount),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: () => _contactViaWhatsApp(
+                              post.userPhone,
+                              post.itemName,
+                            ),
+                            icon: const Icon(Icons.chat_rounded),
+                            label: Text(l10n.contactWhatsapp),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.whatsappGreen,
+                              foregroundColor: Colors.white,
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                  ),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: _commentController,
-                  minLines: 1,
-                  maxLines: 3,
-                  maxLength: 250,
-                  textInputAction: TextInputAction.send,
-                  onSubmitted: (_) => _addComment(app, post),
-                  decoration: InputDecoration(
-                    hintText: l10n.typeComment,
-                    suffixIcon: IconButton(
-                      onPressed: () => _addComment(app, post),
-                      icon: const Icon(Icons.send_rounded),
-                    ),
-                  ),
-                ),
-                if (isOwner) ...[
-                  const SizedBox(height: 8),
-                  if (!post.isResolved)
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: () => _markResolved(app, post),
-                        icon: const Icon(
-                          Icons.check_circle_outline,
-                          color: AppColors.foundPrimary,
                         ),
-                        label: Text(
-                          l10n.markAsResolved,
-                          style: GoogleFonts.inter(fontWeight: FontWeight.w600),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.foundPrimary,
-                          side: const BorderSide(color: AppColors.foundPrimary),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                        const SizedBox(height: 16),
+                        Text(
+                          l10n.description,
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w700,
+                            color: cs.onSurface,
                           ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          post.description ?? l10n.noDescription,
+                          style: GoogleFonts.manrope(
+                            color: cs.onSurfaceVariant,
+                            fontWeight: FontWeight.w600,
+                            height: 1.55,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Align(
+                          alignment: AlignmentDirectional.centerEnd,
+                          child: TextButton.icon(
+                            onPressed: () => _confirmReport(app, post),
+                            icon: Icon(
+                              Icons.flag_outlined,
+                              color: post.reports.contains(app.currentUser?.id)
+                                  ? cs.onSurfaceVariant
+                                  : AppColors.lostPrimary,
+                            ),
+                            label: Text(
+                              post.reports.contains(app.currentUser?.id)
+                                  ? l10n.reported
+                                  : l10n.report,
+                              style: GoogleFonts.manrope(
+                                color:
+                                    post.reports.contains(app.currentUser?.id)
+                                    ? cs.onSurfaceVariant
+                                    : AppColors.lostPrimary,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            AppPanel(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.commentsSection(post.comments.length),
+                    style: GoogleFonts.spaceGrotesk(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                      color: cs.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  if (post.comments.isEmpty)
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: cs.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(22),
+                      ),
+                      child: Text(
+                        l10n.noCommentsSection,
+                        style: GoogleFonts.manrope(
+                          color: cs.onSurfaceVariant,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     )
                   else
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 12,
-                        horizontal: 16,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? AppColors.foundPrimary.withAlpha(40)
-                            : AppColors.foundLight,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.foundPrimary),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.check_circle,
-                            color: AppColors.foundPrimary,
-                            size: 18,
+                    ...post.comments.map(
+                      (comment) => Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: cs.surfaceContainerHighest,
+                            borderRadius: BorderRadius.circular(22),
+                            border: Border.all(color: cs.outlineVariant),
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            l10n.itemResolved,
-                            style: GoogleFonts.inter(
-                              color: AppColors.foundDark,
-                              fontWeight: FontWeight.w600,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 18,
+                                    backgroundColor: AppColors.primaryBlue,
+                                    child: Text(
+                                      comment.userName.isNotEmpty
+                                          ? comment.userName[0].toUpperCase()
+                                          : '?',
+                                      style: GoogleFonts.spaceGrotesk(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      comment.userName,
+                                      style: GoogleFonts.manrope(
+                                        fontWeight: FontWeight.w800,
+                                        color: cs.onSurface,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    timeago.format(
+                                      comment.createdAt,
+                                      locale: l10n.localeName,
+                                    ),
+                                    style: GoogleFonts.manrope(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                      color: cs.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                comment.text,
+                                style: GoogleFonts.manrope(
+                                  color: cs.onSurfaceVariant,
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: _commentController,
+                    minLines: 1,
+                    maxLines: 3,
+                    maxLength: 250,
+                    textInputAction: TextInputAction.send,
+                    onSubmitted: (_) => _addComment(app, post),
+                    decoration: InputDecoration(
+                      hintText: l10n.typeComment,
+                      suffixIcon: IconButton(
+                        onPressed: () => _addComment(app, post),
+                        icon: const Icon(Icons.send_rounded),
+                      ),
+                    ),
+                  ),
+                  if (isOwner) ...[
+                    const SizedBox(height: 12),
+                    if (!post.isResolved)
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          onPressed: () => _markResolved(app, post),
+                          icon: const Icon(
+                            Icons.check_circle_outline_rounded,
+                            color: AppColors.foundPrimary,
+                          ),
+                          label: Text(l10n.markAsResolved),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.foundPrimary,
+                            side: const BorderSide(
+                              color: AppColors.foundPrimary,
                             ),
                           ),
-                        ],
+                        ),
+                      )
+                    else
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 14,
+                          horizontal: 16,
+                        ),
+                        decoration: BoxDecoration(
+                          color: adaptedSoftColor,
+                          borderRadius: BorderRadius.circular(22),
+                          border: Border.all(color: AppColors.foundPrimary),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.check_circle_rounded,
+                              color: AppColors.foundPrimary,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              l10n.itemResolved,
+                              style: GoogleFonts.manrope(
+                                color: AppColors.foundDark,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => CreatePostSheet(existingPost: post),
-                          ),
-                        );
-                      },
-                      icon: const Icon(Icons.edit_outlined),
-                      label: Text(
-                        l10n.editPost,
-                        style: GoogleFonts.inter(fontWeight: FontWeight.w600),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.primaryBlue,
-                        side: const BorderSide(color: AppColors.primaryBlue),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  CreatePostSheet(existingPost: post),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.edit_outlined),
+                        label: Text(l10n.editPost),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.primaryBlue,
+                          side: const BorderSide(color: AppColors.primaryBlue),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton(
-                      onPressed: () => _deletePost(app, post),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.lostPrimary,
-                        side: const BorderSide(color: AppColors.lostPrimary),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        onPressed: () => _deletePost(app, post),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.lostPrimary,
+                          side: const BorderSide(color: AppColors.lostPrimary),
                         ),
-                      ),
-                      child: Text(
-                        l10n.deletePost,
-                        style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                        child: Text(l10n.deletePost),
                       ),
                     ),
-                  ),
+                  ],
                 ],
-              ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _OverlayPill extends StatelessWidget {
+  const _OverlayPill({required this.text, required this.color});
+
+  final String text;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        text,
+        style: GoogleFonts.manrope(
+          color: Colors.white,
+          fontWeight: FontWeight.w900,
+          fontSize: 11,
+        ),
+      ),
+    );
+  }
+}
+
+class _MetaPill extends StatelessWidget {
+  const _MetaPill({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.white.withAlpha(8) : AppColors.frost,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: cs.outlineVariant),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 15, color: cs.onSurfaceVariant),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: GoogleFonts.manrope(
+              color: cs.onSurfaceVariant,
+              fontWeight: FontWeight.w800,
             ),
           ),
         ],

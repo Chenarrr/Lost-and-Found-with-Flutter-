@@ -4,6 +4,8 @@ import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/screens/auth/welcome_screen.dart';
 import 'package:flutter_application/navigation/main_page.dart';
+import 'package:flutter_application/widgets/app_backdrop.dart';
+import 'package:flutter_application/widgets/app_panel.dart';
 
 // RootRouter determines the initial screen once on startup.
 // After that, all auth transitions are handled imperatively via
@@ -29,8 +31,15 @@ class _RootRouterState extends State<RootRouter> {
 
     if (!isInitialized) {
       return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(color: AppColors.primaryBlue),
+        body: AppBackdrop(
+          child: Center(
+            child: AppPanel(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 28, vertical: 24),
+                child: CircularProgressIndicator(color: AppColors.primaryBlue),
+              ),
+            ),
+          ),
         ),
       );
     }

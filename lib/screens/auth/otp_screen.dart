@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/l10n/l10n.dart';
-import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/navigation/main_page.dart';
+import 'package:flutter_application/providers/app_state.dart';
+import 'package:flutter_application/widgets/app_backdrop.dart';
+import 'package:flutter_application/widgets/app_panel.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
@@ -29,7 +31,6 @@ class _OtpScreenState extends State<OtpScreen> {
   bool _loading = false;
   String? _error;
 
-  // Resend countdown
   int _secondsLeft = 60;
   bool _resendLoading = false;
   Timer? _resendTimer;
@@ -42,15 +43,15 @@ class _OtpScreenState extends State<OtpScreen> {
 
   void _startCountdown() {
     _resendTimer?.cancel();
-    setState(() => _secondsLeft = 60);
-    _resendTimer = Timer.periodic(const Duration(seconds: 1), (t) {
+    _secondsLeft = 60;
+    _resendTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!mounted) {
-        t.cancel();
+        timer.cancel();
         return;
       }
       setState(() {
         _secondsLeft--;
-        if (_secondsLeft <= 0) t.cancel();
+        if (_secondsLeft <= 0) timer.cancel();
       });
     });
   }
@@ -89,7 +90,7 @@ class _OtpScreenState extends State<OtpScreen> {
 
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const MainPage()),
-      (r) => false,
+      (route) => false,
     );
   }
 
@@ -110,7 +111,10 @@ class _OtpScreenState extends State<OtpScreen> {
         _startCountdown();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(context.l10n.newCodeSent, style: GoogleFonts.inter()),
+            content: Text(
+              context.l10n.newCodeSent,
+              style: GoogleFonts.manrope(),
+            ),
             backgroundColor: AppColors.primaryBlueDark,
             behavior: SnackBarBehavior.floating,
           ),
@@ -122,111 +126,289 @@ class _OtpScreenState extends State<OtpScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final cs = Theme.of(context).colorScheme;
+
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.verifyPhone, style: GoogleFonts.inter())),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              l10n.enterCodeSentTo,
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                color: AppColors.textSecondary,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              widget.phone,
-              style: GoogleFonts.inter(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 24),
-            TextField(
-              controller: _otpController,
-              keyboardType: TextInputType.number,
-              maxLength: 6,
-              style: GoogleFonts.inter(
-                fontSize: 28,
-                letterSpacing: 10,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-              decoration: InputDecoration(
-                hintText: '------',
-                hintStyle: GoogleFonts.inter(
-                  letterSpacing: 10,
-                  color: AppColors.placeholderGray,
-                ),
-                counterText: '',
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                errorText: _error,
-              ),
-              onChanged: (_) => setState(() => _error = null),
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _loading ? null : _verify,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
+      body: AppBackdrop(
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
+              child: TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0, end: 1),
+                duration: const Duration(milliseconds: 600),
+                curve: Curves.easeOutCubic,
+                builder: (context, value, child) => Opacity(
+                  opacity: value,
+                  child: Transform.translate(
+                    offset: Offset(0, 26 * (1 - value)),
+                    child: child,
                   ),
                 ),
-                child: _loading
-                    ? const SizedBox(
-                        height: 24,
-                        width: 24,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
-                        ),
-                      )
-                    : Text(
-                        l10n.verifyCode,
-                        style: GoogleFonts.inter(fontSize: 16),
-                      ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Center(
-              child: _resendLoading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : _secondsLeft > 0
-                  ? Text(
-                      l10n.resendCountdown(_secondsLeft),
-                      style: GoogleFonts.inter(
-                        color: AppColors.textTertiary,
-                        fontSize: 14,
-                      ),
-                    )
-                  : TextButton(
-                      onPressed: _resend,
-                      child: Text(
-                        l10n.resendCode,
-                        style: GoogleFonts.inter(
-                          color: AppColors.primaryBlue,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
+                child: Column(
+                  children: [
+                    Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: GestureDetector(
+                        onTap: () => Navigator.of(context).pop(),
+                        child: AppPanel(
+                          padding: const EdgeInsets.all(12),
+                          borderRadius: BorderRadius.circular(18),
+                          child: Icon(
+                            Icons.arrow_back_rounded,
+                            color: cs.onSurface,
+                          ),
                         ),
                       ),
                     ),
+                    const SizedBox(height: 18),
+                    AppPanel(
+                      padding: EdgeInsets.zero,
+                      clipBehavior: Clip.antiAlias,
+                      gradient: const LinearGradient(
+                        colors: [
+                          AppColors.heroNavy,
+                          AppColors.heroBlue,
+                          AppColors.heroTeal,
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 58,
+                              height: 58,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withAlpha(16),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: Colors.white.withAlpha(16),
+                                ),
+                              ),
+                              alignment: Alignment.center,
+                              child: const Icon(
+                                Icons.lock_person_rounded,
+                                color: Colors.white,
+                                size: 28,
+                              ),
+                            ),
+                            const SizedBox(height: 18),
+                            Text(
+                              l10n.verifyPhone,
+                              style: GoogleFonts.spaceGrotesk(
+                                color: Colors.white,
+                                fontSize: 30,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              l10n.enterCodeSentTo,
+                              style: GoogleFonts.manrope(
+                                color: Colors.white.withAlpha(204),
+                                fontWeight: FontWeight.w600,
+                                height: 1.45,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 10,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withAlpha(14),
+                                borderRadius: BorderRadius.circular(18),
+                                border: Border.all(
+                                  color: Colors.white.withAlpha(14),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    Icons.phone_android_rounded,
+                                    color: Colors.white,
+                                    size: 18,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    widget.phone,
+                                    style: GoogleFonts.manrope(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    AppPanel(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.verifyCode,
+                            style: GoogleFonts.spaceGrotesk(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
+                              color: cs.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            l10n.codeInvalid,
+                            style: GoogleFonts.manrope(
+                              color: cs.onSurfaceVariant,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          TextField(
+                            controller: _otpController,
+                            keyboardType: TextInputType.number,
+                            maxLength: 6,
+                            style: GoogleFonts.spaceGrotesk(
+                              fontSize: 34,
+                              letterSpacing: 12,
+                              fontWeight: FontWeight.w700,
+                              color: cs.onSurface,
+                            ),
+                            textAlign: TextAlign.center,
+                            decoration: InputDecoration(
+                              hintText: '------',
+                              hintStyle: GoogleFonts.spaceGrotesk(
+                                letterSpacing: 12,
+                                color: AppColors.placeholderGray,
+                                fontWeight: FontWeight.w700,
+                              ),
+                              counterText: '',
+                              errorText: _error,
+                            ),
+                            onChanged: (_) => setState(() => _error = null),
+                          ),
+                          const SizedBox(height: 20),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: _loading ? null : _verify,
+                              style: ElevatedButton.styleFrom(
+                                padding: EdgeInsets.zero,
+                                backgroundColor: Colors.transparent,
+                                shadowColor: Colors.transparent,
+                              ),
+                              child: Ink(
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      AppColors.primaryBlue,
+                                      AppColors.accentIndigo,
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(24),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColors.primaryBlue.withAlpha(
+                                        56,
+                                      ),
+                                      blurRadius: 24,
+                                      offset: const Offset(0, 14),
+                                    ),
+                                  ],
+                                ),
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 18,
+                                  ),
+                                  child: _loading
+                                      ? const SizedBox(
+                                          height: 22,
+                                          width: 22,
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                            strokeWidth: 2,
+                                          ),
+                                        )
+                                      : Text(
+                                          l10n.verifyCode,
+                                          style: GoogleFonts.manrope(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w800,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 14,
+                            ),
+                            decoration: BoxDecoration(
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.white.withAlpha(8)
+                                  : AppColors.infoBox,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.white.withAlpha(14)
+                                    : AppColors.primaryBlue.withAlpha(18),
+                              ),
+                            ),
+                            child: Center(
+                              child: _resendLoading
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : _secondsLeft > 0
+                                  ? Text(
+                                      l10n.resendCountdown(_secondsLeft),
+                                      style: GoogleFonts.manrope(
+                                        color: cs.onSurfaceVariant,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    )
+                                  : TextButton(
+                                      onPressed: _resend,
+                                      child: Text(
+                                        l10n.resendCode,
+                                        style: GoogleFonts.manrope(
+                                          color: AppColors.primaryBlue,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
+                                    ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ],
+          ),
         ),
       ),
     );

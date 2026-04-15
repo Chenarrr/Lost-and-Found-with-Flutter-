@@ -3,6 +3,8 @@ import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/screens/auth/welcome_screen.dart';
+import 'package:flutter_application/widgets/app_backdrop.dart';
+import 'package:flutter_application/widgets/app_panel.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
@@ -28,13 +30,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   // ── Helpers ────────────────────────────────────────────────────────────────
 
   Widget _leadingIcon(IconData icon, Color bg, Color fg) => Container(
-    width: 36,
-    height: 36,
+    width: 42,
+    height: 42,
     decoration: BoxDecoration(
       color: bg,
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: BorderRadius.circular(14),
     ),
-    child: Icon(icon, color: fg),
+    child: Icon(icon, color: fg, size: 20),
   );
 
   Widget _tile(
@@ -50,18 +52,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final adaptedBg = isDark ? iconFg.withAlpha(40) : iconBg;
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       leading: _leadingIcon(icon, adaptedBg, iconFg),
       title: Text(
         title,
-        style: GoogleFonts.inter(
-          fontWeight: FontWeight.w600,
+        style: GoogleFonts.manrope(
+          fontWeight: FontWeight.w800,
           color: cs.onSurface,
         ),
       ),
       subtitle: Text(
         subtitle,
-        style: GoogleFonts.inter(color: cs.onSurfaceVariant, fontSize: 12),
+        style: GoogleFonts.manrope(
+          color: cs.onSurfaceVariant,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
       ),
       trailing: Icon(Icons.chevron_right_rounded, color: cs.onSurfaceVariant),
       onTap: onTap,
@@ -474,228 +481,212 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final isDark = app.themeMode == ThemeMode.dark;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.settingsTitle, style: GoogleFonts.inter()),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          // ── User info header ──────────────────────────────────────────
-          Container(
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: cs.surface,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: cs.outlineVariant),
-            ),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 26,
-                  backgroundColor: AppColors.primaryBlue,
-                  child: Text(
-                    userName.isNotEmpty ? userName[0].toUpperCase() : '?',
-                    style: GoogleFonts.inter(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(title: Text(l10n.settingsTitle)),
+      body: AppBackdrop(
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(18, 10, 18, 120),
+          children: [
+            AppPanel(
+              padding: EdgeInsets.zero,
+              clipBehavior: Clip.antiAlias,
+              gradient: const LinearGradient(
+                colors: [
+                  AppColors.heroNavy,
+                  AppColors.heroBlue,
+                  AppColors.heroTeal,
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(22),
+                child: Row(
                   children: [
-                    Text(
-                      userName.isNotEmpty ? userName : 'Unknown',
-                      style: GoogleFonts.inter(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w700,
-                        color: cs.onSurface,
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withAlpha(18),
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: CircleAvatar(
+                        radius: 30,
+                        backgroundColor: Colors.white,
+                        child: Text(
+                          userName.isNotEmpty ? userName[0].toUpperCase() : '?',
+                          style: GoogleFonts.spaceGrotesk(
+                            color: AppColors.primaryBlue,
+                            fontSize: 24,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      userPhone,
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        color: cs.onSurfaceVariant,
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            userName.isNotEmpty ? userName : 'Unknown',
+                            style: GoogleFonts.spaceGrotesk(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            userPhone,
+                            style: GoogleFonts.manrope(
+                              color: Colors.white.withAlpha(204),
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          if (_appVersion.isNotEmpty)
+                            Text(
+                              _appVersion,
+                              style: GoogleFonts.manrope(
+                                color: Colors.white.withAlpha(190),
+                                fontWeight: FontWeight.w700,
+                                fontSize: 12,
+                              ),
+                            ),
+                        ],
                       ),
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          // ── Dark Mode toggle ──────────────────────────────────────────
-          Container(
-            decoration: BoxDecoration(
-              color: cs.surface,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: cs.outlineVariant),
-            ),
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 14,
-                vertical: 4,
               ),
-              leading: Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: isDark
+            ),
+            const SizedBox(height: 16),
+            AppPanel(
+              child: ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: _leadingIcon(
+                  isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
+                  isDark
                       ? AppColors.primaryBlue.withAlpha(40)
                       : AppColors.infoBox,
-                  borderRadius: BorderRadius.circular(10),
+                  AppColors.primaryBlue,
                 ),
-                child: Icon(
-                  isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
-                  color: AppColors.primaryBlue,
+                title: Text(
+                  l10n.darkMode,
+                  style: GoogleFonts.manrope(
+                    fontWeight: FontWeight.w800,
+                    color: cs.onSurface,
+                  ),
                 ),
-              ),
-              title: Text(
-                l10n.darkMode,
-                style: GoogleFonts.inter(
-                  fontWeight: FontWeight.w600,
-                  color: cs.onSurface,
+                subtitle: Text(
+                  l10n.preferences,
+                  style: GoogleFonts.manrope(
+                    color: cs.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                  ),
                 ),
-              ),
-              trailing: Switch(
-                value: isDark,
-                activeThumbColor: AppColors.primaryBlue,
-                onChanged: (v) =>
-                    app.setThemeMode(v ? ThemeMode.dark : ThemeMode.light),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          // ── Account section ───────────────────────────────────────────
-          Text(
-            l10n.account,
-            style: GoogleFonts.inter(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: cs.onSurfaceVariant,
-              letterSpacing: 0.5,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            decoration: BoxDecoration(
-              color: cs.surface,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: cs.outlineVariant),
-            ),
-            child: Column(
-              children: [
-                _tile(
-                  context,
-                  icon: Icons.edit_rounded,
-                  iconBg: AppColors.infoBox,
-                  iconFg: AppColors.primaryBlue,
-                  title: l10n.changeName,
-                  subtitle: l10n.updateDisplayName,
-                  onTap: () => _showChangeNameDialog(context),
-                ),
-
-                Divider(height: 1, color: cs.outlineVariant),
-
-                _tile(
-                  context,
-                  icon: Icons.logout,
-                  iconBg: AppColors.lostLight,
-                  iconFg: AppColors.lostPrimary,
-                  title: l10n.logout,
-                  subtitle: l10n.signOutDevice,
-                  onTap: () => _logout(context),
-                ),
-
-                Divider(height: 1, color: cs.outlineVariant),
-
-                _tile(
-                  context,
-                  icon: Icons.delete_forever_rounded,
-                  iconBg: AppColors.lostLight,
-                  iconFg: AppColors.lostDark,
-                  title: l10n.deleteAccount,
-                  subtitle: l10n.permanentlyRemove,
-                  onTap: () => _deleteAccount(context),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          // ── Preferences section ───────────────────────────────────────
-          Text(
-            l10n.preferences,
-            style: GoogleFonts.inter(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: cs.onSurfaceVariant,
-              letterSpacing: 0.5,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            decoration: BoxDecoration(
-              color: cs.surface,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: cs.outlineVariant),
-            ),
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 14,
-                vertical: 4,
-              ),
-              leading: _leadingIcon(
-                Icons.language_rounded,
-                isDark ? AppColors.primaryBlue.withAlpha(40) : AppColors.skyTop,
-                AppColors.primaryBlue,
-              ),
-              title: Text(
-                l10n.language,
-                style: GoogleFonts.inter(
-                  fontWeight: FontWeight.w600,
-                  color: cs.onSurface,
+                trailing: Switch(
+                  value: isDark,
+                  onChanged: (v) =>
+                      app.setThemeMode(v ? ThemeMode.dark : ThemeMode.light),
                 ),
               ),
-              subtitle: Text(
-                currentLangLabel,
-                style: GoogleFonts.inter(
+            ),
+            const SizedBox(height: 20),
+            Text(
+              l10n.account,
+              style: GoogleFonts.manrope(
+                fontSize: 13,
+                fontWeight: FontWeight.w800,
+                color: cs.onSurfaceVariant,
+                letterSpacing: 0.4,
+              ),
+            ),
+            const SizedBox(height: 8),
+            AppPanel(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+              child: Column(
+                children: [
+                  _tile(
+                    context,
+                    icon: Icons.edit_rounded,
+                    iconBg: AppColors.infoBox,
+                    iconFg: AppColors.primaryBlue,
+                    title: l10n.changeName,
+                    subtitle: l10n.updateDisplayName,
+                    onTap: () => _showChangeNameDialog(context),
+                  ),
+                  Divider(height: 1, color: cs.outlineVariant),
+                  _tile(
+                    context,
+                    icon: Icons.logout_rounded,
+                    iconBg: AppColors.lostLight,
+                    iconFg: AppColors.lostPrimary,
+                    title: l10n.logout,
+                    subtitle: l10n.signOutDevice,
+                    onTap: () => _logout(context),
+                  ),
+                  Divider(height: 1, color: cs.outlineVariant),
+                  _tile(
+                    context,
+                    icon: Icons.delete_forever_rounded,
+                    iconBg: AppColors.lostLight,
+                    iconFg: AppColors.lostDark,
+                    title: l10n.deleteAccount,
+                    subtitle: l10n.permanentlyRemove,
+                    onTap: () => _deleteAccount(context),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              l10n.preferences,
+              style: GoogleFonts.manrope(
+                fontSize: 13,
+                fontWeight: FontWeight.w800,
+                color: cs.onSurfaceVariant,
+                letterSpacing: 0.4,
+              ),
+            ),
+            const SizedBox(height: 8),
+            AppPanel(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+              child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 6,
+                ),
+                leading: _leadingIcon(
+                  Icons.language_rounded,
+                  isDark
+                      ? AppColors.primaryBlue.withAlpha(40)
+                      : AppColors.skyTop,
+                  AppColors.primaryBlue,
+                ),
+                title: Text(
+                  l10n.language,
+                  style: GoogleFonts.manrope(
+                    fontWeight: FontWeight.w800,
+                    color: cs.onSurface,
+                  ),
+                ),
+                subtitle: Text(
+                  currentLangLabel,
+                  style: GoogleFonts.manrope(
+                    color: cs.onSurfaceVariant,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                trailing: Icon(
+                  Icons.chevron_right_rounded,
                   color: cs.onSurfaceVariant,
-                  fontSize: 12,
                 ),
-              ),
-              trailing: Icon(
-                Icons.chevron_right_rounded,
-                color: cs.onSurfaceVariant,
-              ),
-              onTap: () => _showLanguageDialog(context),
-            ),
-          ),
-
-          const SizedBox(height: 32),
-
-          // ── App version footer ────────────────────────────────────────
-          Center(
-            child: Text(
-              _appVersion,
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                color: cs.onSurfaceVariant,
+                onTap: () => _showLanguageDialog(context),
               ),
             ),
-          ),
-
-          const SizedBox(height: 24),
-        ],
+          ],
+        ),
       ),
     );
   }

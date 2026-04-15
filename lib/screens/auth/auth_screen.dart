@@ -7,7 +7,6 @@ import 'package:flutter_application/screens/auth/otp_screen.dart';
 import 'package:flutter_application/utils/phone_input_formatter.dart';
 import 'package:flutter_application/widgets/app_backdrop.dart';
 import 'package:flutter_application/widgets/app_panel.dart';
-import 'package:flutter_application/widgets/lang_toggle.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
@@ -179,8 +178,6 @@ class _AuthScreenState extends State<AuthScreen>
                           ),
                         ),
                         const SizedBox(height: 14),
-                        const Center(child: LangToggle()),
-                        const SizedBox(height: 20),
                         AppPanel(
                           padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
                           clipBehavior: Clip.antiAlias,
@@ -328,7 +325,7 @@ class _AuthScreenState extends State<AuthScreen>
               icon: Icons.verified_user_rounded,
               text: l10n.verifyPhone,
             ),
-            const Spacer(),
+            const SizedBox(height: 24),
             _buildSubmitButton(l10n.sendOtp, _doLogin),
           ],
         ),

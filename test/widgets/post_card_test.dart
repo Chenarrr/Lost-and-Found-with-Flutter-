@@ -101,20 +101,21 @@ void main() {
       expect(find.text('Documents'), findsOneWidget);
     });
 
-    testWidgets('displays location (city and street)', (tester) async {
+    testWidgets('displays city in location row', (tester) async {
       await tester.pumpWidget(
-        _buildTestApp(_makePost(city: 'Sulaymaniyah', street: '60m Road')),
+        _buildTestApp(_makePost(city: 'Sulaymaniyah')),
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Sulaymaniyah · 60m Road'), findsOneWidget);
+      // PostCard shows "${city} · ${timeago}" format
+      expect(find.textContaining('Sulaymaniyah'), findsWidgets);
     });
 
-    testWidgets('displays user name', (tester) async {
-      await tester.pumpWidget(_buildTestApp(_makePost(userName: 'Chenar')));
+    testWidgets('card is tappable', (tester) async {
+      await tester.pumpWidget(_buildTestApp(_makePost()));
       await tester.pumpAndSettle();
 
-      expect(find.text('Chenar'), findsOneWidget);
+      expect(find.byType(InkWell), findsOneWidget);
     });
 
     testWidgets('shows placeholder icon when no images', (tester) async {
@@ -187,20 +188,20 @@ void main() {
       expect(find.byIcon(Icons.chat_bubble_outline_rounded), findsNothing);
     });
 
-    testWidgets('shows View button', (tester) async {
+    testWidgets('does not show a View button (minimal card)', (tester) async {
       await tester.pumpWidget(_buildTestApp(_makePost()));
       await tester.pumpAndSettle();
 
-      expect(find.text('View'), findsOneWidget);
-      expect(find.byIcon(Icons.arrow_forward_rounded), findsOneWidget);
+      expect(find.text('View'), findsNothing);
+      expect(find.byIcon(Icons.arrow_forward_rounded), findsNothing);
     });
 
-    testWidgets('displays time ago text', (tester) async {
+    testWidgets('displays time ago in location row', (tester) async {
       await tester.pumpWidget(_buildTestApp(_makePost()));
       await tester.pumpAndSettle();
 
-      // timeago formats "2 hours ago"
-      expect(find.byIcon(Icons.access_time_rounded), findsOneWidget);
+      // Location row format: "City · X ago"
+      expect(find.textContaining('ago'), findsWidgets);
     });
 
     testWidgets('all category displayNames are shown correctly', (

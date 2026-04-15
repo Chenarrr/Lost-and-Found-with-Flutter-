@@ -11,22 +11,27 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  FLUTTER_VERSION: '3.38.7'
-
 jobs:
   ci:
     name: Format, Analyze & Test
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
+
+      # Cache pub packages separately for faster restores
+      - name: Cache pub packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
 
       - name: Install dependencies
         run: flutter pub get
@@ -42,5 +47,6 @@ jobs:
       - name: Analyze
         run: flutter analyze --fatal-warnings
 
+      # --no-pub skips redundant pub get; --reporter compact keeps output tight
       - name: Test
-        run: flutter test --coverage
+        run: flutter test --no-pub --reporter compact --coverage

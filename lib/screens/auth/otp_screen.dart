@@ -104,9 +104,9 @@ class _OtpScreenState extends State<OtpScreen> {
     await app.resendOtp((error) {
       if (!mounted) return;
       setState(() => _resendLoading = false);
-      if (error != null) {
+      if (error != null && error.isNotEmpty) {
         setState(() => _error = error);
-      } else {
+      } else if (error == null) {
         _startCountdown();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

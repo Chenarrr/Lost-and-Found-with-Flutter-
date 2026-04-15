@@ -93,9 +93,7 @@ class _AuthScreenState extends State<AuthScreen>
       onCodeSent: (error) {
         if (!mounted) return;
         setState(() => _loading = false);
-        if (error != null) {
-          _showMessage(error, isError: true);
-        } else {
+        if (error == null) {
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (_) => OtpScreen(
@@ -105,7 +103,10 @@ class _AuthScreenState extends State<AuthScreen>
               ),
             ),
           );
+        } else if (error.isNotEmpty) {
+          _showMessage(error, isError: true);
         }
+        // empty string = user cancelled reCAPTCHA, just reset loading
       },
     );
   }
@@ -122,15 +123,16 @@ class _AuthScreenState extends State<AuthScreen>
       onCodeSent: (error) {
         if (!mounted) return;
         setState(() => _loading = false);
-        if (error != null) {
-          _showMessage(error, isError: true);
-        } else {
+        if (error == null) {
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (_) => OtpScreen(phone: phone, name: '', email: null),
             ),
           );
+        } else if (error.isNotEmpty) {
+          _showMessage(error, isError: true);
         }
+        // empty string = user cancelled reCAPTCHA, just reset loading
       },
     );
   }

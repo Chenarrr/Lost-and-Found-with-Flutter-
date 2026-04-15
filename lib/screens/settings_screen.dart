@@ -369,16 +369,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               error = null;
                             });
                             await app.startReauthOtp((err) {
-                              if (err != null) {
+                              if (err == null) {
+                                setState(() {
+                                  sending = false;
+                                  codeSent = true;
+                                });
+                              } else if (err.isNotEmpty) {
                                 setState(() {
                                   sending = false;
                                   error = err;
                                 });
                               } else {
-                                setState(() {
-                                  sending = false;
-                                  codeSent = true;
-                                });
+                                // empty = user cancelled reCAPTCHA
+                                setState(() => sending = false);
                               }
                             });
                           },

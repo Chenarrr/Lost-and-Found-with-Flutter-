@@ -207,6 +207,11 @@ class AppState extends ChangeNotifier {
         },
         verificationFailed: (FirebaseAuthException e) {
           debugPrint('[Auth] Verification failed: ${e.code} - ${e.message}');
+          if (e.code == 'web-context-cancelled') {
+            // User dismissed the reCAPTCHA challenge — not an error, just reset.
+            onCodeSent('');
+            return;
+          }
           String errorMsg;
           switch (e.code) {
             case 'invalid-phone-number':

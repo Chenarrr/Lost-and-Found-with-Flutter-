@@ -108,8 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
       side: BorderSide(
         color: isActive ? Colors.transparent : cs.outlineVariant,
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-      visualDensity: VisualDensity.compact,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
     );
   }
 
@@ -138,8 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
       side: BorderSide(
         color: isActive ? Colors.transparent : cs.outlineVariant,
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-      visualDensity: VisualDensity.compact,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
     );
   }
 
@@ -243,8 +241,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final l10n = context.l10n;
     final cs = Theme.of(context).colorScheme;
     final app = context.watch<AppState>();
-    final postsSource = app.posts;
-    final posts = postsSource.where((post) {
+    final posts = app.posts.where((post) {
       final matchesCity =
           _cityFilter == 'All Cities' || post.city == _cityFilter;
       final matchesSearch =
@@ -264,106 +261,86 @@ class _HomeScreenState extends State<HomeScreen> {
         color: AppColors.primaryBlue,
         child: ListView(
           physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(16, 10, 16, 150),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 150),
           children: [
-            // ── Hero ──────────────────────────────────────────────────────────
+            // ── Hero (stripped) ───────────────────────────────────────────────
             AppPanel(
-              padding: EdgeInsets.zero,
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
               clipBehavior: Clip.antiAlias,
               gradient: const LinearGradient(
-                colors: [AppColors.heroNavy, AppColors.heroBlue, AppColors.heroTeal],
+                colors: [
+                  AppColors.heroNavy,
+                  AppColors.heroBlue,
+                  AppColors.heroTeal,
+                ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      l10n.appName,
-                      style: GoogleFonts.spaceGrotesk(
-                        color: Colors.white,
-                        fontSize: 26,
-                        fontWeight: FontWeight.w700,
-                        height: 1,
-                      ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.appName,
+                    style: GoogleFonts.spaceGrotesk(
+                      color: Colors.white,
+                      fontSize: 28,
+                      fontWeight: FontWeight.w700,
+                      height: 1,
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      l10n.tagline,
-                      style: GoogleFonts.manrope(
-                        color: Colors.white.withAlpha(180),
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
-                      ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    l10n.tagline,
+                    style: GoogleFonts.manrope(
+                      color: Colors.white.withAlpha(180),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
                     ),
-                    const SizedBox(height: 16),
-                    // Search inside hero
-                    TextField(
-                      controller: _searchController,
-                      style: GoogleFonts.manrope(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: l10n.searchHint,
-                        filled: true,
-                        fillColor: Colors.white.withAlpha(20),
-                        prefixIcon: const Icon(
-                          Icons.search_rounded,
-                          color: Colors.white70,
-                          size: 20,
-                        ),
-                        suffixIcon: _searchController.text.isEmpty
-                            ? null
-                            : IconButton(
-                                onPressed: () {
-                                  _searchController.clear();
-                                  _searchDebounce?.cancel();
-                                  setState(() => _searchQuery = '');
-                                },
-                                icon: const Icon(
-                                  Icons.close_rounded,
-                                  color: Colors.white70,
-                                  size: 18,
-                                ),
-                              ),
-                        hintStyle: GoogleFonts.manrope(
-                          color: Colors.white54,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(
-                            color: Colors.white.withAlpha(30),
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(
-                            color: Colors.white.withAlpha(30),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(
-                            color: Colors.white.withAlpha(80),
-                          ),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                      ),
-                      onChanged: (value) {
-                        setState(() {});
-                        _onSearchChanged(value);
-                      },
-                    ),
-                  ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+            // ── Search ────────────────────────────────────────────────────────
+            AppPanel(
+              padding: const EdgeInsets.all(14),
+              child: TextField(
+                controller: _searchController,
+                style: GoogleFonts.manrope(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
                 ),
+                decoration: InputDecoration(
+                  hintText: l10n.searchHint,
+                  prefixIcon: const Icon(
+                    Icons.search_rounded,
+                    color: AppColors.primaryBlue,
+                    size: 20,
+                  ),
+                  suffixIcon: _searchController.text.isEmpty
+                      ? null
+                      : IconButton(
+                          onPressed: () {
+                            _searchController.clear();
+                            _searchDebounce?.cancel();
+                            setState(() => _searchQuery = '');
+                          },
+                          icon: Icon(
+                            Icons.close_rounded,
+                            color: cs.onSurfaceVariant,
+                            size: 18,
+                          ),
+                        ),
+                  isDense: true,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
+                ),
+                onChanged: (value) {
+                  setState(() {});
+                  _onSearchChanged(value);
+                },
               ),
             ),
             const SizedBox(height: 10),
@@ -373,42 +350,55 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Row(
                 children: [
                   // City chip
-                  ActionChip(
-                    avatar: Icon(
-                      Icons.location_on_rounded,
-                      size: 14,
-                      color: _cityFilter != 'All Cities'
-                          ? AppColors.primaryBlue
-                          : cs.onSurfaceVariant,
-                    ),
-                    label: Text(
-                      _cityDisplayName(_cityFilter, l10n),
-                      style: GoogleFonts.manrope(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                        color: _cityFilter != 'All Cities'
-                            ? AppColors.primaryBlue
-                            : cs.onSurface,
+                  GestureDetector(
+                    onTap: () => _showCitySheet(l10n),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
                       ),
-                    ),
-                    onPressed: () => _showCitySheet(l10n),
-                    backgroundColor: _cityFilter != 'All Cities'
-                        ? AppColors.primaryBlue.withAlpha(18)
-                        : (Theme.of(context).brightness == Brightness.dark
-                              ? Colors.white.withAlpha(8)
-                              : Colors.white),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                    side: BorderSide(
-                      color: _cityFilter != 'All Cities'
-                          ? AppColors.primaryBlue.withAlpha(60)
-                          : cs.outlineVariant,
-                    ),
-                    visualDensity: VisualDensity.compact,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 4,
+                      decoration: BoxDecoration(
+                        color: _cityFilter != 'All Cities'
+                            ? AppColors.primaryBlue.withAlpha(18)
+                            : (Theme.of(context).brightness == Brightness.dark
+                                  ? Colors.white.withAlpha(8)
+                                  : Colors.white),
+                        borderRadius: BorderRadius.circular(999),
+                        border: Border.all(
+                          color: _cityFilter != 'All Cities'
+                              ? AppColors.primaryBlue.withAlpha(80)
+                              : cs.outlineVariant,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.location_on_rounded,
+                            size: 14,
+                            color: _cityFilter != 'All Cities'
+                                ? AppColors.primaryBlue
+                                : cs.onSurfaceVariant,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            _cityDisplayName(_cityFilter, l10n),
+                            style: GoogleFonts.manrope(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                              color: _cityFilter != 'All Cities'
+                                  ? AppColors.primaryBlue
+                                  : cs.onSurface,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            size: 14,
+                            color: cs.onSurfaceVariant,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   const SizedBox(width: 6),
@@ -418,11 +408,20 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(width: 6),
                   _typeChip(l10n.found, PostType.found),
                   const SizedBox(width: 6),
-                  _categoryChip(l10n.categoryElectronics, PostCategory.electronics),
+                  _categoryChip(
+                    l10n.categoryElectronics,
+                    PostCategory.electronics,
+                  ),
                   const SizedBox(width: 6),
-                  _categoryChip(l10n.categoryDocuments, PostCategory.documents),
+                  _categoryChip(
+                    l10n.categoryDocuments,
+                    PostCategory.documents,
+                  ),
                   const SizedBox(width: 6),
-                  _categoryChip(l10n.categoryPersonalItems, PostCategory.personalItems),
+                  _categoryChip(
+                    l10n.categoryPersonalItems,
+                    PostCategory.personalItems,
+                  ),
                   const SizedBox(width: 6),
                   _categoryChip(l10n.categoryPets, PostCategory.pets),
                 ],
@@ -432,7 +431,7 @@ class _HomeScreenState extends State<HomeScreen> {
             // ── Posts ─────────────────────────────────────────────────────────
             if (posts.isEmpty)
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 32),
+                padding: const EdgeInsets.symmetric(vertical: 40),
                 child: Column(
                   children: [
                     Icon(
@@ -457,7 +456,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: cs.onSurfaceVariant,
                         fontWeight: FontWeight.w600,
                         fontSize: 13,
-                        height: 1.45,
+                        height: 1.5,
                       ),
                       textAlign: TextAlign.center,
                     ),

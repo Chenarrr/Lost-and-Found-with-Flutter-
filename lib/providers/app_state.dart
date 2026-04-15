@@ -223,6 +223,9 @@ class AppState extends ChangeNotifier {
             case 'app-not-authorized':
               errorMsg = 'Phone auth is not enabled. Please contact support.';
               break;
+            case 'internal-error':
+              errorMsg = 'Verification failed. Check your connection and try again.';
+              break;
             default:
               errorMsg = e.message ?? 'Verification failed. Please try again.';
           }

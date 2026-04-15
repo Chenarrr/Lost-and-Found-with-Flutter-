@@ -425,6 +425,7 @@ class FindItApp extends StatelessWidget {
             theme: _lightTheme(),
             darkTheme: _darkTheme(),
             home: const RootRouter(),
+            onGenerateRoute: (_) => null,
           );
         },
       ),

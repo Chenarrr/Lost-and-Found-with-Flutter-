@@ -4,6 +4,7 @@ import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/screens/auth/otp_screen.dart';
+import 'package:flutter_application/utils/app_route.dart';
 import 'package:flutter_application/utils/phone_input_formatter.dart';
 import 'package:flutter_application/widgets/app_backdrop.dart';
 import 'package:flutter_application/widgets/app_panel.dart';
@@ -17,9 +18,8 @@ class AuthScreen extends StatefulWidget {
   State<AuthScreen> createState() => _AuthScreenState();
 }
 
-class _AuthScreenState extends State<AuthScreen>
-    with SingleTickerProviderStateMixin {
-  late final TabController _tabController;
+class _AuthScreenState extends State<AuthScreen> {
+  int _tab = 0; // 0 = login, 1 = signup
 
   final _sName = TextEditingController();
   final _sPhone = TextEditingController();
@@ -38,14 +38,7 @@ class _AuthScreenState extends State<AuthScreen>
   final _emailReg = RegExp(r'^[\w\.\-]+@([\w\-]+\.)+[\w\-]{2,4}$');
 
   @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-  }
-
-  @override
   void dispose() {
-    _tabController.dispose();
     _sName.dispose();
     _sPhone.dispose();
     _sEmail.dispose();
@@ -93,7 +86,7 @@ class _AuthScreenState extends State<AuthScreen>
         setState(() => _loading = false);
         if (error == null) {
           Navigator.of(context).push(
-            MaterialPageRoute(
+            smoothRoute(
               builder: (_) => OtpScreen(
                 phone: phone,
                 name: _sName.text.trim(),
@@ -122,7 +115,7 @@ class _AuthScreenState extends State<AuthScreen>
         setState(() => _loading = false);
         if (error == null) {
           Navigator.of(context).push(
-            MaterialPageRoute(
+            smoothRoute(
               builder: (_) => OtpScreen(phone: phone, name: '', email: null),
             ),
           );
@@ -139,140 +132,112 @@ class _AuthScreenState extends State<AuthScreen>
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       body: AppBackdrop(
         child: SafeArea(
           child: Stack(
             children: [
-              AnimatedPadding(
-                duration: const Duration(milliseconds: 220),
-                curve: Curves.easeOutCubic,
-                padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom,
-                ),
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
-                  child: TweenAnimationBuilder<double>(
-                    tween: Tween(begin: 0, end: 1),
-                    duration: const Duration(milliseconds: 650),
-                    curve: Curves.easeOutCubic,
-                    builder: (context, value, child) => Opacity(
-                      opacity: value,
-                      child: Transform.translate(
-                        offset: Offset(0, 28 * (1 - value)),
-                        child: child,
+              SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(20, 18, 20, 40),
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Back button
+                    GestureDetector(
+                      onTap: () => Navigator.of(context).maybePop(),
+                      child: AppPanel(
+                        padding: const EdgeInsets.all(12),
+                        borderRadius: BorderRadius.circular(18),
+                        child: Icon(
+                          Icons.arrow_back_rounded,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
                       ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        GestureDetector(
-                          onTap: () => Navigator.of(context).maybePop(),
-                          child: AppPanel(
-                            padding: const EdgeInsets.all(12),
-                            borderRadius: BorderRadius.circular(18),
-                            child: Icon(
-                              Icons.arrow_back_rounded,
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                        AppPanel(
-                          padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-                          clipBehavior: Clip.antiAlias,
-                          gradient: LinearGradient(
-                            colors: isDark
-                                ? const [
-                                    Color(0xFF0B1F3C),
-                                    Color(0xFF113463),
-                                    Color(0xFF0C697F),
-                                  ]
-                                : const [
-                                    AppColors.heroNavy,
-                                    AppColors.heroBlue,
-                                    AppColors.heroTeal,
-                                  ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                l10n.loginOrSignup,
-                                style: GoogleFonts.spaceGrotesk(
-                                  color: Colors.white,
-                                  fontSize: 26,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                l10n.tagline,
-                                style: GoogleFonts.manrope(
-                                  color: Colors.white.withAlpha(180),
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 18),
-                        AppPanel(
-                          padding: const EdgeInsets.all(10),
-                          child: TabBar(
-                            controller: _tabController,
-                            indicator: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [
-                                  AppColors.primaryBlue,
-                                  AppColors.accentIndigo,
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(18),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.primaryBlue.withAlpha(52),
-                                  blurRadius: 18,
-                                  offset: const Offset(0, 10),
-                                ),
+                    const SizedBox(height: 14),
+                    // Hero panel
+                    AppPanel(
+                      padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+                      clipBehavior: Clip.antiAlias,
+                      gradient: LinearGradient(
+                        colors: isDark
+                            ? const [
+                                Color(0xFF0B1F3C),
+                                Color(0xFF113463),
+                                Color(0xFF0C697F),
+                              ]
+                            : const [
+                                AppColors.heroNavy,
+                                AppColors.heroBlue,
+                                AppColors.heroTeal,
                               ],
-                            ),
-                            dividerColor: Colors.transparent,
-                            labelColor: Colors.white,
-                            unselectedLabelColor: Theme.of(
-                              context,
-                            ).colorScheme.onSurfaceVariant,
-                            labelStyle: GoogleFonts.manrope(
-                              fontWeight: FontWeight.w800,
-                              fontSize: 15,
-                            ),
-                            unselectedLabelStyle: GoogleFonts.manrope(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.loginOrSignup,
+                            style: GoogleFonts.spaceGrotesk(
+                              color: Colors.white,
+                              fontSize: 26,
                               fontWeight: FontWeight.w700,
-                              fontSize: 15,
                             ),
-                            tabs: [
-                              Tab(text: l10n.loginTab),
-                              Tab(text: l10n.signupTab),
-                            ],
                           ),
-                        ),
-                        const SizedBox(height: 16),
-                        SizedBox(
-                          height: 620,
-                          child: TabBarView(
-                            controller: _tabController,
-                            children: [
-                              _buildLoginPane(l10n),
-                              _buildSignupPane(l10n),
-                            ],
+                          const SizedBox(height: 6),
+                          Text(
+                            l10n.tagline,
+                            style: GoogleFonts.manrope(
+                              color: Colors.white.withAlpha(180),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 18),
+                    // Segmented toggle
+                    _SegmentedToggle(
+                      selected: _tab,
+                      loginLabel: l10n.loginTab,
+                      signupLabel: l10n.signupTab,
+                      onTap: (i) => setState(() => _tab = i),
+                    ),
+                    const SizedBox(height: 16),
+                    // Animated content switch
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 260),
+                      switchInCurve: Curves.easeOutCubic,
+                      switchOutCurve: Curves.easeInCubic,
+                      transitionBuilder: (child, animation) {
+                        final fade = CurvedAnimation(
+                          parent: animation,
+                          curve: Curves.easeOutCubic,
+                        );
+                        final slide =
+                            Tween(
+                              begin: const Offset(0, 0.04),
+                              end: Offset.zero,
+                            ).animate(
+                              CurvedAnimation(
+                                parent: animation,
+                                curve: Curves.easeOutCubic,
+                              ),
+                            );
+                        return FadeTransition(
+                          opacity: fade,
+                          child: SlideTransition(position: slide, child: child),
+                        );
+                      },
+                      child: _tab == 0
+                          ? _buildLoginPane(l10n, key: const ValueKey(0))
+                          : _buildSignupPane(l10n, key: const ValueKey(1)),
+                    ),
+                  ],
                 ),
               ),
               if (_loading)
@@ -291,8 +256,9 @@ class _AuthScreenState extends State<AuthScreen>
     );
   }
 
-  Widget _buildLoginPane(AppLocalizations l10n) {
+  Widget _buildLoginPane(AppLocalizations l10n, {Key? key}) {
     return AppPanel(
+      key: key,
       child: Form(
         key: _formKeyLogin,
         child: Column(
@@ -333,87 +299,81 @@ class _AuthScreenState extends State<AuthScreen>
     );
   }
 
-  Widget _buildSignupPane(AppLocalizations l10n) {
+  Widget _buildSignupPane(AppLocalizations l10n, {Key? key}) {
     return AppPanel(
+      key: key,
       child: Form(
         key: _formKeySignup,
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                l10n.signupTab,
-                style: GoogleFonts.spaceGrotesk(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w700,
-                ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.signupTab,
+              style: GoogleFonts.spaceGrotesk(
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
               ),
-              const SizedBox(height: 8),
-              Text(
-                l10n.shareDetails,
-                style: GoogleFonts.manrope(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  fontWeight: FontWeight.w600,
-                ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              l10n.shareDetails,
+              style: GoogleFonts.manrope(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.w600,
               ),
-              const SizedBox(height: 20),
-              _buildTextField(
-                controller: _sName,
-                label: l10n.namePlaceholder,
-                icon: Icons.person_rounded,
-                textInputAction: TextInputAction.next,
-                validator: (v) => (v == null || v.trim().length < 2)
-                    ? l10n.nameTooShort
-                    : null,
-              ),
-              const SizedBox(height: 14),
-              _buildPhoneField(
-                controller: _sPhone,
-                l10n: l10n,
-                isRequired: true,
-              ),
-              const SizedBox(height: 14),
-              _buildSectionLabel(l10n.genderLabel),
-              const SizedBox(height: 10),
-              _buildGenderSelector(l10n),
-              const SizedBox(height: 14),
-              _buildTextField(
-                controller: _sAge,
-                label: l10n.ageLabel,
-                icon: Icons.cake_rounded,
-                keyboardType: TextInputType.number,
-                textInputAction: TextInputAction.next,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                validator: (v) {
-                  if (v == null || v.trim().isEmpty) return l10n.ageRequired;
-                  final age = int.tryParse(v.trim());
-                  if (age == null || age < 13 || age > 100) {
-                    return l10n.ageInvalid;
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 14),
-              _buildTextField(
-                controller: _sEmail,
-                label: l10n.emailPlaceholder,
-                icon: Icons.email_rounded,
-                keyboardType: TextInputType.emailAddress,
-                textInputAction: TextInputAction.done,
-                onSubmitted: (_) => _doSignup(),
-                validator: (v) {
-                  if (v != null &&
-                      v.trim().isNotEmpty &&
-                      !_emailReg.hasMatch(v.trim())) {
-                    return l10n.emailInvalid;
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 22),
-              _buildSubmitButton(l10n.sendOtp, _doSignup),
-            ],
-          ),
+            ),
+            const SizedBox(height: 20),
+            _buildTextField(
+              controller: _sName,
+              label: l10n.namePlaceholder,
+              icon: Icons.person_rounded,
+              textInputAction: TextInputAction.next,
+              validator: (v) =>
+                  (v == null || v.trim().length < 2) ? l10n.nameTooShort : null,
+            ),
+            const SizedBox(height: 14),
+            _buildPhoneField(controller: _sPhone, l10n: l10n, isRequired: true),
+            const SizedBox(height: 14),
+            _buildSectionLabel(l10n.genderLabel),
+            const SizedBox(height: 10),
+            _buildGenderSelector(l10n),
+            const SizedBox(height: 14),
+            _buildTextField(
+              controller: _sAge,
+              label: l10n.ageLabel,
+              icon: Icons.cake_rounded,
+              keyboardType: TextInputType.number,
+              textInputAction: TextInputAction.next,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              validator: (v) {
+                if (v == null || v.trim().isEmpty) return l10n.ageRequired;
+                final age = int.tryParse(v.trim());
+                if (age == null || age < 13 || age > 100) {
+                  return l10n.ageInvalid;
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 14),
+            _buildTextField(
+              controller: _sEmail,
+              label: l10n.emailPlaceholder,
+              icon: Icons.email_rounded,
+              keyboardType: TextInputType.emailAddress,
+              textInputAction: TextInputAction.done,
+              onSubmitted: (_) => _doSignup(),
+              validator: (v) {
+                if (v != null &&
+                    v.trim().isNotEmpty &&
+                    !_emailReg.hasMatch(v.trim())) {
+                  return l10n.emailInvalid;
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 22),
+            _buildSubmitButton(l10n.sendOtp, _doSignup),
+          ],
         ),
       ),
     );
@@ -564,6 +524,102 @@ class _AuthScreenState extends State<AuthScreen>
   }
 }
 
+// ── Segmented toggle ─────────────────────────────────────────────────────────
+
+class _SegmentedToggle extends StatelessWidget {
+  const _SegmentedToggle({
+    required this.selected,
+    required this.loginLabel,
+    required this.signupLabel,
+    required this.onTap,
+  });
+
+  final int selected;
+  final String loginLabel;
+  final String signupLabel;
+  final ValueChanged<int> onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppPanel(
+      padding: const EdgeInsets.all(5),
+      child: Row(
+        children: [
+          _ToggleTab(
+            label: loginLabel,
+            selected: selected == 0,
+            onTap: () => onTap(0),
+          ),
+          _ToggleTab(
+            label: signupLabel,
+            selected: selected == 1,
+            onTap: () => onTap(1),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ToggleTab extends StatelessWidget {
+  const _ToggleTab({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          decoration: BoxDecoration(
+            gradient: selected
+                ? const LinearGradient(
+                    colors: [AppColors.primaryBlue, AppColors.accentIndigo],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  )
+                : null,
+            color: selected ? null : Colors.transparent,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: selected
+                ? [
+                    BoxShadow(
+                      color: AppColors.primaryBlue.withAlpha(46),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6),
+                    ),
+                  ]
+                : null,
+          ),
+          alignment: Alignment.center,
+          child: AnimatedDefaultTextStyle(
+            duration: const Duration(milliseconds: 200),
+            style: GoogleFonts.manrope(
+              fontSize: 15,
+              fontWeight: FontWeight.w800,
+              color: selected ? Colors.white : cs.onSurfaceVariant,
+            ),
+            child: Text(label),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Info card ────────────────────────────────────────────────────────────────
 
 class _InfoCard extends StatelessWidget {
   const _InfoCard({required this.icon, required this.text});
@@ -605,6 +661,8 @@ class _InfoCard extends StatelessWidget {
   }
 }
 
+// ── Gender chip ──────────────────────────────────────────────────────────────
+
 class _GenderChip extends StatelessWidget {
   const _GenderChip({
     required this.label,
@@ -625,7 +683,7 @@ class _GenderChip extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
+        duration: const Duration(milliseconds: 200),
         curve: Curves.easeOutCubic,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
@@ -650,9 +708,9 @@ class _GenderChip extends StatelessWidget {
           boxShadow: selected
               ? [
                   BoxShadow(
-                    color: AppColors.primaryBlue.withAlpha(50),
-                    blurRadius: 18,
-                    offset: const Offset(0, 12),
+                    color: AppColors.primaryBlue.withAlpha(44),
+                    blurRadius: 14,
+                    offset: const Offset(0, 8),
                   ),
                 ]
               : null,

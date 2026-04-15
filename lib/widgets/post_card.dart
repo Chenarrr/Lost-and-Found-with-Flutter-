@@ -115,7 +115,9 @@ class PostCard extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(999),
                               ),
                               child: Text(
-                                isLost ? l10n.typeLostUpper : l10n.typeFoundUpper,
+                                isLost
+                                    ? l10n.typeLostUpper
+                                    : l10n.typeFoundUpper,
                                 style: GoogleFonts.manrope(
                                   color: Colors.white,
                                   fontSize: 10,

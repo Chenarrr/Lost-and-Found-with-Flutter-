@@ -413,10 +413,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     PostCategory.electronics,
                   ),
                   const SizedBox(width: 6),
-                  _categoryChip(
-                    l10n.categoryDocuments,
-                    PostCategory.documents,
-                  ),
+                  _categoryChip(l10n.categoryDocuments, PostCategory.documents),
                   const SizedBox(width: 6),
                   _categoryChip(
                     l10n.categoryPersonalItems,

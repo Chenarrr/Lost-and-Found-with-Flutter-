@@ -22,15 +22,13 @@ class LangToggle extends StatelessWidget {
             label: 'English',
             native: 'EN',
             selected: code == 'en',
-            onTap: () =>
-                context.read<AppState>().setLocale(const Locale('en')),
+            onTap: () => context.read<AppState>().setLocale(const Locale('en')),
           ),
           _LangRow(
             label: 'العربية',
             native: 'AR',
             selected: code == 'ar',
-            onTap: () =>
-                context.read<AppState>().setLocale(const Locale('ar')),
+            onTap: () => context.read<AppState>().setLocale(const Locale('ar')),
           ),
           _LangRow(
             label: 'کوردی',
@@ -74,8 +72,7 @@ class _LangRow extends StatelessWidget {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             curve: Curves.easeOutCubic,
-            padding:
-                const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
             decoration: BoxDecoration(
               color: selected
                   ? AppColors.primaryBlue.withAlpha(18)
@@ -115,11 +112,8 @@ class _LangRow extends StatelessWidget {
                     label,
                     style: GoogleFonts.manrope(
                       fontSize: 15,
-                      fontWeight:
-                          selected ? FontWeight.w800 : FontWeight.w600,
-                      color: selected
-                          ? AppColors.primaryBlue
-                          : cs.onSurface,
+                      fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                      color: selected ? AppColors.primaryBlue : cs.onSurface,
                     ),
                   ),
                 ),

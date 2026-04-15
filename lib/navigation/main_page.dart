@@ -6,6 +6,7 @@ import 'package:flutter_application/screens/activity_screen.dart';
 import 'package:flutter_application/screens/home_screen.dart';
 import 'package:flutter_application/screens/post/create_post_sheet.dart';
 import 'package:flutter_application/screens/profile_screen.dart';
+import 'package:flutter_application/utils/app_route.dart';
 import 'package:flutter_application/widgets/app_panel.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -28,7 +29,7 @@ class _MainPageState extends State<MainPage> {
 
   void _openCreatePost() {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      smoothRoute(
         builder: (_) => CreatePostSheet(
           onGoHome: () {
             if (!mounted) return;

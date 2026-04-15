@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/screens/auth/auth_screen.dart';
+import 'package:flutter_application/utils/app_route.dart';
 import 'package:flutter_application/widgets/app_backdrop.dart';
 import 'package:flutter_application/widgets/lang_toggle.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -18,7 +19,7 @@ class WelcomeScreen extends StatelessWidget {
         child: SafeArea(
           child: TweenAnimationBuilder<double>(
             tween: Tween(begin: 0, end: 1),
-            duration: const Duration(milliseconds: 600),
+            duration: const Duration(milliseconds: 380),
             curve: Curves.easeOutCubic,
             builder: (context, value, child) => Opacity(
               opacity: value,
@@ -99,9 +100,9 @@ class WelcomeScreen extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () => Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const AuthScreen()),
-                      ),
+                      onPressed: () => Navigator.of(
+                        context,
+                      ).push(smoothRoute(builder: (_) => const AuthScreen())),
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.zero,
                         backgroundColor: Colors.transparent,

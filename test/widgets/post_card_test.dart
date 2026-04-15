@@ -102,9 +102,7 @@ void main() {
     });
 
     testWidgets('displays city in location row', (tester) async {
-      await tester.pumpWidget(
-        _buildTestApp(_makePost(city: 'Sulaymaniyah')),
-      );
+      await tester.pumpWidget(_buildTestApp(_makePost(city: 'Sulaymaniyah')));
       await tester.pumpAndSettle();
 
       // PostCard shows "${city} · ${timeago}" format

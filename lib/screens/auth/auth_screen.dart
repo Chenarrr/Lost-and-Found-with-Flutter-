@@ -182,7 +182,7 @@ class _AuthScreenState extends State<AuthScreen>
                         const Center(child: LangToggle()),
                         const SizedBox(height: 20),
                         AppPanel(
-                          padding: EdgeInsets.zero,
+                          padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
                           clipBehavior: Clip.antiAlias,
                           gradient: LinearGradient(
                             colors: isDark
@@ -199,63 +199,24 @@ class _AuthScreenState extends State<AuthScreen>
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
-                          child: Stack(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Positioned(
-                                top: -32,
-                                right: -10,
-                                child: Container(
-                                  width: 120,
-                                  height: 120,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.white.withAlpha(16),
-                                  ),
+                              Text(
+                                l10n.loginOrSignup,
+                                style: GoogleFonts.spaceGrotesk(
+                                  color: Colors.white,
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
-                              Padding(
-                                padding: const EdgeInsets.all(22),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      l10n.loginOrSignup,
-                                      style: GoogleFonts.spaceGrotesk(
-                                        color: Colors.white,
-                                        fontSize: 28,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      l10n.tagline,
-                                      style: GoogleFonts.manrope(
-                                        color: Colors.white.withAlpha(204),
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                        height: 1.45,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 18),
-                                    Wrap(
-                                      spacing: 10,
-                                      runSpacing: 10,
-                                      children: [
-                                        _HeroPill(
-                                          icon: Icons.login_rounded,
-                                          label: l10n.loginTab,
-                                        ),
-                                        _HeroPill(
-                                          icon: Icons.person_add_alt_1_rounded,
-                                          label: l10n.signupTab,
-                                        ),
-                                        _HeroPill(
-                                          icon: Icons.sms_rounded,
-                                          label: l10n.sendOtp,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                              const SizedBox(height: 6),
+                              Text(
+                                l10n.tagline,
+                                style: GoogleFonts.manrope(
+                                  color: Colors.white.withAlpha(180),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ],
@@ -606,38 +567,6 @@ class _AuthScreenState extends State<AuthScreen>
   }
 }
 
-class _HeroPill extends StatelessWidget {
-  const _HeroPill({required this.icon, required this.label});
-
-  final IconData icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white.withAlpha(16),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: Colors.white.withAlpha(14)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 16, color: Colors.white),
-          const SizedBox(width: 8),
-          Text(
-            label,
-            style: GoogleFonts.manrope(
-              color: Colors.white,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _InfoCard extends StatelessWidget {
   const _InfoCard({required this.icon, required this.text});

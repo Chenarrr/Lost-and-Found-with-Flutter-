@@ -94,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
         style: GoogleFonts.manrope(
           color: isActive ? Colors.white : cs.onSurface,
           fontWeight: FontWeight.w800,
-          fontSize: 13,
+          fontSize: 12,
         ),
       ),
       selected: isActive,
@@ -108,7 +108,8 @@ class _HomeScreenState extends State<HomeScreen> {
       side: BorderSide(
         color: isActive ? Colors.transparent : cs.outlineVariant,
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+      visualDensity: VisualDensity.compact,
     );
   }
 
@@ -122,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
         style: GoogleFonts.manrope(
           color: isActive ? Colors.white : cs.onSurface,
           fontWeight: FontWeight.w800,
-          fontSize: 13,
+          fontSize: 12,
         ),
       ),
       selected: isActive,
@@ -137,7 +138,8 @@ class _HomeScreenState extends State<HomeScreen> {
       side: BorderSide(
         color: isActive ? Colors.transparent : cs.outlineVariant,
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+      visualDensity: VisualDensity.compact,
     );
   }
 
@@ -186,18 +188,19 @@ class _HomeScreenState extends State<HomeScreen> {
                         vertical: 2,
                       ),
                       leading: Container(
-                        width: 42,
-                        height: 42,
+                        width: 36,
+                        height: 36,
                         decoration: BoxDecoration(
                           color: city == _cityFilter
                               ? AppColors.primaryBlue.withAlpha(18)
                               : sheetCs.surfaceContainerHighest,
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(
                           city == 'All Cities'
                               ? Icons.public_rounded
                               : Icons.location_on_rounded,
+                          size: 18,
                           color: city == _cityFilter
                               ? AppColors.primaryBlue
                               : sheetCs.onSurfaceVariant,
@@ -208,7 +211,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         style: GoogleFonts.manrope(
                           fontWeight: city == _cityFilter
                               ? FontWeight.w800
-                              : FontWeight.w700,
+                              : FontWeight.w600,
                           color: city == _cityFilter
                               ? AppColors.primaryBlue
                               : sheetCs.onSurface,
@@ -218,6 +221,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ? const Icon(
                               Icons.check_circle_rounded,
                               color: AppColors.primaryBlue,
+                              size: 18,
                             )
                           : null,
                       onTap: () {
@@ -254,307 +258,210 @@ class _HomeScreenState extends State<HomeScreen> {
       return matchesCity && matchesSearch && matchesType && matchesCategory;
     }).toList();
 
-    final lostCount = posts.where((post) => post.type == PostType.lost).length;
-    final foundCount = posts.length - lostCount;
-
     return AppBackdrop(
       child: RefreshIndicator(
         onRefresh: _onRefresh,
         color: AppColors.primaryBlue,
         child: ListView(
           physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(18, 14, 18, 150),
+          padding: const EdgeInsets.fromLTRB(16, 10, 16, 150),
           children: [
+            // ── Hero ──────────────────────────────────────────────────────────
             AppPanel(
               padding: EdgeInsets.zero,
               clipBehavior: Clip.antiAlias,
               gradient: const LinearGradient(
-                colors: [
-                  AppColors.heroNavy,
-                  AppColors.heroBlue,
-                  AppColors.heroTeal,
-                ],
+                colors: [AppColors.heroNavy, AppColors.heroBlue, AppColors.heroTeal],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              child: Stack(
-                children: [
-                  Positioned(
-                    top: -44,
-                    right: -8,
-                    child: Container(
-                      width: 150,
-                      height: 150,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white.withAlpha(14),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.appName,
+                      style: GoogleFonts.spaceGrotesk(
+                        color: Colors.white,
+                        fontSize: 26,
+                        fontWeight: FontWeight.w700,
+                        height: 1,
                       ),
                     ),
-                  ),
-                  Positioned(
-                    bottom: -60,
-                    left: -16,
-                    child: Container(
-                      width: 180,
-                      height: 180,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white.withAlpha(10),
+                    const SizedBox(height: 4),
+                    Text(
+                      l10n.tagline,
+                      style: GoogleFonts.manrope(
+                        color: Colors.white.withAlpha(180),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(22),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Wrap(
-                          spacing: 10,
-                          runSpacing: 10,
-                          children: [
-                            _HeroPill(
-                              icon: Icons.radar_rounded,
-                              label: l10n.resultsCount(posts.length),
-                            ),
-                            _HeroPill(
-                              icon: Icons.location_on_rounded,
-                              label: _cityDisplayName(_cityFilter, l10n),
-                            ),
-                          ],
+                    const SizedBox(height: 16),
+                    // Search inside hero
+                    TextField(
+                      controller: _searchController,
+                      style: GoogleFonts.manrope(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: l10n.searchHint,
+                        filled: true,
+                        fillColor: Colors.white.withAlpha(20),
+                        prefixIcon: const Icon(
+                          Icons.search_rounded,
+                          color: Colors.white70,
+                          size: 20,
                         ),
-                        const SizedBox(height: 18),
-                        Text(
-                          l10n.appName,
-                          style: GoogleFonts.spaceGrotesk(
-                            color: Colors.white,
-                            fontSize: 32,
-                            fontWeight: FontWeight.w700,
-                            height: 1,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          l10n.tagline,
-                          style: GoogleFonts.manrope(
-                            color: Colors.white.withAlpha(210),
-                            fontWeight: FontWeight.w600,
-                            height: 1.45,
-                          ),
-                        ),
-                        const SizedBox(height: 22),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _MetricCard(
-                                label: l10n.lostBadge(lostCount),
-                                icon: Icons.search_rounded,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: _MetricCard(
-                                label: l10n.foundBadge(foundCount),
-                                icon: Icons.volunteer_activism_rounded,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            AppPanel(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    l10n.searchHint,
-                    style: GoogleFonts.spaceGrotesk(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: cs.onSurface,
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  TextField(
-                    controller: _searchController,
-                    style: GoogleFonts.manrope(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: l10n.searchHint,
-                      prefixIcon: const Icon(
-                        Icons.search_rounded,
-                        color: AppColors.primaryBlue,
-                      ),
-                      suffixIcon: _searchController.text.isEmpty
-                          ? null
-                          : IconButton(
-                              onPressed: () {
-                                _searchController.clear();
-                                _searchDebounce?.cancel();
-                                setState(() => _searchQuery = '');
-                              },
-                              icon: Icon(
-                                Icons.close_rounded,
-                                color: cs.onSurfaceVariant,
-                              ),
-                            ),
-                    ),
-                    onChanged: (value) {
-                      setState(() {});
-                      _onSearchChanged(value);
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  GestureDetector(
-                    onTap: () => _showCitySheet(l10n),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 14,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white.withAlpha(8)
-                            : AppColors.frost,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: cs.outlineVariant),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryBlue.withAlpha(18),
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                            child: const Icon(
-                              Icons.location_on_rounded,
-                              color: AppColors.primaryBlue,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  l10n.filterByCity,
-                                  style: GoogleFonts.manrope(
-                                    color: cs.onSurfaceVariant,
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 12,
-                                  ),
+                        suffixIcon: _searchController.text.isEmpty
+                            ? null
+                            : IconButton(
+                                onPressed: () {
+                                  _searchController.clear();
+                                  _searchDebounce?.cancel();
+                                  setState(() => _searchQuery = '');
+                                },
+                                icon: const Icon(
+                                  Icons.close_rounded,
+                                  color: Colors.white70,
+                                  size: 18,
                                 ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  _cityDisplayName(_cityFilter, l10n),
-                                  style: GoogleFonts.manrope(
-                                    color: cs.onSurface,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Icon(
-                            Icons.keyboard_arrow_down_rounded,
-                            color: cs.onSurfaceVariant,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        _typeChip(l10n.all, null),
-                        const SizedBox(width: 8),
-                        _typeChip(l10n.lost, PostType.lost),
-                        const SizedBox(width: 8),
-                        _typeChip(l10n.found, PostType.found),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        _categoryChip(l10n.allCategories, null),
-                        const SizedBox(width: 8),
-                        _categoryChip(
-                          l10n.categoryElectronics,
-                          PostCategory.electronics,
-                        ),
-                        const SizedBox(width: 8),
-                        _categoryChip(
-                          l10n.categoryDocuments,
-                          PostCategory.documents,
-                        ),
-                        const SizedBox(width: 8),
-                        _categoryChip(
-                          l10n.categoryPersonalItems,
-                          PostCategory.personalItems,
-                        ),
-                        const SizedBox(width: 8),
-                        _categoryChip(l10n.categoryPets, PostCategory.pets),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 18),
-            if (posts.isEmpty)
-              AppPanel(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 88,
-                        height: 88,
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryBlue.withAlpha(16),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.search_off_rounded,
-                          size: 40,
-                          color: AppColors.primaryBlue,
-                        ),
-                      ),
-                      const SizedBox(height: 18),
-                      Text(
-                        l10n.noItemsFound,
-                        style: GoogleFonts.spaceGrotesk(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                          color: cs.onSurface,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        l10n.noItemsFoundHint,
-                        style: GoogleFonts.manrope(
-                          color: cs.onSurfaceVariant,
+                              ),
+                        hintStyle: GoogleFonts.manrope(
+                          color: Colors.white54,
                           fontWeight: FontWeight.w600,
-                          height: 1.45,
+                          fontSize: 14,
                         ),
-                        textAlign: TextAlign.center,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(
+                            color: Colors.white.withAlpha(30),
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(
+                            color: Colors.white.withAlpha(30),
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(
+                            color: Colors.white.withAlpha(80),
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
                       ),
-                    ],
+                      onChanged: (value) {
+                        setState(() {});
+                        _onSearchChanged(value);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            // ── Filters ───────────────────────────────────────────────────────
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  // City chip
+                  ActionChip(
+                    avatar: Icon(
+                      Icons.location_on_rounded,
+                      size: 14,
+                      color: _cityFilter != 'All Cities'
+                          ? AppColors.primaryBlue
+                          : cs.onSurfaceVariant,
+                    ),
+                    label: Text(
+                      _cityDisplayName(_cityFilter, l10n),
+                      style: GoogleFonts.manrope(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                        color: _cityFilter != 'All Cities'
+                            ? AppColors.primaryBlue
+                            : cs.onSurface,
+                      ),
+                    ),
+                    onPressed: () => _showCitySheet(l10n),
+                    backgroundColor: _cityFilter != 'All Cities'
+                        ? AppColors.primaryBlue.withAlpha(18)
+                        : (Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white.withAlpha(8)
+                              : Colors.white),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    side: BorderSide(
+                      color: _cityFilter != 'All Cities'
+                          ? AppColors.primaryBlue.withAlpha(60)
+                          : cs.outlineVariant,
+                    ),
+                    visualDensity: VisualDensity.compact,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 4,
+                    ),
                   ),
+                  const SizedBox(width: 6),
+                  _typeChip(l10n.all, null),
+                  const SizedBox(width: 6),
+                  _typeChip(l10n.lost, PostType.lost),
+                  const SizedBox(width: 6),
+                  _typeChip(l10n.found, PostType.found),
+                  const SizedBox(width: 6),
+                  _categoryChip(l10n.categoryElectronics, PostCategory.electronics),
+                  const SizedBox(width: 6),
+                  _categoryChip(l10n.categoryDocuments, PostCategory.documents),
+                  const SizedBox(width: 6),
+                  _categoryChip(l10n.categoryPersonalItems, PostCategory.personalItems),
+                  const SizedBox(width: 6),
+                  _categoryChip(l10n.categoryPets, PostCategory.pets),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            // ── Posts ─────────────────────────────────────────────────────────
+            if (posts.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 32),
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.search_off_rounded,
+                      size: 40,
+                      color: cs.onSurfaceVariant,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      l10n.noItemsFound,
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: cs.onSurface,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      l10n.noItemsFoundHint,
+                      style: GoogleFonts.manrope(
+                        color: cs.onSurfaceVariant,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                        height: 1.45,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
               )
             else
@@ -563,83 +470,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _HeroPill extends StatelessWidget {
-  const _HeroPill({required this.icon, required this.label});
-
-  final IconData icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white.withAlpha(16),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: Colors.white.withAlpha(14)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 16, color: Colors.white),
-          const SizedBox(width: 8),
-          Text(
-            label,
-            style: GoogleFonts.manrope(
-              color: Colors.white,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _MetricCard extends StatelessWidget {
-  const _MetricCard({required this.label, required this.icon});
-
-  final String label;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white.withAlpha(14),
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withAlpha(12)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(
-              color: Colors.white.withAlpha(16),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            alignment: Alignment.center,
-            child: Icon(icon, color: Colors.white, size: 18),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              label,
-              style: GoogleFonts.manrope(
-                color: Colors.white,
-                fontWeight: FontWeight.w800,
-                height: 1.25,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

@@ -51,11 +51,10 @@ class _MainPageState extends State<MainPage> {
       extendBody: true,
       appBar: showHomeAppBar
           ? AppBar(
-              toolbarHeight: 86,
-              titleSpacing: 10,
-              leadingWidth: 76,
+              titleSpacing: 12,
+              leadingWidth: 60,
               leading: Padding(
-                padding: const EdgeInsets.fromLTRB(18, 14, 0, 14),
+                padding: const EdgeInsets.fromLTRB(14, 10, 0, 10),
                 child: Container(
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
@@ -63,14 +62,7 @@ class _MainPageState extends State<MainPage> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primaryBlue.withAlpha(58),
-                        blurRadius: 22,
-                        offset: const Offset(0, 12),
-                      ),
-                    ],
+                    borderRadius: BorderRadius.circular(14),
                   ),
                   alignment: Alignment.center,
                   child: Text(
@@ -78,55 +70,21 @@ class _MainPageState extends State<MainPage> {
                     style: GoogleFonts.spaceGrotesk(
                       color: Colors.white,
                       fontWeight: FontWeight.w700,
-                      fontSize: 22,
+                      fontSize: 18,
                     ),
                   ),
                 ),
               ),
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    currentUser?.name.isNotEmpty == true
-                        ? currentUser!.name
-                        : l10n.appName,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.spaceGrotesk(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 24,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                  Text(
-                    l10n.tagline,
-                    style: GoogleFonts.manrope(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 12,
-                      color: isDark
-                          ? Colors.white.withAlpha(190)
-                          : AppColors.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-              flexibleSpace: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: isDark
-                        ? const [
-                            Color(0xFF09192F),
-                            Color(0xFF0D213A),
-                            Color(0xFF08111E),
-                          ]
-                        : const [
-                            Color(0xFFF5FAFF),
-                            Color(0xFFEAF4FF),
-                            Color(0xFFF7FBFF),
-                          ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+              title: Text(
+                currentUser?.name.isNotEmpty == true
+                    ? currentUser!.name
+                    : l10n.appName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.spaceGrotesk(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 20,
+                  letterSpacing: -0.5,
                 ),
               ),
               actions: [
@@ -138,18 +96,16 @@ class _MainPageState extends State<MainPage> {
                     isDark ? ThemeMode.light : ThemeMode.dark,
                   ),
                 ),
-                const SizedBox(width: 8),
-                _TopAction(icon: Icons.add_rounded, onTap: _openCreatePost),
-                const SizedBox(width: 18),
+                const SizedBox(width: 14),
               ],
             )
           : null,
       body: IndexedStack(index: _selectedIndex, children: _tabs),
       bottomNavigationBar: SafeArea(
-        minimum: const EdgeInsets.fromLTRB(16, 0, 16, 18),
+        minimum: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         child: AppPanel(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-          borderRadius: BorderRadius.circular(30),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          borderRadius: BorderRadius.circular(26),
           color: isDark
               ? const Color(0xFF102038).withAlpha(236)
               : Colors.white.withAlpha(236),
@@ -193,9 +149,9 @@ class _MainPageState extends State<MainPage> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primaryBlue.withAlpha(84),
-              blurRadius: 26,
-              offset: const Offset(0, 14),
+              color: AppColors.primaryBlue.withAlpha(70),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
             ),
           ],
         ),
@@ -229,12 +185,16 @@ class _TopAction extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AppPanel(
-        padding: const EdgeInsets.all(10),
-        borderRadius: BorderRadius.circular(18),
+        padding: const EdgeInsets.all(8),
+        borderRadius: BorderRadius.circular(14),
         color: isDark
             ? Colors.white.withAlpha(10)
             : Colors.white.withAlpha(218),
-        child: Icon(icon, color: Theme.of(context).colorScheme.onSurface),
+        child: Icon(
+          icon,
+          size: 20,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
       ),
     );
   }
@@ -260,33 +220,30 @@ class _NavItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
+        duration: const Duration(milliseconds: 200),
         curve: Curves.easeOutCubic,
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         decoration: BoxDecoration(
-          gradient: selected
-              ? const LinearGradient(
-                  colors: [AppColors.primaryBlue, AppColors.accentIndigo],
-                )
-              : null,
-          color: selected ? null : Colors.transparent,
-          borderRadius: BorderRadius.circular(22),
+          color: selected
+              ? AppColors.primaryBlue.withAlpha(20)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(18),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               icon,
-              color: selected ? Colors.white : cs.onSurfaceVariant,
+              color: selected ? AppColors.primaryBlue : cs.onSurfaceVariant,
               size: 22,
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 4),
             Text(
               label,
               style: GoogleFonts.manrope(
-                fontSize: 12,
+                fontSize: 11,
                 fontWeight: FontWeight.w800,
-                color: selected ? Colors.white : cs.onSurfaceVariant,
+                color: selected ? AppColors.primaryBlue : cs.onSurfaceVariant,
               ),
             ),
           ],

@@ -126,31 +126,57 @@ class ActivityScreen extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(18, 14, 18, 0),
                   child: AppPanel(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(6),
                     child: TabBar(
+                      indicatorSize: TabBarIndicatorSize.tab,
+                      indicatorPadding: const EdgeInsets.all(2),
                       indicator: BoxDecoration(
                         gradient: const LinearGradient(
                           colors: [
                             AppColors.primaryBlue,
                             AppColors.accentIndigo,
                           ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                        borderRadius: BorderRadius.circular(18),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primaryBlue.withAlpha(40),
+                            blurRadius: 14,
+                            offset: const Offset(0, 7),
+                          ),
+                        ],
                       ),
                       dividerColor: Colors.transparent,
                       labelColor: Colors.white,
                       unselectedLabelColor: Theme.of(
                         context,
                       ).colorScheme.onSurfaceVariant,
+                      overlayColor: const WidgetStatePropertyAll(
+                        Colors.transparent,
+                      ),
                       labelStyle: GoogleFonts.manrope(
                         fontWeight: FontWeight.w800,
+                        fontSize: 13,
                       ),
                       unselectedLabelStyle: GoogleFonts.manrope(
                         fontWeight: FontWeight.w700,
+                        fontSize: 13,
                       ),
                       tabs: [
-                        Tab(text: l10n.myPostsTab(userPosts.length)),
-                        Tab(text: l10n.myCommentsTab(userComments.length)),
+                        Tab(
+                          child: _ActivityTabLabel(
+                            icon: Icons.inventory_2_rounded,
+                            label: l10n.myPostsTab(userPosts.length),
+                          ),
+                        ),
+                        Tab(
+                          child: _ActivityTabLabel(
+                            icon: Icons.chat_bubble_outline_rounded,
+                            label: l10n.myCommentsTab(userComments.length),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -161,10 +187,9 @@ class ActivityScreen extends StatelessWidget {
                       if (userPosts.isEmpty)
                         Padding(
                           padding: const EdgeInsets.all(18),
-                          child: _ActivityEmpty(
-                            icon: Icons.post_add_rounded,
-                            title: l10n.noPostsYet,
-                            message: l10n.createFirstPost,
+                          child: _ProfileLikeEmpty(
+                            icon: Icons.inventory_2_outlined,
+                            message: l10n.noItemsPosted,
                           ),
                         )
                       else
@@ -406,6 +431,70 @@ class _ActivityEmpty extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _ProfileLikeEmpty extends StatelessWidget {
+  const _ProfileLikeEmpty({required this.icon, required this.message});
+
+  final IconData icon;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Center(
+      child: AppPanel(
+        child: Column(
+          children: [
+            Container(
+              width: 76,
+              height: 76,
+              decoration: BoxDecoration(
+                color: AppColors.primaryBlue.withAlpha(16),
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Icon(icon, color: AppColors.primaryBlue, size: 34),
+            ),
+            const SizedBox(height: 14),
+            Text(
+              message,
+              style: GoogleFonts.manrope(
+                color: cs.onSurfaceVariant,
+                fontWeight: FontWeight.w700,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ActivityTabLabel extends StatelessWidget {
+  const _ActivityTabLabel({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(icon, size: 16),
+        const SizedBox(width: 6),
+        Flexible(
+          child: Text(
+            label,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
+        ),
+      ],
     );
   }
 }

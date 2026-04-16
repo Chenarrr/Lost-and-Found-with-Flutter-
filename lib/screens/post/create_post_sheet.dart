@@ -6,7 +6,6 @@ import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/models/post.dart';
 import 'package:flutter_application/providers/app_state.dart';
-import 'package:flutter_application/widgets/app_backdrop.dart';
 import 'package:flutter_application/widgets/app_panel.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -38,11 +37,13 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
   final _itemNameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _streetController = TextEditingController();
+  final _customCategoryController = TextEditingController();
 
   final List<String> _imagePaths = [];
 
   PostType _postType = PostType.lost;
   PostCategory _category = PostCategory.electronics;
+  bool _useCustomCategory = false;
   String? _selectedCity;
   bool _isLoading = false;
 
@@ -68,6 +69,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
     _itemNameController.dispose();
     _descriptionController.dispose();
     _streetController.dispose();
+    _customCategoryController.dispose();
     super.dispose();
   }
 
@@ -154,6 +156,11 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
+    if (_useCustomCategory && _customCategoryController.text.trim().isEmpty) {
+      _showMessage('Please enter a custom category.', isError: true);
+      return;
+    }
+
     final app = Provider.of<AppState>(context, listen: false);
     final messenger = ScaffoldMessenger.of(context);
     final l10n = context.l10n;
@@ -169,11 +176,9 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
       if (_isEditing) {
         final updated = widget.existingPost!.copyWith(
           type: _postType,
-          category: _category,
+          category: _useCustomCategory ? PostCategory.personalItems : _category,
           itemName: _itemNameController.text.trim(),
-          description: _descriptionController.text.trim().isEmpty
-              ? null
-              : _descriptionController.text.trim(),
+          description: _buildFinalDescription(),
           street: _streetController.text.trim(),
           city: _selectedCity!,
         );
@@ -192,11 +197,9 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
         final newPost = Post(
           id: _uuid.v4(),
           type: _postType,
-          category: _category,
+          category: _useCustomCategory ? PostCategory.personalItems : _category,
           itemName: _itemNameController.text.trim(),
-          description: _descriptionController.text.trim().isEmpty
-              ? null
-              : _descriptionController.text.trim(),
+          description: _buildFinalDescription(),
           street: _streetController.text.trim(),
           city: _selectedCity!,
           imageUrls: List.from(_imagePaths),
@@ -223,6 +226,130 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
       setState(() => _isLoading = false);
       _showMessage(l10n.requiredField, isError: true);
     }
+  }
+
+  String? _buildFinalDescription() {
+    final base = _descriptionController.text.trim();
+    final baseOrNull = base.isEmpty ? null : base;
+    if (!_useCustomCategory) return baseOrNull;
+
+    final custom = _customCategoryController.text.trim();
+    if (custom.isEmpty) return baseOrNull;
+    final tag = 'Category: $custom';
+    if (baseOrNull == null) return tag;
+    return '$tag\n$baseOrNull';
+  }
+
+  Widget _buildCategoryList(AppLocalizations l10n, ColorScheme cs) {
+    Widget categoryRow({
+      required String label,
+      required bool selected,
+      required VoidCallback onTap,
+    }) {
+      return InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: onTap,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: selected ? AppColors.primaryBlue.withAlpha(14) : null,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: selected ? AppColors.primaryBlue : cs.outlineVariant,
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                selected
+                    ? Icons.radio_button_checked_rounded
+                    : Icons.radio_button_off_rounded,
+                color: selected ? AppColors.primaryBlue : cs.onSurfaceVariant,
+                size: 20,
+              ),
+              const SizedBox(width: 10),
+              Text(
+                label,
+                style: GoogleFonts.manrope(
+                  fontWeight: FontWeight.w700,
+                  color: cs.onSurface,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        categoryRow(
+          label: l10n.categoryElectronics,
+          selected:
+              !_useCustomCategory && _category == PostCategory.electronics,
+          onTap: () => setState(() {
+            _useCustomCategory = false;
+            _category = PostCategory.electronics;
+          }),
+        ),
+        const SizedBox(height: 8),
+        categoryRow(
+          label: l10n.categoryDocuments,
+          selected: !_useCustomCategory && _category == PostCategory.documents,
+          onTap: () => setState(() {
+            _useCustomCategory = false;
+            _category = PostCategory.documents;
+          }),
+        ),
+        const SizedBox(height: 8),
+        categoryRow(
+          label: l10n.categoryPersonalItems,
+          selected:
+              !_useCustomCategory && _category == PostCategory.personalItems,
+          onTap: () => setState(() {
+            _useCustomCategory = false;
+            _category = PostCategory.personalItems;
+          }),
+        ),
+        const SizedBox(height: 8),
+        categoryRow(
+          label: l10n.categoryPets,
+          selected: !_useCustomCategory && _category == PostCategory.pets,
+          onTap: () => setState(() {
+            _useCustomCategory = false;
+            _category = PostCategory.pets;
+          }),
+        ),
+        const SizedBox(height: 8),
+        categoryRow(
+          label: 'Custom',
+          selected: _useCustomCategory,
+          onTap: () => setState(() => _useCustomCategory = true),
+        ),
+        if (_useCustomCategory) ...[
+          const SizedBox(height: 10),
+          TextFormField(
+            controller: _customCategoryController,
+            textInputAction: TextInputAction.next,
+            validator: (value) {
+              if (!_useCustomCategory) return null;
+              if (value == null || value.trim().isEmpty) {
+                return 'Enter custom category';
+              }
+              return null;
+            },
+            decoration: const InputDecoration(
+              labelText: 'Custom category',
+              prefixIcon: Icon(
+                Icons.label_outline_rounded,
+                color: AppColors.primaryBlue,
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
   }
 
   Widget _buildImagesSection(AppLocalizations l10n, ColorScheme cs) {
@@ -371,12 +498,14 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: isDark ? const Color(0xFF0F1E33) : Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: isDark ? AppColors.heroNavy : Colors.white.withAlpha(232),
+        backgroundColor: isDark ? AppColors.heroNavy : Colors.white,
         foregroundColor: isDark ? Colors.white : cs.onSurface,
+        centerTitle: true,
         elevation: 0,
+        shadowColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
         scrolledUnderElevation: 0,
         title: Text(_isEditing ? l10n.editPostTitle : l10n.createPost),
@@ -391,300 +520,232 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
               ),
               child: IconButton(
                 onPressed: _goHome,
-                icon: const Icon(Icons.home_rounded, color: AppColors.primaryBlue),
+                icon: const Icon(
+                  Icons.home_rounded,
+                  color: AppColors.primaryBlue,
+                ),
                 tooltip: l10n.homeNav,
               ),
             ),
           ),
         ],
       ),
-      body: AppBackdrop(
-        child: SafeArea(
-          top: false,
-          child: SingleChildScrollView(
-            padding: EdgeInsets.fromLTRB(
-              18,
-              10,
-              18,
-              MediaQuery.of(context).viewInsets.bottom + 120,
-            ),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  AppPanel(
-                    padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-                    borderRadius: BorderRadius.circular(22),
-                    gradient: isDark
-                        ? const LinearGradient(
-                            colors: [Color(0xFF142949), Color(0xFF1D456F)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          )
-                        : const LinearGradient(
-                            colors: [Color(0xFFF0F6FF), Color(0xFFE8FAFF)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 38,
-                          height: 38,
-                          decoration: BoxDecoration(
-                            color: isDark
-                                ? Colors.white.withAlpha(18)
-                                : AppColors.primaryBlue.withAlpha(20),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Icon(
-                            Icons.tips_and_updates_rounded,
-                            color: isDark ? Colors.white : AppColors.primaryBlue,
-                            size: 20,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            l10n.shareDetails,
-                            style: GoogleFonts.manrope(
-                              color: isDark ? Colors.white : cs.onSurface,
-                              fontWeight: FontWeight.w700,
-                              height: 1.3,
+      body: SafeArea(
+        top: false,
+        child: SingleChildScrollView(
+          padding: EdgeInsets.fromLTRB(
+            18,
+            6,
+            18,
+            MediaQuery.of(context).viewInsets.bottom + 120,
+          ),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (!_isEditing) ...[
+                  _buildImagesSection(l10n, cs),
+                  const SizedBox(height: 16),
+                ],
+                AppPanel(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _ChoiceCard(
+                              label: l10n.typeLost,
+                              icon: Icons.search_rounded,
+                              selected: _postType == PostType.lost,
+                              color: AppColors.lostPrimary,
+                              onTap: () =>
+                                  setState(() => _postType = PostType.lost),
                             ),
                           ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: _ChoiceCard(
+                              label: l10n.typeFound,
+                              icon: Icons.volunteer_activism_rounded,
+                              selected: _postType == PostType.found,
+                              color: AppColors.foundPrimary,
+                              onTap: () =>
+                                  setState(() => _postType = PostType.found),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 14),
+                      Text(
+                        l10n.filterByCategory,
+                        style: GoogleFonts.manrope(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                          color: cs.onSurfaceVariant,
+                          letterSpacing: 0.4,
                         ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 10),
+                      _buildCategoryList(l10n, cs),
+                    ],
                   ),
-                  const SizedBox(height: 14),
-                  if (!_isEditing) ...[
-                    _buildImagesSection(l10n, cs),
-                    const SizedBox(height: 16),
-                  ],
-                  AppPanel(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _SectionTitle(
-                          title: l10n.typeLost,
-                          subtitle: l10n.typeFound,
+                ),
+                const SizedBox(height: 16),
+                AppPanel(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _SectionTitle(
+                        title: l10n.itemName,
+                        subtitle: l10n.descriptionOptional,
+                      ),
+                      const SizedBox(height: 14),
+                      TextFormField(
+                        controller: _itemNameController,
+                        textInputAction: TextInputAction.next,
+                        maxLength: 60,
+                        validator: (value) {
+                          if (value == null || value.trim().length < 2) {
+                            return l10n.itemNameRequired;
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          labelText: l10n.itemName,
+                          prefixIcon: const Icon(
+                            Icons.inventory_2_rounded,
+                            color: AppColors.primaryBlue,
+                          ),
                         ),
-                        const SizedBox(height: 14),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _ChoiceCard(
-                                label: l10n.typeLost,
-                                icon: Icons.search_rounded,
-                                selected: _postType == PostType.lost,
-                                color: AppColors.lostPrimary,
-                                onTap: () => setState(() => _postType = PostType.lost),
-                              ),
+                      ),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        controller: _descriptionController,
+                        maxLength: 300,
+                        minLines: 3,
+                        maxLines: 5,
+                        textInputAction: TextInputAction.newline,
+                        decoration: InputDecoration(
+                          labelText: l10n.descriptionOptional,
+                          alignLabelWithHint: true,
+                          prefixIcon: const Padding(
+                            padding: EdgeInsets.only(bottom: 50),
+                            child: Icon(
+                              Icons.notes_rounded,
+                              color: AppColors.primaryBlue,
                             ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: _ChoiceCard(
-                                label: l10n.typeFound,
-                                icon: Icons.volunteer_activism_rounded,
-                                selected: _postType == PostType.found,
-                                color: AppColors.foundPrimary,
-                                onTap: () => setState(() => _postType = PostType.found),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                        const SizedBox(height: 16),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: PostCategory.values.map((category) {
-                            final isSelected = _category == category;
-                            return ChoiceChip(
-                              label: Text(
-                                category.displayName,
-                                style: GoogleFonts.manrope(
-                                  fontWeight: FontWeight.w800,
-                                  color: isSelected ? Colors.white : cs.onSurface,
+                      ),
+                      const SizedBox(height: 10),
+                      DropdownButtonFormField<String>(
+                        initialValue: _selectedCity,
+                        isExpanded: true,
+                        decoration: InputDecoration(
+                          labelText: l10n.city,
+                          prefixIcon: const Icon(
+                            Icons.location_city_rounded,
+                            color: AppColors.primaryBlue,
+                          ),
+                        ),
+                        hint: Text(
+                          l10n.selectCity,
+                          style: GoogleFonts.manrope(
+                            color: cs.onSurfaceVariant,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        items: _cityOptions
+                            .map(
+                              (city) => DropdownMenuItem<String>(
+                                value: city,
+                                child: Text(
+                                  _cityDisplayName(city, l10n),
+                                  style: GoogleFonts.manrope(),
                                 ),
                               ),
-                              selected: isSelected,
-                              onSelected: (_) => setState(() => _category = category),
-                              showCheckmark: false,
-                              selectedColor: AppColors.primaryBlue,
-                              backgroundColor: Theme.of(context).brightness == Brightness.dark
-                                  ? Colors.white.withAlpha(8)
-                                  : Colors.white,
-                              side: BorderSide(
-                                color: isSelected ? Colors.transparent : cs.outlineVariant,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(999),
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 8,
-                              ),
-                            );
-                          }).toList(),
+                            )
+                            .toList(),
+                        onChanged: (value) =>
+                            setState(() => _selectedCity = value),
+                        validator: (value) =>
+                            value == null ? l10n.cityRequired : null,
+                      ),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        controller: _streetController,
+                        textInputAction: TextInputAction.done,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return l10n.streetRequired;
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          labelText: l10n.street,
+                          prefixIcon: const Icon(
+                            Icons.map_rounded,
+                            color: AppColors.primaryBlue,
+                          ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  AppPanel(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _SectionTitle(
-                          title: l10n.itemName,
-                          subtitle: l10n.descriptionOptional,
+                ),
+                const SizedBox(height: 22),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _submit,
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                    ),
+                    child: Ink(
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [
+                            AppColors.primaryBlue,
+                            AppColors.accentIndigo,
+                          ],
                         ),
-                        const SizedBox(height: 14),
-                        TextFormField(
-                          controller: _itemNameController,
-                          textInputAction: TextInputAction.next,
-                          maxLength: 60,
-                          validator: (value) {
-                            if (value == null || value.trim().length < 2) {
-                              return l10n.itemNameRequired;
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                            labelText: l10n.itemName,
-                            prefixIcon: const Icon(
-                              Icons.inventory_2_rounded,
-                              color: AppColors.primaryBlue,
-                            ),
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primaryBlue.withAlpha(62),
+                            blurRadius: 24,
+                            offset: const Offset(0, 14),
                           ),
-                        ),
-                        const SizedBox(height: 10),
-                        TextFormField(
-                          controller: _descriptionController,
-                          maxLength: 300,
-                          minLines: 3,
-                          maxLines: 5,
-                          textInputAction: TextInputAction.newline,
-                          decoration: InputDecoration(
-                            labelText: l10n.descriptionOptional,
-                            alignLabelWithHint: true,
-                            prefixIcon: const Padding(
-                              padding: EdgeInsets.only(bottom: 50),
-                              child: Icon(
-                                Icons.notes_rounded,
-                                color: AppColors.primaryBlue,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        DropdownButtonFormField<String>(
-                          initialValue: _selectedCity,
-                          isExpanded: true,
-                          decoration: InputDecoration(
-                            labelText: l10n.city,
-                            prefixIcon: const Icon(
-                              Icons.location_city_rounded,
-                              color: AppColors.primaryBlue,
-                            ),
-                          ),
-                          hint: Text(
-                            l10n.selectCity,
-                            style: GoogleFonts.manrope(
-                              color: cs.onSurfaceVariant,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          items: _cityOptions
-                              .map(
-                                (city) => DropdownMenuItem<String>(
-                                  value: city,
-                                  child: Text(
-                                    _cityDisplayName(city, l10n),
-                                    style: GoogleFonts.manrope(),
-                                  ),
+                        ],
+                      ),
+                      child: Container(
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.symmetric(vertical: 18),
+                        child: _isLoading
+                            ? const SizedBox(
+                                height: 22,
+                                width: 22,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
                                 ),
                               )
-                              .toList(),
-                          onChanged: (value) => setState(() => _selectedCity = value),
-                          validator: (value) => value == null ? l10n.cityRequired : null,
-                        ),
-                        const SizedBox(height: 10),
-                        TextFormField(
-                          controller: _streetController,
-                          textInputAction: TextInputAction.done,
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return l10n.streetRequired;
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                            labelText: l10n.street,
-                            prefixIcon: const Icon(
-                              Icons.map_rounded,
-                              color: AppColors.primaryBlue,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 22),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _isLoading ? null : _submit,
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                        backgroundColor: Colors.transparent,
-                        shadowColor: Colors.transparent,
-                      ),
-                      child: Ink(
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [
-                              AppColors.primaryBlue,
-                              AppColors.accentIndigo,
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.primaryBlue.withAlpha(62),
-                              blurRadius: 24,
-                              offset: const Offset(0, 14),
-                            ),
-                          ],
-                        ),
-                        child: Container(
-                          alignment: Alignment.center,
-                          padding: const EdgeInsets.symmetric(vertical: 18),
-                          child: _isLoading
-                              ? const SizedBox(
-                                  height: 22,
-                                  width: 22,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : Text(
-                                  _isEditing ? l10n.update : l10n.submit,
-                                  style: GoogleFonts.manrope(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w800,
-                                    color: Colors.white,
-                                  ),
+                            : Text(
+                                _isEditing ? l10n.update : l10n.submit,
+                                style: GoogleFonts.manrope(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.white,
                                 ),
-                        ),
+                              ),
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),

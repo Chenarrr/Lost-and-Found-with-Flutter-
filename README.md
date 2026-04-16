@@ -269,6 +269,75 @@ service cloud.firestore {
 }
 ```
 
+### Firebase Emulator Suite (local development)
+
+Use the Emulator Suite when you want safe local testing without touching production data.
+
+#### What you need
+
+| Requirement | Why it is needed |
+|---|---|
+| `firebase-tools` CLI | Starts and manages local Firebase emulators |
+| Java Runtime (JDK 17+) | Required by the Firestore emulator |
+| Project config (`firebase.json`) | Defines local ports for each emulator |
+
+Quick checks:
+
+```bash
+firebase --version
+java -version
+```
+
+#### Start emulators
+
+From the project root:
+
+```bash
+# Full local backend (recommended)
+firebase emulators:start --only auth,firestore --project lost-found-1771621310
+
+# Auth only (if Firestore/Java is not available yet)
+firebase emulators:start --only auth --project lost-found-1771621310
+```
+
+Current configured ports in this project (`firebase.json`):
+
+- Emulator UI: `http://127.0.0.1:4000`
+- Auth: `127.0.0.1:9099`
+- Firestore: `127.0.0.1:8080`
+
+#### What you will see in Emulator UI
+
+- **Home**: list of running emulators and quick status
+- **Authentication**: test users, phone auth flows, sign-in activity
+- **Firestore**: local collections/documents, writes/reads, request traces
+- **Logs**: realtime emulator logs and rule evaluation output
+
+#### Connect this Flutter app to local emulators
+
+This repository already includes integration wiring in `lib/main_integration.dart`:
+
+- `FirebaseAuth.instance.useAuthEmulator('localhost', 9099)`
+- `FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080)`
+
+Run with:
+
+```bash
+flutter run -t lib/main_integration.dart
+```
+
+#### Stop emulators
+
+- Press `Ctrl+C` in the terminal where emulators are running.
+
+#### Common issue
+
+If Firestore emulator fails with a Java error, install a JDK and retry:
+
+```bash
+brew install openjdk@17
+```
+
 ### Test phone numbers (simulator)
 
 Firebase Console → Authentication → Sign-in method → Phone → **Phone numbers for testing**.

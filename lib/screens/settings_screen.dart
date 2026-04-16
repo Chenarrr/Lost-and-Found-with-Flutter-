@@ -469,6 +469,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final cs = Theme.of(context).colorScheme;
+    final isDarkUi = Theme.of(context).brightness == Brightness.dark;
     final app = context.watch<AppState>();
     final userName = app.currentUser?.name ?? '';
     final userPhone = app.currentUser?.phone ?? '';
@@ -482,7 +483,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      appBar: AppBar(title: Text(l10n.settingsTitle)),
+      appBar: AppBar(
+        title: Text(l10n.settingsTitle),
+        backgroundColor: isDarkUi
+            ? AppColors.heroNavy
+            : Colors.white.withAlpha(232),
+        foregroundColor: isDarkUi ? Colors.white : cs.onSurface,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        scrolledUnderElevation: 0,
+      ),
       body: AppBackdrop(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(18, 10, 18, 120),

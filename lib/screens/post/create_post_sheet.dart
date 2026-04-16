@@ -225,14 +225,111 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
     }
   }
 
+  Widget _buildImagesSection(AppLocalizations l10n, ColorScheme cs) {
+    return AppPanel(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionTitle(
+            title: l10n.imagesSection(_imagePaths.length),
+            subtitle: l10n.addImage,
+          ),
+          const SizedBox(height: 14),
+          if (_imagePaths.isEmpty)
+            Container(
+              height: 150,
+              decoration: BoxDecoration(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white.withAlpha(8)
+                    : AppColors.frost,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: cs.outlineVariant),
+              ),
+              child: Center(
+                child: Text(
+                  l10n.noImagesSelected,
+                  style: GoogleFonts.manrope(
+                    color: cs.onSurfaceVariant,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            )
+          else
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: _imagePaths.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 1.05,
+              ),
+              itemBuilder: (context, index) {
+                final path = _imagePaths[index];
+                return Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(24),
+                      child: SizedBox.expand(child: _buildImagePreview(path)),
+                    ),
+                    Positioned(
+                      top: 10,
+                      right: 10,
+                      child: GestureDetector(
+                        onTap: () => setState(() => _imagePaths.remove(path)),
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withAlpha(120),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.close_rounded,
+                            color: Colors.white,
+                            size: 18,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          const SizedBox(height: 12),
+          if (_imagePaths.length < 3)
+            OutlinedButton.icon(
+              onPressed: _pickImage,
+              icon: const Icon(Icons.add_photo_alternate_outlined),
+              label: Text(l10n.addImage),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.primaryBlue,
+                side: const BorderSide(color: AppColors.primaryBlue),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: isDark
+            ? AppColors.heroNavy
+            : Colors.white.withAlpha(232),
+        foregroundColor: isDark ? Colors.white : cs.onSurface,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        scrolledUnderElevation: 0,
         title: Text(_isEditing ? l10n.editPostTitle : l10n.createPost),
         actions: [
           GestureDetector(
@@ -303,6 +400,10 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                     ),
                   ),
                   const SizedBox(height: 16),
+                  if (!_isEditing) ...[
+                    _buildImagesSection(l10n, cs),
+                    const SizedBox(height: 16),
+                  ],
                   AppPanel(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -483,105 +584,6 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                       ],
                     ),
                   ),
-                  if (!_isEditing) ...[
-                    const SizedBox(height: 16),
-                    AppPanel(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _SectionTitle(
-                            title: l10n.imagesSection(_imagePaths.length),
-                            subtitle: l10n.addImage,
-                          ),
-                          const SizedBox(height: 14),
-                          if (_imagePaths.isEmpty)
-                            Container(
-                              height: 150,
-                              decoration: BoxDecoration(
-                                color:
-                                    Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? Colors.white.withAlpha(8)
-                                    : AppColors.frost,
-                                borderRadius: BorderRadius.circular(24),
-                                border: Border.all(color: cs.outlineVariant),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  l10n.noImagesSelected,
-                                  style: GoogleFonts.manrope(
-                                    color: cs.onSurfaceVariant,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
-                            )
-                          else
-                            GridView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: _imagePaths.length,
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
-                                    crossAxisSpacing: 10,
-                                    mainAxisSpacing: 10,
-                                    childAspectRatio: 1.05,
-                                  ),
-                              itemBuilder: (context, index) {
-                                final path = _imagePaths[index];
-                                return Stack(
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(24),
-                                      child: SizedBox.expand(
-                                        child: _buildImagePreview(path),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      top: 10,
-                                      right: 10,
-                                      child: GestureDetector(
-                                        onTap: () => setState(
-                                          () => _imagePaths.remove(path),
-                                        ),
-                                        child: Container(
-                                          padding: const EdgeInsets.all(8),
-                                          decoration: BoxDecoration(
-                                            color: Colors.black.withAlpha(120),
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: const Icon(
-                                            Icons.close_rounded,
-                                            color: Colors.white,
-                                            size: 18,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            ),
-                          const SizedBox(height: 12),
-                          if (_imagePaths.length < 3)
-                            OutlinedButton.icon(
-                              onPressed: _pickImage,
-                              icon: const Icon(
-                                Icons.add_photo_alternate_outlined,
-                              ),
-                              label: Text(l10n.addImage),
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: AppColors.primaryBlue,
-                                side: const BorderSide(
-                                  color: AppColors.primaryBlue,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ],
                   const SizedBox(height: 22),
                   SizedBox(
                     width: double.infinity,

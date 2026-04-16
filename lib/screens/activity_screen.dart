@@ -188,10 +188,13 @@ class ActivityScreen extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.all(18),
                           child: Align(
-                            alignment: Alignment.topCenter,
-                            child: _ProfileLikeEmpty(
-                              icon: Icons.inventory_2_outlined,
-                              message: l10n.noItemsPosted,
+                            alignment: const Alignment(0, 0.22),
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: _ProfileLikeEmpty(
+                                icon: Icons.inventory_2_outlined,
+                                message: l10n.noItemsPosted,
+                              ),
                             ),
                           ),
                         )
@@ -450,6 +453,7 @@ class _ProfileLikeEmpty extends StatelessWidget {
 
     return AppPanel(
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             width: 76,

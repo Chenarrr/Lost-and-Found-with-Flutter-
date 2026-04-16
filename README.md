@@ -278,7 +278,7 @@ Use the Emulator Suite when you want safe local testing without touching product
 | Requirement | Why it is needed |
 |---|---|
 | `firebase-tools` CLI | Starts and manages local Firebase emulators |
-| Java Runtime (JDK 17+) | Required by the Firestore emulator |
+| Java Runtime (JDK 21+) | Required by the Firestore emulator (`firebase-tools` v15+) |
 | Project config (`firebase.json`) | Defines local ports for each emulator |
 
 Quick checks:
@@ -291,6 +291,12 @@ java -version
 #### Start emulators
 
 From the project root:
+
+```bash
+# If you installed JDK 21 via Homebrew on macOS
+export PATH="/opt/homebrew/opt/openjdk@21/bin:$PATH"
+export JAVA_HOME=$(/usr/libexec/java_home -v 21)
+```
 
 ```bash
 # Full local backend (recommended)
@@ -332,10 +338,12 @@ flutter run -t lib/main_integration.dart
 
 #### Common issue
 
-If Firestore emulator fails with a Java error, install a JDK and retry:
+If Firestore emulator fails with a Java version/runtime error, install JDK 21 and retry:
 
 ```bash
-brew install openjdk@17
+brew install openjdk@21
+export PATH="/opt/homebrew/opt/openjdk@21/bin:$PATH"
+export JAVA_HOME=$(/usr/libexec/java_home -v 21)
 ```
 
 ### Test phone numbers (simulator)

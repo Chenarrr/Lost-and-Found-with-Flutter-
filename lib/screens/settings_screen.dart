@@ -473,16 +473,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final l10n = context.l10n;
     final cs = Theme.of(context).colorScheme;
     final isDarkUi = Theme.of(context).brightness == Brightness.dark;
-    final app = context.watch<AppState>();
-    final userName = app.currentUser?.name ?? '';
-    final userPhone = app.currentUser?.phone ?? '';
-    final currentLangCode = app.locale.languageCode;
+    final app = context.read<AppState>();
+    final userName = context.select<AppState, String>(
+      (state) => state.currentUser?.name ?? '',
+    );
+    final userPhone = context.select<AppState, String>(
+      (state) => state.currentUser?.phone ?? '',
+    );
+    final currentLangCode = context.select<AppState, String>(
+      (state) => state.locale.languageCode,
+    );
     final currentLangLabel = currentLangCode == 'ar'
         ? l10n.arabic
         : currentLangCode == 'ckb'
         ? l10n.kurdish
         : l10n.english;
-    final isDark = app.themeMode == ThemeMode.dark;
+    final isDark =
+        context.select<AppState, ThemeMode>((state) => state.themeMode) ==
+        ThemeMode.dark;
 
     return Scaffold(
       backgroundColor: Colors.transparent,

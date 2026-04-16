@@ -43,9 +43,14 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final app = context.watch<AppState>();
-    final isDark = app.themeMode == ThemeMode.dark;
-    final currentUser = app.currentUser;
+    final app = context.read<AppState>();
+    final themeMode = context.select<AppState, ThemeMode>(
+      (state) => state.themeMode,
+    );
+    final currentUserName = context.select<AppState, String?>(
+      (state) => state.currentUser?.name,
+    );
+    final isDark = themeMode == ThemeMode.dark;
     final showHomeAppBar = _selectedIndex == 0;
 
     return Scaffold(
@@ -77,8 +82,8 @@ class _MainPageState extends State<MainPage> {
                 ),
               ),
               title: Text(
-                currentUser?.name.isNotEmpty == true
-                    ? currentUser!.name
+                currentUserName?.isNotEmpty == true
+                    ? currentUserName!
                     : l10n.appName,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

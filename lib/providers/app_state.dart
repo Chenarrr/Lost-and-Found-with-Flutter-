@@ -106,10 +106,57 @@ class AppState extends ChangeNotifier {
     } catch (e) {
       debugPrint('Error loading user: $e');
     }
-    notifyListeners();
   }
 
   static const int _postsPageSize = 50;
+
+  bool _hasMeaningfulPostListChange(List<Post> nextPosts) {
+    if (posts.length != nextPosts.length) return true;
+
+    for (var i = 0; i < nextPosts.length; i++) {
+      final oldPost = posts[i];
+      final newPost = nextPosts[i];
+
+      if (oldPost.id != newPost.id ||
+          oldPost.type != newPost.type ||
+          oldPost.category != newPost.category ||
+          oldPost.itemName != newPost.itemName ||
+          oldPost.description != newPost.description ||
+          oldPost.street != newPost.street ||
+          oldPost.city != newPost.city ||
+          oldPost.userName != newPost.userName ||
+          oldPost.userPhone != newPost.userPhone ||
+          oldPost.userId != newPost.userId ||
+          oldPost.isResolved != newPost.isResolved ||
+          oldPost.isHidden != newPost.isHidden ||
+          oldPost.viewCount != newPost.viewCount ||
+          oldPost.createdAt.millisecondsSinceEpoch !=
+              newPost.createdAt.millisecondsSinceEpoch) {
+        return true;
+      }
+
+      if (oldPost.imageUrls.length != newPost.imageUrls.length) return true;
+      for (var j = 0; j < newPost.imageUrls.length; j++) {
+        if (oldPost.imageUrls[j] != newPost.imageUrls[j]) return true;
+      }
+
+      if (oldPost.comments.length != newPost.comments.length) return true;
+      for (var j = 0; j < newPost.comments.length; j++) {
+        final oldComment = oldPost.comments[j];
+        final newComment = newPost.comments[j];
+        if (oldComment.id != newComment.id ||
+            oldComment.userId != newComment.userId ||
+            oldComment.userName != newComment.userName ||
+            oldComment.text != newComment.text ||
+            oldComment.createdAt.millisecondsSinceEpoch !=
+                newComment.createdAt.millisecondsSinceEpoch) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
 
   void _listenToPosts() {
     _postsSubscription?.cancel();
@@ -120,7 +167,7 @@ class AppState extends ChangeNotifier {
         .snapshots()
         .listen(
           (snapshot) {
-            posts = snapshot.docs
+            final nextPosts = snapshot.docs
                 .map((doc) {
                   final data = doc.data();
                   data['id'] = doc.id;
@@ -148,6 +195,10 @@ class AppState extends ChangeNotifier {
                 })
                 .where((p) => !p.isHidden)
                 .toList();
+
+            if (!_hasMeaningfulPostListChange(nextPosts)) return;
+
+            posts = nextPosts;
             notifyListeners();
           },
           onError: (e) {

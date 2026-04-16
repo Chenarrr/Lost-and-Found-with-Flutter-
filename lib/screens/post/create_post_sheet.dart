@@ -6,6 +6,7 @@ import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/models/post.dart';
 import 'package:flutter_application/providers/app_state.dart';
+import 'package:flutter_application/widgets/app_backdrop.dart';
 import 'package:flutter_application/widgets/app_panel.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -498,16 +499,10 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0F1E33) : Colors.white,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: isDark ? AppColors.heroNavy : Colors.white,
-        foregroundColor: isDark ? Colors.white : cs.onSurface,
         centerTitle: true,
-        elevation: 0,
-        shadowColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-        scrolledUnderElevation: 0,
         title: Text(_isEditing ? l10n.editPostTitle : l10n.createPost),
         actions: [
           Padding(
@@ -530,222 +525,224 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
           ),
         ],
       ),
-      body: SafeArea(
-        top: false,
-        child: SingleChildScrollView(
-          padding: EdgeInsets.fromLTRB(
-            18,
-            6,
-            18,
-            MediaQuery.of(context).viewInsets.bottom + 120,
-          ),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (!_isEditing) ...[
-                  _buildImagesSection(l10n, cs),
-                  const SizedBox(height: 16),
-                ],
-                AppPanel(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _ChoiceCard(
-                              label: l10n.typeLost,
-                              icon: Icons.search_rounded,
-                              selected: _postType == PostType.lost,
-                              color: AppColors.lostPrimary,
-                              onTap: () =>
-                                  setState(() => _postType = PostType.lost),
+      body: AppBackdrop(
+        child: SafeArea(
+          top: false,
+          child: SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(
+              18,
+              6,
+              18,
+              MediaQuery.of(context).viewInsets.bottom + 120,
+            ),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (!_isEditing) ...[
+                    _buildImagesSection(l10n, cs),
+                    const SizedBox(height: 16),
+                  ],
+                  AppPanel(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _ChoiceCard(
+                                label: l10n.typeLost,
+                                icon: Icons.search_rounded,
+                                selected: _postType == PostType.lost,
+                                color: AppColors.lostPrimary,
+                                onTap: () =>
+                                    setState(() => _postType = PostType.lost),
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: _ChoiceCard(
-                              label: l10n.typeFound,
-                              icon: Icons.volunteer_activism_rounded,
-                              selected: _postType == PostType.found,
-                              color: AppColors.foundPrimary,
-                              onTap: () =>
-                                  setState(() => _postType = PostType.found),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: _ChoiceCard(
+                                label: l10n.typeFound,
+                                icon: Icons.volunteer_activism_rounded,
+                                selected: _postType == PostType.found,
+                                color: AppColors.foundPrimary,
+                                onTap: () =>
+                                    setState(() => _postType = PostType.found),
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 14),
-                      Text(
-                        l10n.filterByCategory,
-                        style: GoogleFonts.manrope(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w800,
-                          color: cs.onSurfaceVariant,
-                          letterSpacing: 0.4,
+                          ],
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      _buildCategoryList(l10n, cs),
-                    ],
+                        const SizedBox(height: 14),
+                        Text(
+                          l10n.filterByCategory,
+                          style: GoogleFonts.manrope(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                            color: cs.onSurfaceVariant,
+                            letterSpacing: 0.4,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        _buildCategoryList(l10n, cs),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                AppPanel(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _SectionTitle(
-                        title: l10n.itemName,
-                        subtitle: l10n.descriptionOptional,
-                      ),
-                      const SizedBox(height: 14),
-                      TextFormField(
-                        controller: _itemNameController,
-                        textInputAction: TextInputAction.next,
-                        maxLength: 60,
-                        validator: (value) {
-                          if (value == null || value.trim().length < 2) {
-                            return l10n.itemNameRequired;
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          labelText: l10n.itemName,
-                          prefixIcon: const Icon(
-                            Icons.inventory_2_rounded,
-                            color: AppColors.primaryBlue,
-                          ),
+                  const SizedBox(height: 16),
+                  AppPanel(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _SectionTitle(
+                          title: l10n.itemName,
+                          subtitle: l10n.descriptionOptional,
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      TextFormField(
-                        controller: _descriptionController,
-                        maxLength: 300,
-                        minLines: 3,
-                        maxLines: 5,
-                        textInputAction: TextInputAction.newline,
-                        decoration: InputDecoration(
-                          labelText: l10n.descriptionOptional,
-                          alignLabelWithHint: true,
-                          prefixIcon: const Padding(
-                            padding: EdgeInsets.only(bottom: 50),
-                            child: Icon(
-                              Icons.notes_rounded,
+                        const SizedBox(height: 14),
+                        TextFormField(
+                          controller: _itemNameController,
+                          textInputAction: TextInputAction.next,
+                          maxLength: 60,
+                          validator: (value) {
+                            if (value == null || value.trim().length < 2) {
+                              return l10n.itemNameRequired;
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            labelText: l10n.itemName,
+                            prefixIcon: const Icon(
+                              Icons.inventory_2_rounded,
                               color: AppColors.primaryBlue,
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      DropdownButtonFormField<String>(
-                        initialValue: _selectedCity,
-                        isExpanded: true,
-                        decoration: InputDecoration(
-                          labelText: l10n.city,
-                          prefixIcon: const Icon(
-                            Icons.location_city_rounded,
-                            color: AppColors.primaryBlue,
-                          ),
-                        ),
-                        hint: Text(
-                          l10n.selectCity,
-                          style: GoogleFonts.manrope(
-                            color: cs.onSurfaceVariant,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        items: _cityOptions
-                            .map(
-                              (city) => DropdownMenuItem<String>(
-                                value: city,
-                                child: Text(
-                                  _cityDisplayName(city, l10n),
-                                  style: GoogleFonts.manrope(),
-                                ),
+                        const SizedBox(height: 10),
+                        TextFormField(
+                          controller: _descriptionController,
+                          maxLength: 300,
+                          minLines: 3,
+                          maxLines: 5,
+                          textInputAction: TextInputAction.newline,
+                          decoration: InputDecoration(
+                            labelText: l10n.descriptionOptional,
+                            alignLabelWithHint: true,
+                            prefixIcon: const Padding(
+                              padding: EdgeInsets.only(bottom: 50),
+                              child: Icon(
+                                Icons.notes_rounded,
+                                color: AppColors.primaryBlue,
                               ),
-                            )
-                            .toList(),
-                        onChanged: (value) =>
-                            setState(() => _selectedCity = value),
-                        validator: (value) =>
-                            value == null ? l10n.cityRequired : null,
-                      ),
-                      const SizedBox(height: 10),
-                      TextFormField(
-                        controller: _streetController,
-                        textInputAction: TextInputAction.done,
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return l10n.streetRequired;
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          labelText: l10n.street,
-                          prefixIcon: const Icon(
-                            Icons.map_rounded,
-                            color: AppColors.primaryBlue,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 22),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _submit,
-                    style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      backgroundColor: Colors.transparent,
-                      shadowColor: Colors.transparent,
-                    ),
-                    child: Ink(
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [
-                            AppColors.primaryBlue,
-                            AppColors.accentIndigo,
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.primaryBlue.withAlpha(62),
-                            blurRadius: 24,
-                            offset: const Offset(0, 14),
+                        const SizedBox(height: 10),
+                        DropdownButtonFormField<String>(
+                          initialValue: _selectedCity,
+                          isExpanded: true,
+                          decoration: InputDecoration(
+                            labelText: l10n.city,
+                            prefixIcon: const Icon(
+                              Icons.location_city_rounded,
+                              color: AppColors.primaryBlue,
+                            ),
                           ),
-                        ],
-                      ),
-                      child: Container(
-                        alignment: Alignment.center,
-                        padding: const EdgeInsets.symmetric(vertical: 18),
-                        child: _isLoading
-                            ? const SizedBox(
-                                height: 22,
-                                width: 22,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
+                          hint: Text(
+                            l10n.selectCity,
+                            style: GoogleFonts.manrope(
+                              color: cs.onSurfaceVariant,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          items: _cityOptions
+                              .map(
+                                (city) => DropdownMenuItem<String>(
+                                  value: city,
+                                  child: Text(
+                                    _cityDisplayName(city, l10n),
+                                    style: GoogleFonts.manrope(),
+                                  ),
                                 ),
                               )
-                            : Text(
-                                _isEditing ? l10n.update : l10n.submit,
-                                style: GoogleFonts.manrope(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w800,
-                                  color: Colors.white,
+                              .toList(),
+                          onChanged: (value) =>
+                              setState(() => _selectedCity = value),
+                          validator: (value) =>
+                              value == null ? l10n.cityRequired : null,
+                        ),
+                        const SizedBox(height: 10),
+                        TextFormField(
+                          controller: _streetController,
+                          textInputAction: TextInputAction.done,
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return l10n.streetRequired;
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            labelText: l10n.street,
+                            prefixIcon: const Icon(
+                              Icons.map_rounded,
+                              color: AppColors.primaryBlue,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 22),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _isLoading ? null : _submit,
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                      ),
+                      child: Ink(
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [
+                              AppColors.primaryBlue,
+                              AppColors.accentIndigo,
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(24),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primaryBlue.withAlpha(62),
+                              blurRadius: 24,
+                              offset: const Offset(0, 14),
+                            ),
+                          ],
+                        ),
+                        child: Container(
+                          alignment: Alignment.center,
+                          padding: const EdgeInsets.symmetric(vertical: 18),
+                          child: _isLoading
+                              ? const SizedBox(
+                                  height: 22,
+                                  width: 22,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Text(
+                                  _isEditing ? l10n.update : l10n.submit,
+                                  style: GoogleFonts.manrope(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w800,
+                                    color: Colors.white,
+                                  ),
                                 ),
-                              ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

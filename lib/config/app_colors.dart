@@ -9,6 +9,12 @@ class AppColors {
   static const Color heroNavy = Color(0xFF091B38);
   static const Color heroBlue = Color(0xFF173B70);
   static const Color heroTeal = Color(0xFF0F7087);
+  static const Color backdropLightTop = Color(0xFFF7FBFF);
+  static const Color backdropLightMid = Color(0xFFEAF4FF);
+  static const Color backdropLightBottom = Color(0xFFFDFEFF);
+  static const Color backdropDarkTop = Color(0xFF071323);
+  static const Color backdropDarkMid = Color(0xFF0C1D34);
+  static const Color backdropDarkBottom = Color(0xFF08111E);
   static const Color skyTop = Color(0xFFF2F8FF);
   static const Color skyBottom = Color(0xFFE7F2FF);
   static const Color infoBox = Color(0xFFE7F4FF);

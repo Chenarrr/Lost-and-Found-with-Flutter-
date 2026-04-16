@@ -98,7 +98,7 @@ ThemeData _lightTheme() {
     textTheme: _appTextTheme(Brightness.light),
     scaffoldBackgroundColor: AppColors.bgGray,
     appBarTheme: AppBarTheme(
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.backdropLightTop,
       surfaceTintColor: Colors.transparent,
       foregroundColor: AppColors.textPrimary,
       elevation: 0,
@@ -253,7 +253,7 @@ ThemeData _darkTheme() {
     textTheme: _appTextTheme(Brightness.dark),
     scaffoldBackgroundColor: _darkBg,
     appBarTheme: AppBarTheme(
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.backdropDarkTop,
       surfaceTintColor: Colors.transparent,
       foregroundColor: _darkOnSurface,
       elevation: 0,

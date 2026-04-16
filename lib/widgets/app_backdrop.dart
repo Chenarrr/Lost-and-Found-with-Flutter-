@@ -18,14 +18,14 @@ class AppBackdrop extends StatelessWidget {
               gradient: LinearGradient(
                 colors: isDark
                     ? const [
-                        Color(0xFF071323),
-                        Color(0xFF0C1D34),
-                        Color(0xFF08111E),
+                        AppColors.backdropDarkTop,
+                        AppColors.backdropDarkMid,
+                        AppColors.backdropDarkBottom,
                       ]
                     : const [
-                        Color(0xFFF7FBFF),
-                        Color(0xFFEAF4FF),
-                        Color(0xFFFDFEFF),
+                        AppColors.backdropLightTop,
+                        AppColors.backdropLightMid,
+                        AppColors.backdropLightBottom,
                       ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,

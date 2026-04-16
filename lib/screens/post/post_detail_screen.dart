@@ -301,134 +301,143 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
             AppPanel(
               padding: EdgeInsets.zero,
               clipBehavior: Clip.antiAlias,
+              child: SizedBox(
+                height: 286,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    post.imageUrls.isNotEmpty
+                        ? _buildImage(post.imageUrls.first, cs)
+                        : ColoredBox(
+                            color: adaptedSoftColor,
+                            child: Icon(
+                              isLost
+                                  ? Icons.search_rounded
+                                  : Icons.volunteer_activism_rounded,
+                              size: 56,
+                              color: typeColor,
+                            ),
+                          ),
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.black.withAlpha(6),
+                            Colors.black.withAlpha(170),
+                          ],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      left: 18,
+                      right: 18,
+                      bottom: 18,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              _OverlayPill(
+                                text: isLost
+                                    ? l10n.typeLostUpper
+                                    : l10n.typeFoundUpper,
+                                color: typeColor,
+                              ),
+                              _OverlayPill(
+                                text: post.category.displayName,
+                                color: Colors.white.withAlpha(36),
+                              ),
+                              if (post.isResolved)
+                                _OverlayPill(
+                                  text: l10n.resolvedBadge,
+                                  color: AppColors.foundPrimary,
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            post.itemName,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.spaceGrotesk(
+                              color: Colors.white,
+                              fontSize: 34,
+                              fontWeight: FontWeight.w700,
+                              height: 0.98,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            '${post.city}, ${post.street}',
+                            style: GoogleFonts.manrope(
+                              color: Colors.white.withAlpha(220),
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 14),
+            AppPanel(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      _MetaPill(
+                        icon: Icons.access_time_rounded,
+                        label: timeago.format(
+                          post.createdAt,
+                          locale: l10n.localeName,
+                        ),
+                      ),
+                      _MetaPill(
+                        icon: Icons.person_rounded,
+                        label: post.userName,
+                      ),
+                      _MetaPill(
+                        icon: Icons.visibility_outlined,
+                        label: l10n.viewsCount(post.viewCount),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
                   SizedBox(
-                    height: 280,
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        post.imageUrls.isNotEmpty
-                            ? _buildImage(post.imageUrls.first, cs)
-                            : ColoredBox(
-                                color: adaptedSoftColor,
-                                child: Icon(
-                                  isLost
-                                      ? Icons.search_rounded
-                                      : Icons.volunteer_activism_rounded,
-                                  size: 56,
-                                  color: typeColor,
-                                ),
-                              ),
-                        DecoratedBox(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.black.withAlpha(10),
-                                Colors.black.withAlpha(150),
-                              ],
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          left: 18,
-                          right: 18,
-                          bottom: 18,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Wrap(
-                                spacing: 8,
-                                runSpacing: 8,
-                                children: [
-                                  _OverlayPill(
-                                    text: isLost
-                                        ? l10n.typeLostUpper
-                                        : l10n.typeFoundUpper,
-                                    color: typeColor,
-                                  ),
-                                  _OverlayPill(
-                                    text: post.category.displayName,
-                                    color: Colors.white.withAlpha(36),
-                                  ),
-                                  if (post.isResolved)
-                                    _OverlayPill(
-                                      text: l10n.resolvedBadge,
-                                      color: AppColors.foundPrimary,
-                                    ),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                post.itemName,
-                                style: GoogleFonts.spaceGrotesk(
-                                  color: Colors.white,
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.w700,
-                                  height: 1,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                '${post.city}, ${post.street}',
-                                style: GoogleFonts.manrope(
-                                  color: Colors.white.withAlpha(215),
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () =>
+                          _contactViaWhatsApp(post.userPhone, post.itemName),
+                      icon: const Icon(Icons.chat_rounded),
+                      label: Text(l10n.contactWhatsapp),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.whatsappGreen,
+                        foregroundColor: Colors.white,
+                      ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(18),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: [
-                            _MetaPill(
-                              icon: Icons.access_time_rounded,
-                              label: timeago.format(
-                                post.createdAt,
-                                locale: l10n.localeName,
-                              ),
-                            ),
-                            _MetaPill(
-                              icon: Icons.person_rounded,
-                              label: post.userName,
-                            ),
-                            _MetaPill(
-                              icon: Icons.visibility_outlined,
-                              label: l10n.viewsCount(post.viewCount),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton.icon(
-                            onPressed: () => _contactViaWhatsApp(
-                              post.userPhone,
-                              post.itemName,
-                            ),
-                            icon: const Icon(Icons.chat_rounded),
-                            label: Text(l10n.contactWhatsapp),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.whatsappGreen,
-                              foregroundColor: Colors.white,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
+                ],
+              ),
+            ),
+            const SizedBox(height: 14),
+            AppPanel(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
                           l10n.description,
                           style: GoogleFonts.spaceGrotesk(
                             fontSize: 22,
@@ -436,47 +445,54 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                             color: cs.onSurface,
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          post.description ?? l10n.noDescription,
-                          style: GoogleFonts.manrope(
-                            color: cs.onSurfaceVariant,
-                            fontWeight: FontWeight.w600,
-                            height: 1.55,
+                      ),
+                      if (!isOwner)
+                        TextButton.icon(
+                          onPressed: () => _confirmReport(app, post),
+                          icon: Icon(
+                            Icons.flag_outlined,
+                            color: post.reports.contains(app.currentUser?.id)
+                                ? cs.onSurfaceVariant
+                                : AppColors.lostPrimary,
                           ),
-                        ),
-                        const SizedBox(height: 16),
-                        Align(
-                          alignment: AlignmentDirectional.centerEnd,
-                          child: TextButton.icon(
-                            onPressed: () => _confirmReport(app, post),
-                            icon: Icon(
-                              Icons.flag_outlined,
+                          label: Text(
+                            post.reports.contains(app.currentUser?.id)
+                                ? l10n.reported
+                                : l10n.report,
+                            style: GoogleFonts.manrope(
                               color: post.reports.contains(app.currentUser?.id)
                                   ? cs.onSurfaceVariant
                                   : AppColors.lostPrimary,
-                            ),
-                            label: Text(
-                              post.reports.contains(app.currentUser?.id)
-                                  ? l10n.reported
-                                  : l10n.report,
-                              style: GoogleFonts.manrope(
-                                color:
-                                    post.reports.contains(app.currentUser?.id)
-                                    ? cs.onSurfaceVariant
-                                    : AppColors.lostPrimary,
-                                fontWeight: FontWeight.w800,
-                              ),
+                              fontWeight: FontWeight.w800,
                             ),
                           ),
                         ),
-                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? Colors.white.withAlpha(6)
+                          : AppColors.frost,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: cs.outlineVariant),
+                    ),
+                    child: Text(
+                      post.description ?? l10n.noDescription,
+                      style: GoogleFonts.manrope(
+                        color: cs.onSurfaceVariant,
+                        fontWeight: FontWeight.w600,
+                        height: 1.55,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
             AppPanel(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -493,17 +509,35 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                   if (post.comments.isEmpty)
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: cs.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(22),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
                       ),
-                      child: Text(
-                        l10n.noCommentsSection,
-                        style: GoogleFonts.manrope(
-                          color: cs.onSurfaceVariant,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? Colors.white.withAlpha(8)
+                            : cs.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(22),
+                        border: Border.all(color: cs.outlineVariant),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.chat_bubble_outline_rounded,
+                            size: 18,
+                            color: cs.onSurfaceVariant,
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              l10n.noCommentsSection,
+                              style: GoogleFonts.manrope(
+                                color: cs.onSurfaceVariant,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     )
                   else
@@ -572,7 +606,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                         ),
                       ),
                     ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 10),
                   TextField(
                     controller: _commentController,
                     minLines: 1,
@@ -582,14 +616,27 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                     onSubmitted: (_) => _addComment(app, post),
                     decoration: InputDecoration(
                       hintText: l10n.typeComment,
+                      prefixIcon: const Icon(
+                        Icons.mode_comment_outlined,
+                        color: AppColors.primaryBlue,
+                      ),
                       suffixIcon: IconButton(
                         onPressed: () => _addComment(app, post),
-                        icon: const Icon(Icons.send_rounded),
+                        icon: const Icon(
+                          Icons.send_rounded,
+                          color: AppColors.primaryBlue,
+                        ),
                       ),
                     ),
                   ),
-                  if (isOwner) ...[
-                    const SizedBox(height: 12),
+                ],
+              ),
+            ),
+            if (isOwner) ...[
+              const SizedBox(height: 14),
+              AppPanel(
+                child: Column(
+                  children: [
                     if (!post.isResolved)
                       SizedBox(
                         width: double.infinity,
@@ -672,9 +719,9 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                       ),
                     ),
                   ],
-                ],
+                ),
               ),
-            ),
+            ],
           ],
         ),
       ),

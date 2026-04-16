@@ -156,15 +156,15 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
+    final l10n = context.l10n;
 
     if (_useCustomCategory && _customCategoryController.text.trim().isEmpty) {
-      _showMessage('Please enter a custom category.', isError: true);
+      _showMessage(l10n.customCategoryRequired, isError: true);
       return;
     }
 
     final app = Provider.of<AppState>(context, listen: false);
     final messenger = ScaffoldMessenger.of(context);
-    final l10n = context.l10n;
     final currentUser = app.currentUser;
     if (currentUser == null) {
       _showMessage(l10n.loginToPost, isError: true);
@@ -236,7 +236,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
 
     final custom = _customCategoryController.text.trim();
     if (custom.isEmpty) return baseOrNull;
-    final tag = 'Category: $custom';
+    final tag = '${context.l10n.customCategoryPrefix}: $custom';
     if (baseOrNull == null) return tag;
     return '$tag\n$baseOrNull';
   }
@@ -324,7 +324,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
         ),
         const SizedBox(height: 8),
         categoryRow(
-          label: 'Custom',
+          label: l10n.customCategoryOption,
           selected: _useCustomCategory,
           onTap: () => setState(() => _useCustomCategory = true),
         ),
@@ -336,13 +336,13 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
             validator: (value) {
               if (!_useCustomCategory) return null;
               if (value == null || value.trim().isEmpty) {
-                return 'Enter custom category';
+                return l10n.customCategoryRequired;
               }
               return null;
             },
-            decoration: const InputDecoration(
-              labelText: 'Custom category',
-              prefixIcon: Icon(
+            decoration: InputDecoration(
+              labelText: l10n.customCategoryField,
+              prefixIcon: const Icon(
                 Icons.label_outline_rounded,
                 color: AppColors.primaryBlue,
               ),

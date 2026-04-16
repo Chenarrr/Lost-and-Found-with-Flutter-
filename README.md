@@ -27,6 +27,7 @@ flutter run
 ## Table of Contents
 
 - [Features](#features)
+- [Recent Improvements (Apr 2026)](#recent-improvements-apr-2026)
 - [Tech Stack](#tech-stack)
 - [Architecture](#architecture)
 - [Development](#development)
@@ -44,15 +45,29 @@ flutter run
 
 ## Features
 
-- **Phone OTP auth** — SMS login, no password, Iraqi `+964` format auto-applied
+- **Phone OTP auth** — SMS login, no password, Iraqi `+964` format auto-applied from spaced input like `750 222 22 22`
+- **Single auth flow** — Login first, then Signup in one continuous scroll screen
 - **Lost / Found posts** — type, category (Electronics, Documents, Personal Items, Pets), city, street, up to 3 photos
 - **Real-time feed** — live Firestore listener, search, city filter, type filter, live stats
 - **Post actions** — Mark as Resolved, Delete, Edit (owner); Report, Share, Comment (any user)
+- **Refined post details UI** — cleaner card hierarchy for media, actions, description, and comments
 - **WhatsApp contact** — deep link to pre-filled message; falls back to `wa.me` web URL
 - **Activity tab** — My Posts + My Comments in one place
 - **Profile** — stats (total / lost / found), post list, member since date
 - **Settings** — dark mode toggle, change name, language switcher, logout, delete account
-- **Localization** — English, Arabic, Kurdish Sorani (کوردی) with instant RTL switching
+- **Localization** — English, Arabic, Kurdish Sorani (کوردی) with instant RTL switching, including custom category flow
+
+---
+
+## Recent Improvements (Apr 2026)
+
+- Unified top-area styling across auth, post, profile, and settings screens using shared backdrop/app bar theme tokens
+- Improved post creation UX with image-first layout, in-place add-image actions, and cleaner category selection
+- Fully localized custom-category text in Create Post and persisted description tagging
+- Reduced unnecessary rebuilds with `context.select` and smarter post-list change detection in `AppState`
+- Improved scrolling performance using lazy list building and cache tuning on feed/activity screens
+- Optimized image rendering with targeted caching/decode hints in post cards
+- Hardened async dialog flows in Settings (mounted/context-safe operations during name/theme/account actions)
 
 ---
 
@@ -288,6 +303,8 @@ The following test numbers are registered in this project (all use code `123456`
 ## Localization
 
 The app ships with **English (`en`)**, **Arabic (`ar`)**, and **Kurdish Sorani (`ckb`)**.
+
+Custom category strings in Create Post are localized end-to-end (`customCategoryOption`, `customCategoryField`, `customCategoryRequired`, `customCategoryPrefix`).
 
 | File | Purpose |
 |---|---|

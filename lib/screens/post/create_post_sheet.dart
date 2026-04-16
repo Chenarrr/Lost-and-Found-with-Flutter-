@@ -227,131 +227,139 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
 
   Widget _buildImagesSection(AppLocalizations l10n, ColorScheme cs) {
     return AppPanel(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _SectionTitle(
-            title: l10n.imagesSection(_imagePaths.length),
-            subtitle: l10n.addImage,
-          ),
-          const SizedBox(height: 14),
-          if (_imagePaths.isEmpty)
-            InkWell(
-              borderRadius: BorderRadius.circular(24),
-              onTap: _pickImage,
-              child: Container(
-                height: 150,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white.withAlpha(8)
-                      : AppColors.frost,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: cs.outlineVariant),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.add_photo_alternate_outlined,
-                      color: AppColors.primaryBlue,
-                      size: 26,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      l10n.addImage,
-                      style: GoogleFonts.manrope(
-                        color: AppColors.primaryBlue,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      l10n.noImagesSelected,
-                      style: GoogleFonts.manrope(
-                        color: cs.onSurfaceVariant,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            )
-          else
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _imagePaths.length + (_imagePaths.length < 3 ? 1 : 0),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                childAspectRatio: 1.05,
-              ),
-              itemBuilder: (context, index) {
-                if (index == _imagePaths.length && _imagePaths.length < 3) {
-                  return InkWell(
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _SectionTitle(
+              title: l10n.imagesSection(_imagePaths.length),
+              subtitle: l10n.addImage,
+            ),
+            const SizedBox(height: 16),
+            if (_imagePaths.isEmpty)
+              InkWell(
+                borderRadius: BorderRadius.circular(24),
+                onTap: _pickImage,
+                child: Container(
+                  width: double.infinity,
+                  height: 180,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white.withAlpha(8)
+                        : AppColors.frost,
                     borderRadius: BorderRadius.circular(24),
-                    onTap: _pickImage,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white.withAlpha(8)
-                            : AppColors.frost,
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: cs.outlineVariant),
+                    border: Border.all(color: cs.outlineVariant),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.add_photo_alternate_outlined,
+                        color: AppColors.primaryBlue,
+                        size: 30,
                       ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.add_photo_alternate_outlined,
-                            color: AppColors.primaryBlue,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            l10n.addImage,
-                            style: GoogleFonts.manrope(
-                              color: AppColors.primaryBlue,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ],
+                      const SizedBox(height: 10),
+                      Text(
+                        l10n.addImage,
+                        style: GoogleFonts.manrope(
+                          color: AppColors.primaryBlue,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 16,
+                        ),
                       ),
-                    ),
-                  );
-                }
-
-                final path = _imagePaths[index];
-                return Stack(
-                  children: [
-                    ClipRRect(
+                      const SizedBox(height: 8),
+                      Text(
+                        l10n.noImagesSelected,
+                        style: GoogleFonts.manrope(
+                          color: cs.onSurfaceVariant,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount:
+                    _imagePaths.length + (_imagePaths.length < 3 ? 1 : 0),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  childAspectRatio: 1,
+                ),
+                itemBuilder: (context, index) {
+                  if (index == _imagePaths.length && _imagePaths.length < 3) {
+                    return InkWell(
                       borderRadius: BorderRadius.circular(24),
-                      child: SizedBox.expand(child: _buildImagePreview(path)),
-                    ),
-                    Positioned(
-                      top: 10,
-                      right: 10,
-                      child: GestureDetector(
-                        onTap: () => setState(() => _imagePaths.remove(path)),
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withAlpha(120),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.close_rounded,
-                            color: Colors.white,
-                            size: 18,
+                      onTap: _pickImage,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white.withAlpha(8)
+                              : AppColors.frost,
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(color: cs.outlineVariant),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.add_photo_alternate_outlined,
+                              color: AppColors.primaryBlue,
+                              size: 28,
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              l10n.addImage,
+                              style: GoogleFonts.manrope(
+                                color: AppColors.primaryBlue,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+
+                  final path = _imagePaths[index];
+                  return Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(24),
+                        child: SizedBox.expand(child: _buildImagePreview(path)),
+                      ),
+                      Positioned(
+                        top: 10,
+                        right: 10,
+                        child: GestureDetector(
+                          onTap: () => setState(() => _imagePaths.remove(path)),
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withAlpha(120),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.close_rounded,
+                              color: Colors.white,
+                              size: 18,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                );
-              },
-            ),
-        ],
+                    ],
+                  );
+                },
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -366,26 +374,25 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: isDark
-            ? AppColors.heroNavy
-            : Colors.white.withAlpha(232),
+        backgroundColor: isDark ? AppColors.heroNavy : Colors.white.withAlpha(232),
         foregroundColor: isDark ? Colors.white : cs.onSurface,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         scrolledUnderElevation: 0,
         title: Text(_isEditing ? l10n.editPostTitle : l10n.createPost),
         actions: [
-          GestureDetector(
-            onTap: _goHome,
-            child: Padding(
-              padding: const EdgeInsets.only(right: 18),
-              child: AppPanel(
-                padding: const EdgeInsets.all(10),
-                borderRadius: BorderRadius.circular(18),
-                child: const Icon(
-                  Icons.home_rounded,
-                  color: AppColors.primaryBlue,
-                ),
+          Padding(
+            padding: const EdgeInsets.only(right: 14),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: isDark ? Colors.white.withAlpha(14) : Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: cs.outlineVariant.withAlpha(160)),
+              ),
+              child: IconButton(
+                onPressed: _goHome,
+                icon: const Icon(Icons.home_rounded, color: AppColors.primaryBlue),
+                tooltip: l10n.homeNav,
               ),
             ),
           ),
@@ -407,42 +414,51 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   AppPanel(
-                    padding: EdgeInsets.zero,
-                    clipBehavior: Clip.antiAlias,
-                    gradient: const LinearGradient(
-                      colors: [
-                        AppColors.heroNavy,
-                        AppColors.heroBlue,
-                        AppColors.heroTeal,
-                      ],
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(22),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _isEditing ? l10n.editPostTitle : l10n.createPost,
-                            style: GoogleFonts.spaceGrotesk(
-                              color: Colors.white,
-                              fontSize: 30,
-                              fontWeight: FontWeight.w700,
-                            ),
+                    padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                    borderRadius: BorderRadius.circular(22),
+                    gradient: isDark
+                        ? const LinearGradient(
+                            colors: [Color(0xFF142949), Color(0xFF1D456F)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          )
+                        : const LinearGradient(
+                            colors: [Color(0xFFF0F6FF), Color(0xFFE8FAFF)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
-                          const SizedBox(height: 8),
-                          Text(
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 38,
+                          height: 38,
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? Colors.white.withAlpha(18)
+                                : AppColors.primaryBlue.withAlpha(20),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Icons.tips_and_updates_rounded,
+                            color: isDark ? Colors.white : AppColors.primaryBlue,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
                             l10n.shareDetails,
                             style: GoogleFonts.manrope(
-                              color: Colors.white.withAlpha(204),
-                              fontWeight: FontWeight.w600,
-                              height: 1.45,
+                              color: isDark ? Colors.white : cs.onSurface,
+                              fontWeight: FontWeight.w700,
+                              height: 1.3,
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 14),
                   if (!_isEditing) ...[
                     _buildImagesSection(l10n, cs),
                     const SizedBox(height: 16),
@@ -464,8 +480,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                                 icon: Icons.search_rounded,
                                 selected: _postType == PostType.lost,
                                 color: AppColors.lostPrimary,
-                                onTap: () =>
-                                    setState(() => _postType = PostType.lost),
+                                onTap: () => setState(() => _postType = PostType.lost),
                               ),
                             ),
                             const SizedBox(width: 10),
@@ -475,8 +490,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                                 icon: Icons.volunteer_activism_rounded,
                                 selected: _postType == PostType.found,
                                 color: AppColors.foundPrimary,
-                                onTap: () =>
-                                    setState(() => _postType = PostType.found),
+                                onTap: () => setState(() => _postType = PostType.found),
                               ),
                             ),
                           ],
@@ -492,25 +506,18 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                                 category.displayName,
                                 style: GoogleFonts.manrope(
                                   fontWeight: FontWeight.w800,
-                                  color: isSelected
-                                      ? Colors.white
-                                      : cs.onSurface,
+                                  color: isSelected ? Colors.white : cs.onSurface,
                                 ),
                               ),
                               selected: isSelected,
-                              onSelected: (_) =>
-                                  setState(() => _category = category),
+                              onSelected: (_) => setState(() => _category = category),
                               showCheckmark: false,
                               selectedColor: AppColors.primaryBlue,
-                              backgroundColor:
-                                  Theme.of(context).brightness ==
-                                      Brightness.dark
+                              backgroundColor: Theme.of(context).brightness == Brightness.dark
                                   ? Colors.white.withAlpha(8)
                                   : Colors.white,
                               side: BorderSide(
-                                color: isSelected
-                                    ? Colors.transparent
-                                    : cs.outlineVariant,
+                                color: isSelected ? Colors.transparent : cs.outlineVariant,
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(999),
@@ -601,10 +608,8 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                                 ),
                               )
                               .toList(),
-                          onChanged: (value) =>
-                              setState(() => _selectedCity = value),
-                          validator: (value) =>
-                              value == null ? l10n.cityRequired : null,
+                          onChanged: (value) => setState(() => _selectedCity = value),
+                          validator: (value) => value == null ? l10n.cityRequired : null,
                         ),
                         const SizedBox(height: 10),
                         TextFormField(

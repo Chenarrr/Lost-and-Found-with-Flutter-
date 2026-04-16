@@ -501,6 +501,18 @@ class AppLocalizationsCkb extends AppLocalizations {
   String get categoryPets => 'ئاژەڵ';
 
   @override
+  String get customCategoryOption => 'جۆری تایبەت';
+
+  @override
+  String get customCategoryField => 'جۆری تایبەت';
+
+  @override
+  String get customCategoryRequired => 'تکایە جۆرێکی تایبەت بنووسە.';
+
+  @override
+  String get customCategoryPrefix => 'جۆر';
+
+  @override
   String viewsCount(int count) {
     return '$count بینین';
   }

@@ -499,6 +499,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get categoryPets => 'Pets';
 
   @override
+  String get customCategoryOption => 'Custom';
+
+  @override
+  String get customCategoryField => 'Custom category';
+
+  @override
+  String get customCategoryRequired => 'Please enter a custom category.';
+
+  @override
+  String get customCategoryPrefix => 'Category';
+
+  @override
   String viewsCount(int count) {
     return '$count views';
   }

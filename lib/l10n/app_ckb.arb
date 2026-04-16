@@ -218,6 +218,10 @@
   "categoryDocuments": "بەڵگەنامە",
   "categoryPersonalItems": "شتی کەسی",
   "categoryPets": "ئاژەڵ",
+  "customCategoryOption": "جۆری تایبەت",
+  "customCategoryField": "جۆری تایبەت",
+  "customCategoryRequired": "تکایە جۆرێکی تایبەت بنووسە.",
+  "customCategoryPrefix": "جۆر",
   "viewsCount": "{count} بینین",
   "@viewsCount": {
     "placeholders": {

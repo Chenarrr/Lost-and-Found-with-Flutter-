@@ -1030,6 +1030,30 @@ abstract class AppLocalizations {
   /// **'Pets'**
   String get categoryPets;
 
+  /// No description provided for @customCategoryOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get customCategoryOption;
+
+  /// No description provided for @customCategoryField.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom category'**
+  String get customCategoryField;
+
+  /// No description provided for @customCategoryRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a custom category.'**
+  String get customCategoryRequired;
+
+  /// No description provided for @customCategoryPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get customCategoryPrefix;
+
   /// No description provided for @viewsCount.
   ///
   /// In en, this message translates to:

@@ -218,6 +218,10 @@
   "categoryDocuments": "Documents",
   "categoryPersonalItems": "Personal Items",
   "categoryPets": "Pets",
+  "customCategoryOption": "Custom",
+  "customCategoryField": "Custom category",
+  "customCategoryRequired": "Please enter a custom category.",
+  "customCategoryPrefix": "Category",
   "viewsCount": "{count} views",
   "@viewsCount": {
     "placeholders": {

@@ -218,6 +218,10 @@
   "categoryDocuments": "وثائق",
   "categoryPersonalItems": "أشياء شخصية",
   "categoryPets": "حيوانات أليفة",
+  "customCategoryOption": "فئة مخصّصة",
+  "customCategoryField": "الفئة المخصّصة",
+  "customCategoryRequired": "يرجى إدخال فئة مخصّصة.",
+  "customCategoryPrefix": "الفئة",
   "viewsCount": "{count} مشاهدة",
   "@viewsCount": {
     "placeholders": {

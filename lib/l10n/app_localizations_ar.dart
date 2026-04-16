@@ -498,6 +498,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get categoryPets => 'حيوانات أليفة';
 
   @override
+  String get customCategoryOption => 'فئة مخصّصة';
+
+  @override
+  String get customCategoryField => 'الفئة المخصّصة';
+
+  @override
+  String get customCategoryRequired => 'يرجى إدخال فئة مخصّصة.';
+
+  @override
+  String get customCategoryPrefix => 'الفئة';
+
+  @override
   String viewsCount(int count) {
     return '$count مشاهدة';
   }

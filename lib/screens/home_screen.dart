@@ -263,34 +263,6 @@ class _HomeScreenState extends State<HomeScreen> {
           physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 150),
           children: [
-            // ── Hero (stripped) ───────────────────────────────────────────────
-            AppPanel(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-              clipBehavior: Clip.antiAlias,
-              gradient: const LinearGradient(
-                colors: [
-                  AppColors.heroNavy,
-                  AppColors.heroBlue,
-                  AppColors.heroTeal,
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    l10n.tagline,
-                    style: GoogleFonts.manrope(
-                      color: Colors.white.withAlpha(180),
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 10),
             // ── Search ────────────────────────────────────────────────────────
             AppPanel(
               padding: const EdgeInsets.all(14),

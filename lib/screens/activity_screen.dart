@@ -187,9 +187,12 @@ class ActivityScreen extends StatelessWidget {
                       if (userPosts.isEmpty)
                         Padding(
                           padding: const EdgeInsets.all(18),
-                          child: _ProfileLikeEmpty(
-                            icon: Icons.inventory_2_outlined,
-                            message: l10n.noItemsPosted,
+                          child: Align(
+                            alignment: Alignment.topCenter,
+                            child: _ProfileLikeEmpty(
+                              icon: Icons.inventory_2_outlined,
+                              message: l10n.noItemsPosted,
+                            ),
                           ),
                         )
                       else
@@ -445,30 +448,28 @@ class _ProfileLikeEmpty extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
-    return Center(
-      child: AppPanel(
-        child: Column(
-          children: [
-            Container(
-              width: 76,
-              height: 76,
-              decoration: BoxDecoration(
-                color: AppColors.primaryBlue.withAlpha(16),
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: Icon(icon, color: AppColors.primaryBlue, size: 34),
+    return AppPanel(
+      child: Column(
+        children: [
+          Container(
+            width: 76,
+            height: 76,
+            decoration: BoxDecoration(
+              color: AppColors.primaryBlue.withAlpha(16),
+              borderRadius: BorderRadius.circular(24),
             ),
-            const SizedBox(height: 14),
-            Text(
-              message,
-              style: GoogleFonts.manrope(
-                color: cs.onSurfaceVariant,
-                fontWeight: FontWeight.w700,
-              ),
-              textAlign: TextAlign.center,
+            child: Icon(icon, color: AppColors.primaryBlue, size: 34),
+          ),
+          const SizedBox(height: 14),
+          Text(
+            message,
+            style: GoogleFonts.manrope(
+              color: cs.onSurfaceVariant,
+              fontWeight: FontWeight.w700,
             ),
-          ],
-        ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }
@@ -488,11 +489,7 @@ class _ActivityTabLabel extends StatelessWidget {
         Icon(icon, size: 16),
         const SizedBox(width: 6),
         Flexible(
-          child: Text(
-            label,
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
-          ),
+          child: Text(label, overflow: TextOverflow.ellipsis, maxLines: 1),
         ),
       ],
     );

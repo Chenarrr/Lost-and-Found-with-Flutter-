@@ -208,34 +208,9 @@ class _AuthScreenState extends State<AuthScreen> {
                       onTap: (i) => setState(() => _tab = i),
                     ),
                     const SizedBox(height: 16),
-                    // Animated content switch
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 260),
-                      switchInCurve: Curves.easeOutCubic,
-                      switchOutCurve: Curves.easeInCubic,
-                      transitionBuilder: (child, animation) {
-                        final fade = CurvedAnimation(
-                          parent: animation,
-                          curve: Curves.easeOutCubic,
-                        );
-                        final slide =
-                            Tween(
-                              begin: const Offset(0, 0.04),
-                              end: Offset.zero,
-                            ).animate(
-                              CurvedAnimation(
-                                parent: animation,
-                                curve: Curves.easeOutCubic,
-                              ),
-                            );
-                        return FadeTransition(
-                          opacity: fade,
-                          child: SlideTransition(position: slide, child: child),
-                        );
-                      },
-                      child: _tab == 0
-                          ? _buildLoginPane(l10n, key: const ValueKey(0))
-                          : _buildSignupPane(l10n, key: const ValueKey(1)),
+                    IndexedStack(
+                      index: _tab,
+                      children: [_buildLoginPane(l10n), _buildSignupPane(l10n)],
                     ),
                   ],
                 ),
@@ -256,9 +231,8 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  Widget _buildLoginPane(AppLocalizations l10n, {Key? key}) {
+  Widget _buildLoginPane(AppLocalizations l10n) {
     return AppPanel(
-      key: key,
       child: Form(
         key: _formKeyLogin,
         child: Column(
@@ -299,9 +273,8 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  Widget _buildSignupPane(AppLocalizations l10n, {Key? key}) {
+  Widget _buildSignupPane(AppLocalizations l10n) {
     return AppPanel(
-      key: key,
       child: Form(
         key: _formKeySignup,
         child: Column(

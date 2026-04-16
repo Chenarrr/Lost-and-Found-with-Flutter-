@@ -46,16 +46,6 @@ class PostCard extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Left accent stripe
-                  Container(
-                    width: 3,
-                    height: 88,
-                    decoration: BoxDecoration(
-                      color: accentColor,
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
                   // Image
                   ClipRRect(
                     borderRadius: BorderRadius.circular(16),

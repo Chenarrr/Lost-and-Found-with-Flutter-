@@ -167,30 +167,42 @@ class AppState extends ChangeNotifier {
     required Function(String?) onCodeSent,
   }) async {
     _pendingName = name;
-    _pendingPhone = phone;
+    _pendingPhone = _normalizePhoneForAuth(phone);
     _pendingEmail = email;
     _pendingGender = gender;
     _pendingAge = age;
 
-    _verifyPhone(phone, onCodeSent);
+    _verifyPhone(_pendingPhone!, onCodeSent);
   }
 
   Future<void> initiateOtpLogin({
     required String phone,
     required Function(String?) onCodeSent,
   }) async {
-    _pendingPhone = phone;
-    _verifyPhone(phone, onCodeSent);
+    _pendingPhone = _normalizePhoneForAuth(phone);
+    _verifyPhone(_pendingPhone!, onCodeSent);
+  }
+
+  String _normalizePhoneForAuth(String phone) {
+    final digits = phone.replaceAll(RegExp(r'\D'), '');
+
+    if (digits.startsWith('964') && digits.length == 13) {
+      return '+$digits';
+    }
+    if (digits.startsWith('0') && digits.length == 11) {
+      return '+964${digits.substring(1)}';
+    }
+    if (digits.startsWith('7') && digits.length == 10) {
+      return '+964$digits';
+    }
+
+    // Keep current behavior for unexpected input while still stripping spaces/symbols.
+    if (phone.trim().startsWith('+') && digits.isNotEmpty) return '+$digits';
+    return phone.trim().replaceAll(RegExp(r'\s+'), '');
   }
 
   Future<void> _verifyPhone(String phone, Function(String?) onCodeSent) async {
-    String standardizedPhone = phone.trim().replaceAll(RegExp(r'\s+'), '');
-    if (standardizedPhone.startsWith('0')) {
-      standardizedPhone = '+964${standardizedPhone.substring(1)}';
-    } else if (!standardizedPhone.startsWith('+') &&
-        standardizedPhone.startsWith('7')) {
-      standardizedPhone = '+964$standardizedPhone';
-    }
+    final standardizedPhone = _normalizePhoneForAuth(phone);
 
     debugPrint('[Auth] Verifying phone: $standardizedPhone');
 

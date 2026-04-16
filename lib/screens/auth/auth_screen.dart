@@ -19,8 +19,6 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  int _tab = 0; // 0 = login, 1 = signup
-
   final _sName = TextEditingController();
   final _sPhone = TextEditingController();
   final _sEmail = TextEditingController();
@@ -58,9 +56,21 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
+  String _extractLocalPhoneDigits(String fieldValue) {
+    final digits = fieldValue.replaceAll(RegExp(r'\D'), '');
+
+    if (digits.startsWith('964') && digits.length == 13) {
+      return digits.substring(3);
+    }
+    if (digits.startsWith('0') && digits.length == 11) {
+      return digits.substring(1);
+    }
+    return digits;
+  }
+
   String _toE164(String fieldValue) {
-    final digits = fieldValue.replaceAll(RegExp(r'\s'), '');
-    return '+964$digits';
+    final localDigits = _extractLocalPhoneDigits(fieldValue);
+    return '+964$localDigits';
   }
 
   Future<void> _doSignup() async {
@@ -200,18 +210,11 @@ class _AuthScreenState extends State<AuthScreen> {
                       ),
                     ),
                     const SizedBox(height: 18),
-                    // Segmented toggle
-                    _SegmentedToggle(
-                      selected: _tab,
-                      loginLabel: l10n.loginTab,
-                      signupLabel: l10n.signupTab,
-                      onTap: (i) => setState(() => _tab = i),
-                    ),
+                    _buildLoginPane(l10n),
                     const SizedBox(height: 16),
-                    IndexedStack(
-                      index: _tab,
-                      children: [_buildLoginPane(l10n), _buildSignupPane(l10n)],
-                    ),
+                    _buildScrollSectionDivider(l10n.signupTab),
+                    const SizedBox(height: 16),
+                    _buildSignupPane(l10n),
                   ],
                 ),
               ),
@@ -352,6 +355,33 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
+  Widget _buildScrollSectionDivider(String label) {
+    return Row(
+      children: [
+        Expanded(
+          child: Divider(
+            color: Theme.of(context).colorScheme.outline.withAlpha(120),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Text(
+            label,
+            style: GoogleFonts.manrope(
+              fontWeight: FontWeight.w800,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+        Expanded(
+          child: Divider(
+            color: Theme.of(context).colorScheme.outline.withAlpha(120),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
@@ -391,11 +421,11 @@ class _AuthScreenState extends State<AuthScreen> {
       onFieldSubmitted: onSubmitted,
       inputFormatters: [PhoneInputFormatter()],
       validator: (value) {
-        final clean = (value ?? '').replaceAll(RegExp(r'\s'), '');
-        if (clean.isEmpty) {
+        final localDigits = _extractLocalPhoneDigits(value ?? '');
+        if (localDigits.isEmpty) {
           return isRequired ? l10n.phoneRequired : null;
         }
-        if (!_phoneReg.hasMatch(clean)) return l10n.phoneInvalid;
+        if (!_phoneReg.hasMatch(localDigits)) return l10n.phoneInvalid;
         return null;
       },
       decoration: InputDecoration(
@@ -490,101 +520,6 @@ class _AuthScreenState extends State<AuthScreen> {
                 fontSize: 15,
               ),
             ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ── Segmented toggle ─────────────────────────────────────────────────────────
-
-class _SegmentedToggle extends StatelessWidget {
-  const _SegmentedToggle({
-    required this.selected,
-    required this.loginLabel,
-    required this.signupLabel,
-    required this.onTap,
-  });
-
-  final int selected;
-  final String loginLabel;
-  final String signupLabel;
-  final ValueChanged<int> onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return AppPanel(
-      padding: const EdgeInsets.all(5),
-      child: Row(
-        children: [
-          _ToggleTab(
-            label: loginLabel,
-            selected: selected == 0,
-            onTap: () => onTap(0),
-          ),
-          _ToggleTab(
-            label: signupLabel,
-            selected: selected == 1,
-            onTap: () => onTap(1),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ToggleTab extends StatelessWidget {
-  const _ToggleTab({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOutCubic,
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          decoration: BoxDecoration(
-            gradient: selected
-                ? const LinearGradient(
-                    colors: [AppColors.primaryBlue, AppColors.accentIndigo],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  )
-                : null,
-            color: selected ? null : Colors.transparent,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: selected
-                ? [
-                    BoxShadow(
-                      color: AppColors.primaryBlue.withAlpha(46),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
-                    ),
-                  ]
-                : null,
-          ),
-          alignment: Alignment.center,
-          child: AnimatedDefaultTextStyle(
-            duration: const Duration(milliseconds: 200),
-            style: GoogleFonts.manrope(
-              fontSize: 15,
-              fontWeight: FontWeight.w800,
-              color: selected ? Colors.white : cs.onSurfaceVariant,
-            ),
-            child: Text(label),
           ),
         ),
       ),

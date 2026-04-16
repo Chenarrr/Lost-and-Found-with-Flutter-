@@ -124,6 +124,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           });
                           final navigator = Navigator.of(ctx);
                           final err = await app.updateUserName(name);
+                          if (!ctx.mounted) return;
                           if (err != null) {
                             setState(() {
                               loading = false;
@@ -162,7 +163,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final app = Provider.of<AppState>(context, listen: false);
     await showDialog<void>(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogCtx) => AlertDialog(
         title: Text(
           l10n.language,
           style: GoogleFonts.inter(fontWeight: FontWeight.w700),
@@ -175,7 +176,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               isSelected: app.locale.languageCode == 'en',
               onTap: () {
                 app.setLocale(const Locale('en'));
-                Navigator.of(context).pop();
+                Navigator.of(dialogCtx).pop();
               },
             ),
             const SizedBox(height: 8),
@@ -184,7 +185,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               isSelected: app.locale.languageCode == 'ar',
               onTap: () {
                 app.setLocale(const Locale('ar'));
-                Navigator.of(context).pop();
+                Navigator.of(dialogCtx).pop();
               },
             ),
             const SizedBox(height: 8),
@@ -193,14 +194,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
               isSelected: app.locale.languageCode == 'ckb',
               onTap: () {
                 app.setLocale(const Locale('ckb'));
-                Navigator.of(context).pop();
+                Navigator.of(dialogCtx).pop();
               },
             ),
           ],
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(dialogCtx).pop(),
             child: Text(l10n.cancel, style: GoogleFonts.inter()),
           ),
         ],
@@ -213,7 +214,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final app = Provider.of<AppState>(context, listen: false);
     final shouldLogout = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogCtx) => AlertDialog(
         title: Text(
           l10n.logout,
           style: GoogleFonts.inter(fontWeight: FontWeight.w700),
@@ -221,11 +222,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         content: Text(l10n.logoutConfirm, style: GoogleFonts.inter()),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
+            onPressed: () => Navigator.of(dialogCtx).pop(false),
             child: Text(l10n.cancel, style: GoogleFonts.inter()),
           ),
           TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
+            onPressed: () => Navigator.of(dialogCtx).pop(true),
             child: Text(
               l10n.logout,
               style: GoogleFonts.inter(
@@ -254,7 +255,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogCtx) => AlertDialog(
         title: Text(
           l10n.deleteAccount,
           style: GoogleFonts.inter(fontWeight: FontWeight.w700),
@@ -262,11 +263,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         content: Text(l10n.deleteAccountConfirm, style: GoogleFonts.inter()),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
+            onPressed: () => Navigator.of(dialogCtx).pop(false),
             child: Text(l10n.cancel, style: GoogleFonts.inter()),
           ),
           TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
+            onPressed: () => Navigator.of(dialogCtx).pop(true),
             child: Text(
               l10n.delete,
               style: GoogleFonts.inter(
@@ -376,6 +377,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               error = null;
                             });
                             await app.startReauthOtp((err) {
+                              if (!ctx.mounted) return;
                               if (err == null) {
                                 setState(() {
                                   sending = false;
@@ -424,6 +426,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             final deleteErr = await app.reauthWithOtpAndDelete(
                               code,
                             );
+                            if (!ctx.mounted) return;
                             if (deleteErr != null) {
                               setState(() {
                                 deleting = false;

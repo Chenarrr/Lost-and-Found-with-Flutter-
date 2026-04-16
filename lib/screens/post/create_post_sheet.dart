@@ -236,22 +236,43 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
           ),
           const SizedBox(height: 14),
           if (_imagePaths.isEmpty)
-            Container(
-              height: 150,
-              decoration: BoxDecoration(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white.withAlpha(8)
-                    : AppColors.frost,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: cs.outlineVariant),
-              ),
-              child: Center(
-                child: Text(
-                  l10n.noImagesSelected,
-                  style: GoogleFonts.manrope(
-                    color: cs.onSurfaceVariant,
-                    fontWeight: FontWeight.w700,
-                  ),
+            InkWell(
+              borderRadius: BorderRadius.circular(24),
+              onTap: _pickImage,
+              child: Container(
+                height: 150,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white.withAlpha(8)
+                      : AppColors.frost,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: cs.outlineVariant),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.add_photo_alternate_outlined,
+                      color: AppColors.primaryBlue,
+                      size: 26,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      l10n.addImage,
+                      style: GoogleFonts.manrope(
+                        color: AppColors.primaryBlue,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      l10n.noImagesSelected,
+                      style: GoogleFonts.manrope(
+                        color: cs.onSurfaceVariant,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             )
@@ -259,7 +280,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
             GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: _imagePaths.length,
+              itemCount: _imagePaths.length + (_imagePaths.length < 3 ? 1 : 0),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 crossAxisSpacing: 10,
@@ -267,6 +288,39 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                 childAspectRatio: 1.05,
               ),
               itemBuilder: (context, index) {
+                if (index == _imagePaths.length && _imagePaths.length < 3) {
+                  return InkWell(
+                    borderRadius: BorderRadius.circular(24),
+                    onTap: _pickImage,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white.withAlpha(8)
+                            : AppColors.frost,
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(color: cs.outlineVariant),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.add_photo_alternate_outlined,
+                            color: AppColors.primaryBlue,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            l10n.addImage,
+                            style: GoogleFonts.manrope(
+                              color: AppColors.primaryBlue,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+
                 final path = _imagePaths[index];
                 return Stack(
                   children: [
@@ -296,17 +350,6 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                   ],
                 );
               },
-            ),
-          const SizedBox(height: 12),
-          if (_imagePaths.length < 3)
-            OutlinedButton.icon(
-              onPressed: _pickImage,
-              icon: const Icon(Icons.add_photo_alternate_outlined),
-              label: Text(l10n.addImage),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.primaryBlue,
-                side: const BorderSide(color: AppColors.primaryBlue),
-              ),
             ),
         ],
       ),

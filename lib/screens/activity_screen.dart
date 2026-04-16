@@ -201,6 +201,7 @@ class ActivityScreen extends StatelessWidget {
                       else
                         ListView.builder(
                           padding: const EdgeInsets.fromLTRB(18, 14, 18, 150),
+                          cacheExtent: 1000,
                           itemCount: userPosts.length,
                           itemBuilder: (context, index) =>
                               PostCard(post: userPosts[index]),
@@ -217,6 +218,7 @@ class ActivityScreen extends StatelessWidget {
                       else
                         ListView.builder(
                           padding: const EdgeInsets.fromLTRB(18, 14, 18, 150),
+                          cacheExtent: 1000,
                           itemCount: userComments.length,
                           itemBuilder: (context, index) {
                             final entry = userComments[index];

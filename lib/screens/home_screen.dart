@@ -240,8 +240,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final cs = Theme.of(context).colorScheme;
-    final app = context.watch<AppState>();
-    final posts = app.posts.where((post) {
+    final allPosts = context.select<AppState, List<Post>>((app) => app.posts);
+    final posts = allPosts.where((post) {
       final matchesCity =
           _cityFilter == 'All Cities' || post.city == _cityFilter;
       final matchesSearch =
@@ -259,137 +259,144 @@ class _HomeScreenState extends State<HomeScreen> {
       child: RefreshIndicator(
         onRefresh: _onRefresh,
         color: AppColors.primaryBlue,
-        child: ListView(
+        child: ListView.builder(
           physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 150),
-          children: [
-            // ── Search ────────────────────────────────────────────────────────
-            AppPanel(
-              padding: const EdgeInsets.all(14),
-              child: TextField(
-                controller: _searchController,
-                style: GoogleFonts.manrope(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-                decoration: InputDecoration(
-                  hintText: l10n.searchHint,
-                  prefixIcon: const Icon(
-                    Icons.search_rounded,
-                    color: AppColors.primaryBlue,
-                    size: 20,
+          cacheExtent: 1200,
+          itemCount: posts.isEmpty ? 4 : posts.length + 3,
+          itemBuilder: (context, index) {
+            if (index == 0) {
+              return AppPanel(
+                padding: const EdgeInsets.all(14),
+                child: TextField(
+                  controller: _searchController,
+                  style: GoogleFonts.manrope(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
                   ),
-                  suffixIcon: _searchController.text.isEmpty
-                      ? null
-                      : IconButton(
-                          onPressed: () {
-                            _searchController.clear();
-                            _searchDebounce?.cancel();
-                            setState(() => _searchQuery = '');
-                          },
-                          icon: Icon(
-                            Icons.close_rounded,
-                            color: cs.onSurfaceVariant,
-                            size: 18,
-                          ),
-                        ),
-                  isDense: true,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 12,
-                  ),
-                ),
-                onChanged: (value) {
-                  setState(() {});
-                  _onSearchChanged(value);
-                },
-              ),
-            ),
-            const SizedBox(height: 10),
-            // ── Filters ───────────────────────────────────────────────────────
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  // City chip
-                  GestureDetector(
-                    onTap: () => _showCitySheet(l10n),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _cityFilter != 'All Cities'
-                            ? AppColors.primaryBlue.withAlpha(18)
-                            : (Theme.of(context).brightness == Brightness.dark
-                                  ? Colors.white.withAlpha(8)
-                                  : Colors.white),
-                        borderRadius: BorderRadius.circular(999),
-                        border: Border.all(
-                          color: _cityFilter != 'All Cities'
-                              ? AppColors.primaryBlue.withAlpha(80)
-                              : cs.outlineVariant,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.location_on_rounded,
-                            size: 14,
-                            color: _cityFilter != 'All Cities'
-                                ? AppColors.primaryBlue
-                                : cs.onSurfaceVariant,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            _cityDisplayName(_cityFilter, l10n),
-                            style: GoogleFonts.manrope(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800,
-                              color: _cityFilter != 'All Cities'
-                                  ? AppColors.primaryBlue
-                                  : cs.onSurface,
+                  decoration: InputDecoration(
+                    hintText: l10n.searchHint,
+                    prefixIcon: const Icon(
+                      Icons.search_rounded,
+                      color: AppColors.primaryBlue,
+                      size: 20,
+                    ),
+                    suffixIcon: _searchController.text.isEmpty
+                        ? null
+                        : IconButton(
+                            onPressed: () {
+                              _searchController.clear();
+                              _searchDebounce?.cancel();
+                              setState(() => _searchQuery = '');
+                            },
+                            icon: Icon(
+                              Icons.close_rounded,
+                              color: cs.onSurfaceVariant,
+                              size: 18,
                             ),
                           ),
-                          const SizedBox(width: 4),
-                          Icon(
-                            Icons.keyboard_arrow_down_rounded,
-                            size: 14,
-                            color: cs.onSurfaceVariant,
-                          ),
-                        ],
-                      ),
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 12,
                     ),
                   ),
-                  const SizedBox(width: 6),
-                  _typeChip(l10n.all, null),
-                  const SizedBox(width: 6),
-                  _typeChip(l10n.lost, PostType.lost),
-                  const SizedBox(width: 6),
-                  _typeChip(l10n.found, PostType.found),
-                  const SizedBox(width: 6),
-                  _categoryChip(
-                    l10n.categoryElectronics,
-                    PostCategory.electronics,
-                  ),
-                  const SizedBox(width: 6),
-                  _categoryChip(l10n.categoryDocuments, PostCategory.documents),
-                  const SizedBox(width: 6),
-                  _categoryChip(
-                    l10n.categoryPersonalItems,
-                    PostCategory.personalItems,
-                  ),
-                  const SizedBox(width: 6),
-                  _categoryChip(l10n.categoryPets, PostCategory.pets),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-            // ── Posts ─────────────────────────────────────────────────────────
-            if (posts.isEmpty)
-              Padding(
+                  onChanged: (value) {
+                    setState(() {});
+                    _onSearchChanged(value);
+                  },
+                ),
+              );
+            }
+
+            if (index == 1) return const SizedBox(height: 10);
+
+            if (index == 2) {
+              return SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () => _showCitySheet(l10n),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _cityFilter != 'All Cities'
+                              ? AppColors.primaryBlue.withAlpha(18)
+                              : (Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white.withAlpha(8)
+                                    : Colors.white),
+                          borderRadius: BorderRadius.circular(999),
+                          border: Border.all(
+                            color: _cityFilter != 'All Cities'
+                                ? AppColors.primaryBlue.withAlpha(80)
+                                : cs.outlineVariant,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.location_on_rounded,
+                              size: 14,
+                              color: _cityFilter != 'All Cities'
+                                  ? AppColors.primaryBlue
+                                  : cs.onSurfaceVariant,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              _cityDisplayName(_cityFilter, l10n),
+                              style: GoogleFonts.manrope(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w800,
+                                color: _cityFilter != 'All Cities'
+                                    ? AppColors.primaryBlue
+                                    : cs.onSurface,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              size: 14,
+                              color: cs.onSurfaceVariant,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    _typeChip(l10n.all, null),
+                    const SizedBox(width: 6),
+                    _typeChip(l10n.lost, PostType.lost),
+                    const SizedBox(width: 6),
+                    _typeChip(l10n.found, PostType.found),
+                    const SizedBox(width: 6),
+                    _categoryChip(
+                      l10n.categoryElectronics,
+                      PostCategory.electronics,
+                    ),
+                    const SizedBox(width: 6),
+                    _categoryChip(
+                      l10n.categoryDocuments,
+                      PostCategory.documents,
+                    ),
+                    const SizedBox(width: 6),
+                    _categoryChip(
+                      l10n.categoryPersonalItems,
+                      PostCategory.personalItems,
+                    ),
+                    const SizedBox(width: 6),
+                    _categoryChip(l10n.categoryPets, PostCategory.pets),
+                  ],
+                ),
+              );
+            }
+
+            if (posts.isEmpty) {
+              return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 40),
                 child: Column(
                   children: [
@@ -421,12 +428,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ],
                 ),
-              )
-            else
-              ...posts.map(
-                (post) => PostCard(key: ValueKey(post.id), post: post),
-              ),
-          ],
+              );
+            }
+
+            final post = posts[index - 3];
+            return PostCard(key: ValueKey(post.id), post: post);
+          },
         ),
       ),
     );

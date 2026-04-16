@@ -139,7 +139,6 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -164,49 +163,6 @@ class _AuthScreenState extends State<AuthScreen> {
                           Icons.arrow_back_rounded,
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    // Hero panel
-                    AppPanel(
-                      padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-                      clipBehavior: Clip.antiAlias,
-                      gradient: LinearGradient(
-                        colors: isDark
-                            ? const [
-                                Color(0xFF0B1F3C),
-                                Color(0xFF113463),
-                                Color(0xFF0C697F),
-                              ]
-                            : const [
-                                AppColors.heroNavy,
-                                AppColors.heroBlue,
-                                AppColors.heroTeal,
-                              ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            l10n.loginOrSignup,
-                            style: GoogleFonts.spaceGrotesk(
-                              color: Colors.white,
-                              fontSize: 26,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            l10n.tagline,
-                            style: GoogleFonts.manrope(
-                              color: Colors.white.withAlpha(180),
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
                       ),
                     ),
                     const SizedBox(height: 18),

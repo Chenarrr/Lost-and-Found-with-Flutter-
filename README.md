@@ -197,6 +197,83 @@ Other keys while running: `p` paint bounds · `d` detach · `q` quit · `?` all 
 
 ---
 
+## App Icons & Splash Screen
+
+The app ships with a native launcher icon and a branded splash screen configured in `pubspec.yaml`.
+
+### Source assets
+
+| Asset | Purpose |
+|---|---|
+| `assets/app_icon_source.png` | 1024×1024 source for all launcher icon sizes |
+| `assets/find-it-symbol-transparent.png` | Symbol used on splash screen |
+| `assets/find-it-app-icon-official.png` | In-app logo shown on welcome screen |
+
+### Regenerate launcher icons
+
+After replacing `assets/app_icon_source.png`:
+
+```bash
+dart run flutter_launcher_icons
+```
+
+This rewrites every size under `ios/Runner/Assets.xcassets/AppIcon.appiconset/` and `android/app/src/main/res/mipmap-*/`.
+
+### Regenerate splash screen
+
+After editing the splash block in `pubspec.yaml`:
+
+```bash
+dart run flutter_native_splash:create
+```
+
+To undo and remove the splash files:
+
+```bash
+dart run flutter_native_splash:remove
+```
+
+---
+
+## Performance & Build Speed
+
+### Runtime startup
+
+`main.dart` is optimized for fast first frame:
+
+- `FlutterNativeSplash.preserve()` keeps the native splash visible while the Dart VM boots
+- `dotenv.load()` and `Firebase.initializeApp()` run in parallel via `Future.wait`
+- Theme data is built once at module load (`_cachedLightTheme` / `_cachedDarkTheme`) — locale or theme-mode changes do **not** rebuild `ThemeData`
+- `FlutterNativeSplash.remove()` is called immediately after `runApp` so the first real frame replaces the splash
+
+### iOS build speed
+
+The first iOS build takes 10–15 minutes because CocoaPods compiles Firebase and gRPC from source. Subsequent builds are ~20–40 s thanks to Xcode's `DerivedData` cache.
+
+Speed tips:
+
+- **Don't delete DerivedData** unless a build is broken. Deleting it forces a full ~15 min rebuild.
+- **Don't use Xcode's Run button.** Always `flutter run` — Xcode bypasses Flutter's build pipeline and doesn't give hot reload.
+- **Keep at least 10 GB free on your Mac.** `rsync: No space left on device` is the #1 reason builds fail halfway through.
+
+### Clearing caches safely
+
+```bash
+# Homebrew: removes old package versions and downloads
+brew cleanup --prune=all
+
+# CocoaPods: clears cached pod downloads (next pod install re-fetches)
+pod cache clean --all
+
+# Flutter: removes build/ and .dart_tool/
+flutter clean && flutter pub get
+
+# Xcode DerivedData: only if a build is wedged
+rm -rf ~/Library/Developer/Xcode/DerivedData/Runner-*
+```
+
+---
+
 ## Firebase Setup
 
 ### Enable services

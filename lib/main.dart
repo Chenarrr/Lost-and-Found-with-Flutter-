@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -386,13 +387,23 @@ ThemeData _darkTheme() {
 }
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: '.env');
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  final binding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: binding);
+
   timeago.setLocaleMessages('ar', timeago.ArMessages());
   timeago.setLocaleMessages('ckb', timeago.ArMessages());
+
+  await Future.wait([
+    dotenv.load(fileName: '.env'),
+    Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform),
+  ]);
+
   runApp(const FindItApp());
+  FlutterNativeSplash.remove();
 }
+
+final ThemeData _cachedLightTheme = _lightTheme();
+final ThemeData _cachedDarkTheme = _darkTheme();
 
 class FindItApp extends StatelessWidget {
   final AppState? appState;
@@ -422,8 +433,8 @@ class FindItApp extends StatelessWidget {
               textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
               child: child!,
             ),
-            theme: _lightTheme(),
-            darkTheme: _darkTheme(),
+            theme: _cachedLightTheme,
+            darkTheme: _cachedDarkTheme,
             home: const RootRouter(),
             onGenerateRoute: (_) => null,
           );

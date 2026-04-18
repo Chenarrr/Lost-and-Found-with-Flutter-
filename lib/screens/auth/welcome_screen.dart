@@ -37,28 +37,15 @@ class WelcomeScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Logo row
-                  Row(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(14),
-                        child: Image.asset(
-                          'assets/find-it-app-icon-official.png',
-                          width: 44,
-                          height: 44,
-                          fit: BoxFit.cover,
-                          filterQuality: FilterQuality.high,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        l10n.appName,
-                        style: GoogleFonts.spaceGrotesk(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                      ),
-                    ],
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: Image.asset(
+                      'assets/find-it-app-icon-official.png',
+                      width: 44,
+                      height: 44,
+                      fit: BoxFit.cover,
+                      filterQuality: FilterQuality.high,
+                    ),
                   ),
                   const Spacer(),
                   Align(

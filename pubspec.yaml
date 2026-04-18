@@ -35,6 +35,8 @@ dev_dependencies:
   integration_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.3
+  flutter_native_splash: ^2.4.4
 
 flutter:
   generate: true
@@ -44,3 +46,29 @@ flutter:
     - .env
     - assets/find-it-app-icon-official.png
     - assets/find-it-symbol-transparent.png
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  remove_alpha_ios: true
+  image_path: "assets/app_icon_source.png"
+  min_sdk_android: 21
+  web:
+    generate: true
+    image_path: "assets/app_icon_source.png"
+    background_color: "#1E78FF"
+    theme_color: "#1E78FF"
+
+flutter_native_splash:
+  color: "#1E78FF"
+  image: "assets/find-it-symbol-transparent.png"
+  color_dark: "#071323"
+  image_dark: "assets/find-it-symbol-transparent.png"
+  android_12:
+    color: "#1E78FF"
+    image: "assets/find-it-symbol-transparent.png"
+    color_dark: "#071323"
+    image_dark: "assets/find-it-symbol-transparent.png"
+  ios: true
+  android: true
+  web: false

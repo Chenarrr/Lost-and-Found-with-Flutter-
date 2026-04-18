@@ -61,23 +61,12 @@ class _MainPageState extends State<MainPage> {
               leadingWidth: 60,
               leading: Padding(
                 padding: const EdgeInsets.fromLTRB(14, 10, 0, 10),
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [AppColors.primaryBlue, AppColors.accentIndigo],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    'F',
-                    style: GoogleFonts.spaceGrotesk(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 18,
-                    ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child: Image.asset(
+                    'assets/find-it-app-icon-official.png',
+                    fit: BoxFit.cover,
+                    filterQuality: FilterQuality.high,
                   ),
                 ),
               ),

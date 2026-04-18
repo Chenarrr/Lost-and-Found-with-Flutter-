@@ -1,3 +1,5 @@
+// ignore_for_file: depend_on_referenced_packages
+
 // Integration test entry point — connects to Firebase emulators.
 // Used only by: flutter test integration_test/ --target lib/main_integration.dart
 // Never shipped to production.

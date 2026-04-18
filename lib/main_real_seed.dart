@@ -1,3 +1,5 @@
+// ignore_for_file: depend_on_referenced_packages
+
 // Real-Firebase seed entry point — connects to production Firebase (NOT emulators).
 // Used only by: flutter test integration_test/seed_real_test.dart
 // Never shipped to production.

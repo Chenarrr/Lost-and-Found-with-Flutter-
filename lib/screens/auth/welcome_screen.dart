@@ -13,6 +13,9 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final heroLogoHeight = screenHeight < 760 ? 88.0 : 132.0;
+    final heroLogoSpacing = screenHeight < 760 ? 12.0 : 18.0;
 
     return Scaffold(
       body: AppBackdrop(
@@ -36,28 +39,14 @@ class WelcomeScreen extends StatelessWidget {
                   // Logo row
                   Row(
                     children: [
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [
-                              AppColors.primaryBlue,
-                              AppColors.accentIndigo,
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          'F',
-                          style: GoogleFonts.spaceGrotesk(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                          ),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(14),
+                        child: Image.asset(
+                          'assets/find-it-app-icon-official.png',
+                          width: 44,
+                          height: 44,
+                          fit: BoxFit.cover,
+                          filterQuality: FilterQuality.high,
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -72,6 +61,16 @@ class WelcomeScreen extends StatelessWidget {
                     ],
                   ),
                   const Spacer(),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Image.asset(
+                      'assets/find-it-symbol-transparent.png',
+                      height: heroLogoHeight,
+                      fit: BoxFit.contain,
+                      filterQuality: FilterQuality.high,
+                    ),
+                  ),
+                  SizedBox(height: heroLogoSpacing),
                   // Hero text
                   Text(
                     l10n.appName,

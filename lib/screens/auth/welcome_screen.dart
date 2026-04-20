@@ -36,27 +36,6 @@ class WelcomeScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Logo row
-                  Row(
-                    children: [
-                      Image.asset(
-                        'assets/find-it-symbol-transparent.png',
-                        width: 36,
-                        height: 36,
-                        fit: BoxFit.contain,
-                        filterQuality: FilterQuality.high,
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        l10n.appName,
-                        style: GoogleFonts.spaceGrotesk(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                      ),
-                    ],
-                  ),
                   const Spacer(),
                   Align(
                     alignment: Alignment.centerLeft,

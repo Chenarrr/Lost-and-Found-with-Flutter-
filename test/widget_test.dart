@@ -9,7 +9,9 @@ void main() {
     GoogleFonts.config.allowRuntimeFetching = false;
     // Inject a pre-initialized AppState to bypass loading screens and Firebase checks
     final state = AppState();
-    await tester.pumpWidget(FindItApp(appState: state));
+    await tester.pumpWidget(
+      FindItApp(appState: state, skipLaunchExperience: true),
+    );
     await tester.pumpAndSettle();
   }
 

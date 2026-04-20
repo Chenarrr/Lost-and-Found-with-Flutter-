@@ -21,15 +21,9 @@ class _LaunchScreenState extends State<LaunchScreen>
     duration: const Duration(milliseconds: 1850),
   )..forward();
 
-  late final AnimationController _ambientController = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 4600),
-  )..repeat();
-
   @override
   void dispose() {
     _introController.dispose();
-    _ambientController.dispose();
     super.dispose();
   }
 
@@ -37,7 +31,7 @@ class _LaunchScreenState extends State<LaunchScreen>
     if (value <= begin) return 0;
     if (value >= end) return 1;
     final normalized = (value - begin) / (end - begin);
-    return curve.transform(normalized);
+    return curve.transform(normalized).clamp(0.0, 1.0);
   }
 
   @override
@@ -50,12 +44,12 @@ class _LaunchScreenState extends State<LaunchScreen>
 
     return Scaffold(
       body: AnimatedBuilder(
-        animation: Listenable.merge([_introController, _ambientController]),
+        animation: _introController,
         builder: (context, child) {
           final intro = _introController.value;
-          final ambientAngle = _ambientController.value * math.pi * 2;
+          final ambientAngle = intro * math.pi * 1.7;
           final ambientWave = math.sin(ambientAngle);
-          final ambientWaveSoft = math.sin(ambientAngle * 0.7 + 0.6);
+          final ambientWaveSoft = math.sin((intro * math.pi * 1.15) + 0.6);
 
           final glowReveal = _stagger(intro, 0.0, 0.42, Curves.easeOutCubic);
           final logoReveal = _stagger(intro, 0.14, 0.68, Curves.easeOutBack);
@@ -280,7 +274,7 @@ class _LaunchScreenState extends State<LaunchScreen>
                     opacity: 0.9 * captionReveal,
                     child: _ProgressGlowBar(
                       progress: readyProgress,
-                      glowShift: _ambientController.value,
+                      glowShift: 0.12 + (0.76 * captionReveal),
                     ),
                   ),
                 ),

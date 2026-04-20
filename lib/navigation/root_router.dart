@@ -13,7 +13,9 @@ import 'package:flutter_application/screens/launch_screen.dart';
 // This avoids the duplicate-GlobalKey errors caused by RootRouter swapping
 // its returned widget simultaneously with an imperative pushAndRemoveUntil.
 class RootRouter extends StatefulWidget {
-  const RootRouter({super.key});
+  const RootRouter({super.key, this.skipLaunchExperience = false});
+
+  final bool skipLaunchExperience;
 
   @override
   State<RootRouter> createState() => _RootRouterState();
@@ -30,6 +32,10 @@ class _RootRouterState extends State<RootRouter> {
   @override
   void initState() {
     super.initState();
+    if (widget.skipLaunchExperience) {
+      _minimumLaunchComplete = true;
+      return;
+    }
     _launchTimer = Timer(_minimumLaunchDuration, () {
       if (!mounted) return;
       setState(() => _minimumLaunchComplete = true);

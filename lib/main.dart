@@ -407,7 +407,12 @@ final ThemeData _cachedDarkTheme = _darkTheme();
 
 class FindItApp extends StatelessWidget {
   final AppState? appState;
-  const FindItApp({super.key, this.appState});
+  final bool skipLaunchExperience;
+  const FindItApp({
+    super.key,
+    this.appState,
+    this.skipLaunchExperience = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -435,7 +440,7 @@ class FindItApp extends StatelessWidget {
             ),
             theme: _cachedLightTheme,
             darkTheme: _cachedDarkTheme,
-            home: const RootRouter(),
+            home: RootRouter(skipLaunchExperience: skipLaunchExperience),
             onGenerateRoute: (_) => null,
           );
         },

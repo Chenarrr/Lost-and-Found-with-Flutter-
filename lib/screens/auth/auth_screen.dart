@@ -185,64 +185,83 @@ class _AuthScreenState extends State<AuthScreen> {
                             duration: AppMotion.authModeDuration,
                             curve: AppMotion.standardCurve,
                             alignment: Alignment.topCenter,
-                            child: AnimatedSwitcher(
-                              duration: AppMotion.authModeDuration,
-                              switchInCurve: AppMotion.enterCurve,
-                              switchOutCurve: AppMotion.exitCurve,
-                              layoutBuilder: (currentChild, previousChildren) {
-                                return Stack(
-                                  alignment: Alignment.topCenter,
-                                  children: [
-                                    ...previousChildren,
-                                    // ignore: use_null_aware_elements
-                                    if (currentChild != null) currentChild,
-                                  ],
-                                );
-                              },
-                              transitionBuilder: (child, animation) {
-                                final isIncoming =
-                                    child.key == ValueKey<_AuthMode>(_authMode);
-                                final enterFrom = Offset(
-                                  _authModeMovesForward ? 0.16 : -0.16,
-                                  0,
-                                );
-                                final exitTo = Offset(
-                                  _authModeMovesForward ? -0.1 : 0.1,
-                                  0,
-                                );
-                                final offset =
-                                    Tween<Offset>(
-                                      begin: isIncoming
-                                          ? enterFrom
-                                          : Offset.zero,
-                                      end: isIncoming ? Offset.zero : exitTo,
-                                    ).animate(
-                                      CurvedAnimation(
-                                        parent: animation,
-                                        curve: AppMotion.standardCurve,
-                                        reverseCurve: AppMotion.exitCurve,
+                            child: ClipRect(
+                              child: AnimatedSwitcher(
+                                duration: AppMotion.authModeDuration,
+                                switchInCurve: AppMotion.enterCurve,
+                                switchOutCurve: AppMotion.exitCurve,
+                                layoutBuilder:
+                                    (currentChild, previousChildren) {
+                                      return Stack(
+                                        alignment: Alignment.topCenter,
+                                        children: [
+                                          ...previousChildren,
+                                          // ignore: use_null_aware_elements
+                                          if (currentChild != null)
+                                            currentChild,
+                                        ],
+                                      );
+                                    },
+                                transitionBuilder: (child, animation) {
+                                  final isIncoming =
+                                      child.key ==
+                                      ValueKey<_AuthMode>(_authMode);
+                                  final enterFrom = Offset(
+                                    _authModeMovesForward ? 0.09 : -0.09,
+                                    0,
+                                  );
+                                  final exitTo = Offset(
+                                    _authModeMovesForward ? -0.05 : 0.05,
+                                    0,
+                                  );
+                                  final slide =
+                                      Tween<Offset>(
+                                        begin: isIncoming
+                                            ? enterFrom
+                                            : Offset.zero,
+                                        end: isIncoming ? Offset.zero : exitTo,
+                                      ).animate(
+                                        CurvedAnimation(
+                                          parent: animation,
+                                          curve: AppMotion.standardCurve,
+                                          reverseCurve: AppMotion.exitCurve,
+                                        ),
+                                      );
+                                  final scale =
+                                      Tween<double>(
+                                        begin: isIncoming ? 0.985 : 1,
+                                        end: isIncoming ? 1 : 0.992,
+                                      ).animate(
+                                        CurvedAnimation(
+                                          parent: animation,
+                                          curve: AppMotion.standardCurve,
+                                          reverseCurve: AppMotion.exitCurve,
+                                        ),
+                                      );
+                                  final fade = CurvedAnimation(
+                                    parent: animation,
+                                    curve: isIncoming
+                                        ? AppMotion.enterCurve
+                                        : AppMotion.exitCurve,
+                                    reverseCurve: AppMotion.exitCurve,
+                                  );
+                                  return FadeTransition(
+                                    opacity: fade,
+                                    child: SlideTransition(
+                                      position: slide,
+                                      child: ScaleTransition(
+                                        scale: scale,
+                                        child: child,
                                       ),
-                                    );
-                                final fade = CurvedAnimation(
-                                  parent: animation,
-                                  curve: isIncoming
-                                      ? AppMotion.enterCurve
-                                      : AppMotion.exitCurve,
-                                  reverseCurve: AppMotion.exitCurve,
-                                );
-                                return FadeTransition(
-                                  opacity: fade,
-                                  child: SlideTransition(
-                                    position: offset,
-                                    child: child,
-                                  ),
-                                );
-                              },
-                              child: KeyedSubtree(
-                                key: ValueKey<_AuthMode>(_authMode),
-                                child: _authMode == _AuthMode.login
-                                    ? _buildLoginPane(l10n)
-                                    : _buildSignupPane(l10n),
+                                    ),
+                                  );
+                                },
+                                child: KeyedSubtree(
+                                  key: ValueKey<_AuthMode>(_authMode),
+                                  child: _authMode == _AuthMode.login
+                                      ? _buildLoginPane(l10n)
+                                      : _buildSignupPane(l10n),
+                                ),
                               ),
                             ),
                           ),
@@ -389,26 +408,63 @@ class _AuthScreenState extends State<AuthScreen> {
               : Theme.of(context).colorScheme.outlineVariant.withAlpha(180),
         ),
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: _ModeButton(
-              label: l10n.loginTab,
-              icon: Icons.login_rounded,
-              selected: _authMode == _AuthMode.login,
-              onTap: () => _setAuthMode(_AuthMode.login),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          const gap = 6.0;
+          final segmentWidth = (constraints.maxWidth - gap) / 2;
+
+          return SizedBox(
+            height: 52,
+            child: Stack(
+              children: [
+                AnimatedPositioned(
+                  duration: AppMotion.authModeDuration,
+                  curve: AppMotion.standardCurve,
+                  left: _authMode == _AuthMode.login ? 0 : segmentWidth + gap,
+                  top: 0,
+                  width: segmentWidth,
+                  height: 52,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [AppColors.primaryBlue, AppColors.accentIndigo],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primaryBlue.withAlpha(34),
+                          blurRadius: 18,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _ModeButton(
+                        label: l10n.loginTab,
+                        icon: Icons.login_rounded,
+                        selected: _authMode == _AuthMode.login,
+                        onTap: () => _setAuthMode(_AuthMode.login),
+                      ),
+                    ),
+                    const SizedBox(width: gap),
+                    Expanded(
+                      child: _ModeButton(
+                        label: l10n.signupTab,
+                        icon: Icons.person_add_alt_1_rounded,
+                        selected: _authMode == _AuthMode.signup,
+                        onTap: () => _setAuthMode(_AuthMode.signup),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ),
-          const SizedBox(width: 6),
-          Expanded(
-            child: _ModeButton(
-              label: l10n.signupTab,
-              icon: Icons.person_add_alt_1_rounded,
-              selected: _authMode == _AuthMode.signup,
-              onTap: () => _setAuthMode(_AuthMode.signup),
-            ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
@@ -745,57 +801,47 @@ class _ModeButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final cs = Theme.of(context).colorScheme;
 
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: AppMotion.interactiveDuration,
-        curve: AppMotion.standardCurve,
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-        decoration: BoxDecoration(
-          gradient: selected
-              ? const LinearGradient(
-                  colors: [AppColors.primaryBlue, AppColors.accentIndigo],
-                )
-              : null,
-          color: selected
-              ? null
-              : isDark
-              ? Colors.transparent
-              : Colors.white.withAlpha(130),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: selected
-              ? [
-                  BoxShadow(
-                    color: AppColors.primaryBlue.withAlpha(34),
-                    blurRadius: 18,
-                    offset: const Offset(0, 10),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: SizedBox(
+          height: 52,
+          child: Center(
+            child: AnimatedDefaultTextStyle(
+              duration: AppMotion.interactiveDuration,
+              curve: AppMotion.standardCurve,
+              style: GoogleFonts.manrope(
+                fontWeight: FontWeight.w800,
+                color: selected ? Colors.white : cs.onSurface,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  AnimatedSwitcher(
+                    duration: AppMotion.interactiveDuration,
+                    switchInCurve: AppMotion.enterCurve,
+                    switchOutCurve: AppMotion.exitCurve,
+                    transitionBuilder: (child, animation) => FadeTransition(
+                      opacity: animation,
+                      child: ScaleTransition(scale: animation, child: child),
+                    ),
+                    child: Icon(
+                      icon,
+                      key: ValueKey<bool>(selected),
+                      size: 18,
+                      color: selected ? Colors.white : cs.onSurfaceVariant,
+                    ),
                   ),
-                ]
-              : null,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: 18,
-              color: selected ? Colors.white : cs.onSurfaceVariant,
-            ),
-            const SizedBox(width: 8),
-            Flexible(
-              child: Text(
-                label,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.manrope(
-                  fontWeight: FontWeight.w800,
-                  color: selected ? Colors.white : cs.onSurface,
-                ),
+                  const SizedBox(width: 8),
+                  Flexible(child: Text(label, overflow: TextOverflow.ellipsis)),
+                ],
               ),
             ),
-          ],
+          ),
         ),
       ),
     );

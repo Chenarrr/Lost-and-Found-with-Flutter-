@@ -4,7 +4,7 @@ class AppMotion {
   static const Duration interactiveDuration = Duration(milliseconds: 280);
   static const Duration emphasisDuration = Duration(milliseconds: 420);
   static const Duration revealDuration = Duration(milliseconds: 520);
-  static const Duration authModeDuration = Duration(milliseconds: 560);
+  static const Duration authModeDuration = Duration(milliseconds: 620);
   static const Duration routeDuration = Duration(milliseconds: 520);
   static const Duration routeReverseDuration = Duration(milliseconds: 420);
   static const Duration launchIntroDuration = Duration(milliseconds: 2200);

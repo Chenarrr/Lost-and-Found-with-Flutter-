@@ -182,11 +182,11 @@ class _AuthScreenState extends State<AuthScreen> {
                           _buildModeSwitcher(l10n),
                           const SizedBox(height: 20),
                           AnimatedSize(
-                            duration: AppMotion.emphasisDuration,
+                            duration: AppMotion.authModeDuration,
                             curve: AppMotion.standardCurve,
                             alignment: Alignment.topCenter,
                             child: AnimatedSwitcher(
-                              duration: AppMotion.emphasisDuration,
+                              duration: AppMotion.authModeDuration,
                               switchInCurve: AppMotion.enterCurve,
                               switchOutCurve: AppMotion.exitCurve,
                               layoutBuilder: (currentChild, previousChildren) {
@@ -203,11 +203,11 @@ class _AuthScreenState extends State<AuthScreen> {
                                 final isIncoming =
                                     child.key == ValueKey<_AuthMode>(_authMode);
                                 final enterFrom = Offset(
-                                  _authModeMovesForward ? 0.22 : -0.22,
+                                  _authModeMovesForward ? 0.16 : -0.16,
                                   0,
                                 );
                                 final exitTo = Offset(
-                                  _authModeMovesForward ? -0.14 : 0.14,
+                                  _authModeMovesForward ? -0.1 : 0.1,
                                   0,
                                 );
                                 final offset =

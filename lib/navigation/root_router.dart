@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application/config/app_motion.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_application/navigation/main_page.dart';
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/screens/auth/welcome_screen.dart';
 import 'package:flutter_application/screens/launch_screen.dart';
+import 'package:provider/provider.dart';
 
 // RootRouter determines the initial screen once on startup.
 // After that, all auth transitions are handled imperatively via
@@ -22,19 +22,47 @@ class RootRouter extends StatefulWidget {
   State<RootRouter> createState() => _RootRouterState();
 }
 
-class _RootRouterState extends State<RootRouter> {
+class _RootRouterState extends State<RootRouter>
+    with SingleTickerProviderStateMixin {
   // Set once when isInitialized becomes true; never changes after that.
   bool? _initialIsLoggedIn;
   bool _minimumLaunchComplete = false;
+  bool _launchDismissed = false;
   Timer? _launchTimer;
+  AnimationController? _launchExitController;
+  Animation<double>? _launchFade;
+  Animation<Offset>? _launchSlide;
 
   @override
   void initState() {
     super.initState();
     if (widget.skipLaunchExperience) {
       _minimumLaunchComplete = true;
+      _launchDismissed = true;
       return;
     }
+    _launchExitController =
+        AnimationController(vsync: this, duration: AppMotion.launchExitDuration)
+          ..addStatusListener((status) {
+            if (status == AnimationStatus.completed && mounted) {
+              setState(() => _launchDismissed = true);
+            }
+          });
+    _launchFade = Tween<double>(begin: 1, end: 0).animate(
+      CurvedAnimation(
+        parent: _launchExitController!,
+        curve: AppMotion.standardCurve,
+        reverseCurve: AppMotion.exitCurve,
+      ),
+    );
+    _launchSlide =
+        Tween<Offset>(begin: Offset.zero, end: const Offset(0, -0.02)).animate(
+          CurvedAnimation(
+            parent: _launchExitController!,
+            curve: AppMotion.standardCurve,
+            reverseCurve: AppMotion.exitCurve,
+          ),
+        );
     _launchTimer = Timer(AppMotion.minimumLaunchDuration, () {
       if (!mounted) return;
       setState(() => _minimumLaunchComplete = true);
@@ -44,7 +72,29 @@ class _RootRouterState extends State<RootRouter> {
   @override
   void dispose() {
     _launchTimer?.cancel();
+    _launchExitController?.dispose();
     super.dispose();
+  }
+
+  void _maybeDismissLaunch(bool isInitialized) {
+    final controller = _launchExitController;
+    if (controller == null || _launchDismissed || controller.isAnimating) {
+      return;
+    }
+    if (!_minimumLaunchComplete || !isInitialized) return;
+    if (controller.isCompleted) {
+      if (!_launchDismissed) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) setState(() => _launchDismissed = true);
+        });
+      }
+      return;
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && !controller.isAnimating) {
+        controller.forward();
+      }
+    });
   }
 
   @override
@@ -58,53 +108,36 @@ class _RootRouterState extends State<RootRouter> {
       _initialIsLoggedIn = context.read<AppState>().currentUser != null;
     }
 
-    final showLaunch = !_minimumLaunchComplete || !isInitialized;
+    _maybeDismissLaunch(isInitialized);
+
+    final hasDestination = isInitialized && _initialIsLoggedIn != null;
     final destination = (_initialIsLoggedIn ?? false)
         ? const MainPage()
         : const WelcomeScreen();
 
-    return AnimatedSwitcher(
-      duration: AppMotion.revealDuration,
-      switchInCurve: AppMotion.enterCurve,
-      switchOutCurve: AppMotion.exitCurve,
-      transitionBuilder: (child, animation) {
-        final fade = CurvedAnimation(
-          parent: animation,
-          curve: AppMotion.enterCurve,
-          reverseCurve: AppMotion.exitCurve,
-        );
-        final scale =
-            Tween<double>(
-              begin: child.key == const ValueKey('launch') ? 1.0 : 0.985,
-              end: 1.0,
-            ).animate(
-              CurvedAnimation(
-                parent: animation,
-                curve: AppMotion.standardCurve,
-                reverseCurve: AppMotion.exitCurve,
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        if (hasDestination)
+          KeyedSubtree(
+            key: ValueKey<bool>(_initialIsLoggedIn ?? false),
+            child: destination,
+          ),
+        if (!_launchDismissed)
+          IgnorePointer(
+            ignoring: _launchExitController?.isCompleted ?? true,
+            child: FadeTransition(
+              opacity: _launchFade!,
+              child: SlideTransition(
+                position: _launchSlide!,
+                child: LaunchScreen(
+                  key: const ValueKey('launch'),
+                  isReady: isInitialized,
+                ),
               ),
-            );
-        return FadeTransition(
-          opacity: fade,
-          child: ScaleTransition(scale: scale, child: child),
-        );
-      },
-      layoutBuilder: (currentChild, previousChildren) {
-        return Stack(
-          fit: StackFit.expand,
-          children: [
-            ...previousChildren,
-            // ignore: use_null_aware_elements
-            if (currentChild != null) currentChild,
-          ],
-        );
-      },
-      child: showLaunch
-          ? LaunchScreen(key: const ValueKey('launch'), isReady: isInitialized)
-          : KeyedSubtree(
-              key: const ValueKey('destination'),
-              child: destination,
             ),
+          ),
+      ],
     );
   }
 }

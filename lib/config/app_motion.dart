@@ -4,9 +4,11 @@ class AppMotion {
   static const Duration interactiveDuration = Duration(milliseconds: 280);
   static const Duration emphasisDuration = Duration(milliseconds: 420);
   static const Duration revealDuration = Duration(milliseconds: 520);
-  static const Duration routeDuration = Duration(milliseconds: 420);
-  static const Duration routeReverseDuration = Duration(milliseconds: 340);
+  static const Duration authModeDuration = Duration(milliseconds: 560);
+  static const Duration routeDuration = Duration(milliseconds: 520);
+  static const Duration routeReverseDuration = Duration(milliseconds: 420);
   static const Duration launchIntroDuration = Duration(milliseconds: 2200);
+  static const Duration launchExitDuration = Duration(milliseconds: 620);
   static const Duration minimumLaunchDuration = Duration(milliseconds: 2400);
 
   static const Curve standardCurve = Curves.easeInOutCubicEmphasized;
@@ -46,11 +48,8 @@ class AppPageTransitionsBuilder extends PageTransitionsBuilder {
     Widget child,
   ) {
     final primaryOffset = route.fullscreenDialog
-        ? const Offset(0, 0.035)
-        : const Offset(0.03, 0);
-    final secondaryOffset = route.fullscreenDialog
-        ? const Offset(0, -0.02)
-        : const Offset(-0.02, 0);
+        ? const Offset(0, 0.04)
+        : const Offset(0.035, 0);
 
     final primarySlide = Tween<Offset>(begin: primaryOffset, end: Offset.zero)
         .animate(
@@ -66,22 +65,9 @@ class AppPageTransitionsBuilder extends PageTransitionsBuilder {
       curve: AppMotion.enterCurve,
       reverseCurve: AppMotion.exitCurve,
     );
-
-    final secondarySlide =
-        Tween<Offset>(begin: Offset.zero, end: secondaryOffset).animate(
-          CurvedAnimation(
-            parent: secondaryAnimation,
-            curve: AppMotion.standardCurve,
-            reverseCurve: AppMotion.exitCurve,
-          ),
-        );
-
-    return SlideTransition(
-      position: secondarySlide,
-      child: FadeTransition(
-        opacity: primaryFade,
-        child: SlideTransition(position: primarySlide, child: child),
-      ),
+    return FadeTransition(
+      opacity: primaryFade,
+      child: SlideTransition(position: primarySlide, child: child),
     );
   }
 }

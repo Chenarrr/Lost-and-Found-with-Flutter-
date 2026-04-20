@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_application/config/app_motion.dart';
 import 'package:flutter_application/main.dart';
 import 'package:flutter_application/providers/app_state.dart';
+import 'package:flutter_application/screens/auth/welcome_screen.dart';
+import 'package:flutter_application/screens/launch_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void main() {
@@ -24,6 +27,25 @@ void main() {
     testWidgets('Welcome screen shows Get Started button', (tester) async {
       await pumpApp(tester);
       expect(find.text('Get Started'), findsOneWidget);
+    });
+
+    testWidgets('Launch screen transitions to welcome without errors', (
+      tester,
+    ) async {
+      GoogleFonts.config.allowRuntimeFetching = false;
+      final state = AppState();
+      await tester.pumpWidget(
+        FindItApp(appState: state, skipLaunchExperience: false),
+      );
+
+      expect(find.byType(LaunchScreen), findsOneWidget);
+
+      await tester.pump(
+        AppMotion.minimumLaunchDuration + AppMotion.launchExitDuration,
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(WelcomeScreen), findsOneWidget);
     });
 
     testWidgets('Tapping Get Started navigates to auth screen', (tester) async {

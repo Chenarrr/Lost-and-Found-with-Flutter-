@@ -8,6 +8,7 @@ import 'package:flutter_application/models/post.dart';
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/widgets/app_backdrop.dart';
 import 'package:flutter_application/widgets/app_panel.dart';
+import 'package:flutter_application/widgets/category_visuals.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -244,6 +245,10 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
   Widget _buildCategoryList(AppLocalizations l10n, ColorScheme cs) {
     Widget categoryRow({
       required String label,
+      required IconData icon,
+      required Color accent,
+      required Color bubbleColor,
+      required Color iconColor,
       required bool selected,
       required VoidCallback onTap,
     }) {
@@ -254,28 +259,45 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
-            color: selected ? AppColors.primaryBlue.withAlpha(14) : null,
+            color: selected ? accent.withAlpha(10) : null,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: selected ? AppColors.primaryBlue : cs.outlineVariant,
-            ),
+            border: Border.all(color: selected ? accent : cs.outlineVariant),
           ),
           child: Row(
             children: [
-              Icon(
-                selected
-                    ? Icons.radio_button_checked_rounded
-                    : Icons.radio_button_off_rounded,
-                color: selected ? AppColors.primaryBlue : cs.onSurfaceVariant,
-                size: 20,
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                curve: Curves.easeOutCubic,
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: selected ? accent.withAlpha(18) : bubbleColor,
+                  border: Border.all(
+                    color: selected
+                        ? accent.withAlpha(120)
+                        : Colors.transparent,
+                  ),
+                ),
+                child: Icon(icon, color: iconColor, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  label,
+                  style: GoogleFonts.manrope(
+                    fontWeight: FontWeight.w700,
+                    color: cs.onSurface,
+                  ),
+                ),
               ),
               const SizedBox(width: 10),
-              Text(
-                label,
-                style: GoogleFonts.manrope(
-                  fontWeight: FontWeight.w700,
-                  color: cs.onSurface,
-                ),
+              Icon(
+                selected
+                    ? Icons.check_circle_rounded
+                    : Icons.radio_button_unchecked_rounded,
+                color: selected ? accent : cs.onSurfaceVariant,
+                size: 20,
               ),
             ],
           ),
@@ -283,10 +305,33 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
       );
     }
 
+    (IconData, Color, Color, Color) categoryVisuals(PostCategory category) {
+      final visuals = categoryVisualStyle(category);
+      final isDark = Theme.of(context).brightness == Brightness.dark;
+      return (
+        visuals.icon,
+        visuals.accent,
+        isDark ? visuals.darkTint : visuals.lightTint,
+        isDark ? visuals.darkIcon : visuals.lightIcon,
+      );
+    }
+
+    final electronics = categoryVisuals(PostCategory.electronics);
+    final documents = categoryVisuals(PostCategory.documents);
+    final personalItems = categoryVisuals(PostCategory.personalItems);
+    final pets = categoryVisuals(PostCategory.pets);
+    final customBubble = Theme.of(context).brightness == Brightness.dark
+        ? Colors.white.withAlpha(8)
+        : AppColors.primaryBlue.withAlpha(10);
+
     return Column(
       children: [
         categoryRow(
           label: l10n.categoryElectronics,
+          icon: electronics.$1,
+          accent: electronics.$2,
+          bubbleColor: electronics.$3,
+          iconColor: electronics.$4,
           selected:
               !_useCustomCategory && _category == PostCategory.electronics,
           onTap: () => setState(() {
@@ -297,6 +342,10 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
         const SizedBox(height: 8),
         categoryRow(
           label: l10n.categoryDocuments,
+          icon: documents.$1,
+          accent: documents.$2,
+          bubbleColor: documents.$3,
+          iconColor: documents.$4,
           selected: !_useCustomCategory && _category == PostCategory.documents,
           onTap: () => setState(() {
             _useCustomCategory = false;
@@ -306,6 +355,10 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
         const SizedBox(height: 8),
         categoryRow(
           label: l10n.categoryPersonalItems,
+          icon: personalItems.$1,
+          accent: personalItems.$2,
+          bubbleColor: personalItems.$3,
+          iconColor: personalItems.$4,
           selected:
               !_useCustomCategory && _category == PostCategory.personalItems,
           onTap: () => setState(() {
@@ -316,6 +369,10 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
         const SizedBox(height: 8),
         categoryRow(
           label: l10n.categoryPets,
+          icon: pets.$1,
+          accent: pets.$2,
+          bubbleColor: pets.$3,
+          iconColor: pets.$4,
           selected: !_useCustomCategory && _category == PostCategory.pets,
           onTap: () => setState(() {
             _useCustomCategory = false;
@@ -325,6 +382,10 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
         const SizedBox(height: 8),
         categoryRow(
           label: l10n.customCategoryOption,
+          icon: Icons.label_outline_rounded,
+          accent: AppColors.primaryBlue,
+          bubbleColor: customBubble,
+          iconColor: AppColors.primaryBlue,
           selected: _useCustomCategory,
           onTap: () => setState(() => _useCustomCategory = true),
         ),

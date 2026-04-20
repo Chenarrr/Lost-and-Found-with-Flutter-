@@ -7,6 +7,7 @@ import 'package:flutter_application/models/post.dart';
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/widgets/app_backdrop.dart';
 import 'package:flutter_application/widgets/app_panel.dart';
+import 'package:flutter_application/widgets/category_visuals.dart';
 import 'package:flutter_application/widgets/post_card.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -112,32 +113,69 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _categoryChip(String label, PostCategory? category) {
+  Widget _categoryChip(String label, PostCategory category) {
     final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final visuals = categoryVisualStyle(category);
     final isActive = _categoryFilter == category;
 
-    return ChoiceChip(
-      label: Text(
-        label,
-        style: GoogleFonts.manrope(
-          color: isActive ? Colors.white : cs.onSurface,
-          fontWeight: FontWeight.w800,
-          fontSize: 12,
+    final bubbleColor = isActive
+        ? visuals.accent.withAlpha(isDark ? 70 : 34)
+        : (isDark ? visuals.darkTint : visuals.lightTint);
+    final bubbleBorder = isActive
+        ? visuals.accent.withAlpha(isDark ? 220 : 120)
+        : cs.outlineVariant.withAlpha(isDark ? 36 : 120);
+    final iconColor = isDark ? visuals.darkIcon : visuals.lightIcon;
+
+    return Tooltip(
+      message: label,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: () =>
+            setState(() => _categoryFilter = isActive ? null : category),
+        child: SizedBox(
+          width: 88,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                curve: Curves.easeOutCubic,
+                width: isActive ? 66 : 62,
+                height: isActive ? 66 : 62,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: bubbleColor,
+                  border: Border.all(color: bubbleBorder, width: 1.5),
+                  boxShadow: isActive
+                      ? [
+                          BoxShadow(
+                            color: visuals.accent.withAlpha(isDark ? 42 : 28),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ]
+                      : null,
+                ),
+                child: Icon(visuals.icon, color: iconColor, size: 29),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                label,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.manrope(
+                  color: isActive ? cs.onSurface : cs.onSurfaceVariant,
+                  fontWeight: isActive ? FontWeight.w800 : FontWeight.w700,
+                  fontSize: 11.5,
+                  height: 1.15,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-      selected: isActive,
-      showCheckmark: false,
-      onSelected: (_) =>
-          setState(() => _categoryFilter = isActive ? null : category),
-      selectedColor: AppColors.primaryBlue,
-      backgroundColor: Theme.of(context).brightness == Brightness.dark
-          ? Colors.white.withAlpha(8)
-          : Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
-      side: BorderSide(
-        color: isActive ? Colors.transparent : cs.outlineVariant,
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
     );
   }
 
@@ -312,86 +350,100 @@ class _HomeScreenState extends State<HomeScreen> {
             if (index == 1) return const SizedBox(height: 10);
 
             if (index == 2) {
-              return SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () => _showCitySheet(l10n),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _categoryChip(
+                          l10n.categoryElectronics,
+                          PostCategory.electronics,
                         ),
-                        decoration: BoxDecoration(
-                          color: _cityFilter != 'All Cities'
-                              ? AppColors.primaryBlue.withAlpha(18)
-                              : (Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.white.withAlpha(8)
-                                    : Colors.white),
-                          borderRadius: BorderRadius.circular(999),
-                          border: Border.all(
-                            color: _cityFilter != 'All Cities'
-                                ? AppColors.primaryBlue.withAlpha(80)
-                                : cs.outlineVariant,
-                          ),
+                        const SizedBox(width: 10),
+                        _categoryChip(
+                          l10n.categoryDocuments,
+                          PostCategory.documents,
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.location_on_rounded,
-                              size: 14,
-                              color: _cityFilter != 'All Cities'
-                                  ? AppColors.primaryBlue
-                                  : cs.onSurfaceVariant,
+                        const SizedBox(width: 10),
+                        _categoryChip(
+                          l10n.categoryPersonalItems,
+                          PostCategory.personalItems,
+                        ),
+                        const SizedBox(width: 10),
+                        _categoryChip(l10n.categoryPets, PostCategory.pets),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () => _showCitySheet(l10n),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
                             ),
-                            const SizedBox(width: 4),
-                            Text(
-                              _cityDisplayName(_cityFilter, l10n),
-                              style: GoogleFonts.manrope(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w800,
+                            decoration: BoxDecoration(
+                              color: _cityFilter != 'All Cities'
+                                  ? AppColors.primaryBlue.withAlpha(18)
+                                  : (Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.white.withAlpha(8)
+                                        : Colors.white),
+                              borderRadius: BorderRadius.circular(999),
+                              border: Border.all(
                                 color: _cityFilter != 'All Cities'
-                                    ? AppColors.primaryBlue
-                                    : cs.onSurface,
+                                    ? AppColors.primaryBlue.withAlpha(80)
+                                    : cs.outlineVariant,
                               ),
                             ),
-                            const SizedBox(width: 4),
-                            Icon(
-                              Icons.keyboard_arrow_down_rounded,
-                              size: 14,
-                              color: cs.onSurfaceVariant,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.location_on_rounded,
+                                  size: 14,
+                                  color: _cityFilter != 'All Cities'
+                                      ? AppColors.primaryBlue
+                                      : cs.onSurfaceVariant,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  _cityDisplayName(_cityFilter, l10n),
+                                  style: GoogleFonts.manrope(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w800,
+                                    color: _cityFilter != 'All Cities'
+                                        ? AppColors.primaryBlue
+                                        : cs.onSurface,
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Icon(
+                                  Icons.keyboard_arrow_down_rounded,
+                                  size: 14,
+                                  color: cs.onSurfaceVariant,
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
-                      ),
+                        const SizedBox(width: 6),
+                        _typeChip(l10n.all, null),
+                        const SizedBox(width: 6),
+                        _typeChip(l10n.lost, PostType.lost),
+                        const SizedBox(width: 6),
+                        _typeChip(l10n.found, PostType.found),
+                      ],
                     ),
-                    const SizedBox(width: 6),
-                    _typeChip(l10n.all, null),
-                    const SizedBox(width: 6),
-                    _typeChip(l10n.lost, PostType.lost),
-                    const SizedBox(width: 6),
-                    _typeChip(l10n.found, PostType.found),
-                    const SizedBox(width: 6),
-                    _categoryChip(
-                      l10n.categoryElectronics,
-                      PostCategory.electronics,
-                    ),
-                    const SizedBox(width: 6),
-                    _categoryChip(
-                      l10n.categoryDocuments,
-                      PostCategory.documents,
-                    ),
-                    const SizedBox(width: 6),
-                    _categoryChip(
-                      l10n.categoryPersonalItems,
-                      PostCategory.personalItems,
-                    ),
-                    const SizedBox(width: 6),
-                    _categoryChip(l10n.categoryPets, PostCategory.pets),
-                  ],
-                ),
+                  ),
+                ],
               );
             }
 

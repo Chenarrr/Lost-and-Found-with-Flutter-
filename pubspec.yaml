@@ -60,12 +60,12 @@ flutter_launcher_icons:
     theme_color: "#1E78FF"
 
 flutter_native_splash:
-  color: "#1E78FF"
+  color: "#F7FBFF"
   image: "assets/find-it-symbol-transparent.png"
   color_dark: "#071323"
   image_dark: "assets/find-it-symbol-transparent.png"
   android_12:
-    color: "#1E78FF"
+    color: "#F7FBFF"
     image: "assets/find-it-symbol-transparent.png"
     color_dark: "#071323"
     image_dark: "assets/find-it-symbol-transparent.png"

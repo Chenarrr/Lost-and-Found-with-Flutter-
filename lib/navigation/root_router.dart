@@ -1,11 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_application/providers/app_state.dart';
-import 'package:flutter_application/config/app_colors.dart';
-import 'package:flutter_application/screens/auth/welcome_screen.dart';
 import 'package:flutter_application/navigation/main_page.dart';
-import 'package:flutter_application/widgets/app_backdrop.dart';
-import 'package:flutter_application/widgets/app_panel.dart';
+import 'package:flutter_application/providers/app_state.dart';
+import 'package:flutter_application/screens/auth/welcome_screen.dart';
+import 'package:flutter_application/screens/launch_screen.dart';
 
 // RootRouter determines the initial screen once on startup.
 // After that, all auth transitions are handled imperatively via
@@ -20,8 +20,27 @@ class RootRouter extends StatefulWidget {
 }
 
 class _RootRouterState extends State<RootRouter> {
+  static const _minimumLaunchDuration = Duration(milliseconds: 2100);
+
   // Set once when isInitialized becomes true; never changes after that.
   bool? _initialIsLoggedIn;
+  bool _minimumLaunchComplete = false;
+  Timer? _launchTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _launchTimer = Timer(_minimumLaunchDuration, () {
+      if (!mounted) return;
+      setState(() => _minimumLaunchComplete = true);
+    });
+  }
+
+  @override
+  void dispose() {
+    _launchTimer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,24 +48,53 @@ class _RootRouterState extends State<RootRouter> {
       (app) => app.isInitialized,
     );
 
-    if (!isInitialized) {
-      return const Scaffold(
-        body: AppBackdrop(
-          child: Center(
-            child: AppPanel(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 28, vertical: 24),
-                child: CircularProgressIndicator(color: AppColors.primaryBlue),
-              ),
-            ),
-          ),
-        ),
-      );
+    if (isInitialized && _initialIsLoggedIn == null) {
+      // Capture auth state once, without registering an ongoing dependency.
+      _initialIsLoggedIn = context.read<AppState>().currentUser != null;
     }
 
-    // Capture auth state once, without registering an ongoing dependency.
-    _initialIsLoggedIn ??= context.read<AppState>().currentUser != null;
+    final showLaunch = !_minimumLaunchComplete || !isInitialized;
+    final destination = (_initialIsLoggedIn ?? false)
+        ? const MainPage()
+        : const WelcomeScreen();
 
-    return _initialIsLoggedIn! ? const MainPage() : const WelcomeScreen();
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 680),
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      transitionBuilder: (child, animation) {
+        final fade = CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeInOut,
+        );
+        final scale =
+            Tween<double>(
+              begin: child.key == const ValueKey('launch') ? 1.0 : 0.985,
+              end: 1.0,
+            ).animate(
+              CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+            );
+        return FadeTransition(
+          opacity: fade,
+          child: ScaleTransition(scale: scale, child: child),
+        );
+      },
+      layoutBuilder: (currentChild, previousChildren) {
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            ...previousChildren,
+            // ignore: use_null_aware_elements
+            if (currentChild != null) currentChild,
+          ],
+        );
+      },
+      child: showLaunch
+          ? LaunchScreen(key: const ValueKey('launch'), isReady: isInitialized)
+          : KeyedSubtree(
+              key: const ValueKey('destination'),
+              child: destination,
+            ),
+    );
   }
 }

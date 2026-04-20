@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/config/app_colors.dart';
+import 'package:flutter_application/config/app_motion.dart';
 import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/screens/auth/auth_screen.dart';
 import 'package:flutter_application/utils/app_route.dart';
@@ -22,8 +23,8 @@ class WelcomeScreen extends StatelessWidget {
         child: SafeArea(
           child: TweenAnimationBuilder<double>(
             tween: Tween(begin: 0, end: 1),
-            duration: const Duration(milliseconds: 380),
-            curve: Curves.easeOutCubic,
+            duration: AppMotion.revealDuration,
+            curve: AppMotion.standardCurve,
             builder: (context, value, child) => Opacity(
               opacity: value,
               child: Transform.translate(

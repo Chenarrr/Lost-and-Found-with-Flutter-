@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/config/app_colors.dart';
+import 'package:flutter_application/config/app_motion.dart';
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/widgets/app_panel.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -70,8 +71,8 @@ class _LangRow extends StatelessWidget {
         GestureDetector(
           onTap: onTap,
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.easeOutCubic,
+            duration: AppMotion.interactiveDuration,
+            curve: AppMotion.standardCurve,
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
             decoration: BoxDecoration(
               color: selected

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application/config/app_colors.dart';
+import 'package:flutter_application/config/app_motion.dart';
 import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/navigation/main_page.dart';
 import 'package:flutter_application/providers/app_state.dart';
@@ -136,8 +137,8 @@ class _OtpScreenState extends State<OtpScreen> {
               padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
               child: TweenAnimationBuilder<double>(
                 tween: Tween(begin: 0, end: 1),
-                duration: const Duration(milliseconds: 600),
-                curve: Curves.easeOutCubic,
+                duration: AppMotion.revealDuration,
+                curve: AppMotion.standardCurve,
                 builder: (context, value, child) => Opacity(
                   opacity: value,
                   child: Transform.translate(

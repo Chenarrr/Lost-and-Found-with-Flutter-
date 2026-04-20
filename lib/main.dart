@@ -8,6 +8,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'firebase_options.dart';
 import 'package:flutter_application/config/app_colors.dart';
+import 'package:flutter_application/config/app_motion.dart';
 import 'package:flutter_application/l10n/app_localizations.dart';
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/navigation/root_router.dart';
@@ -96,6 +97,7 @@ ThemeData _lightTheme() {
   return ThemeData(
     useMaterial3: true,
     colorScheme: scheme,
+    pageTransitionsTheme: appPageTransitionsTheme,
     textTheme: _appTextTheme(Brightness.light),
     scaffoldBackgroundColor: AppColors.bgGray,
     appBarTheme: AppBarTheme(
@@ -251,6 +253,7 @@ ThemeData _darkTheme() {
   return ThemeData(
     useMaterial3: true,
     colorScheme: scheme,
+    pageTransitionsTheme: appPageTransitionsTheme,
     textTheme: _appTextTheme(Brightness.dark),
     scaffoldBackgroundColor: _darkBg,
     appBarTheme: AppBarTheme(

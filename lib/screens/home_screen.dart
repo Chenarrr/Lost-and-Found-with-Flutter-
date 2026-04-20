@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application/config/app_colors.dart';
+import 'package:flutter_application/config/app_motion.dart';
 import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/models/post.dart';
 import 'package:flutter_application/providers/app_state.dart';
@@ -139,8 +140,8 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               AnimatedContainer(
-                duration: const Duration(milliseconds: 180),
-                curve: Curves.easeOutCubic,
+                duration: AppMotion.interactiveDuration,
+                curve: AppMotion.standardCurve,
                 width: isActive ? 66 : 62,
                 height: isActive ? 66 : 62,
                 decoration: BoxDecoration(
@@ -183,6 +184,7 @@ class _HomeScreenState extends State<HomeScreen> {
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
+      sheetAnimationStyle: AppMotion.bottomSheetStyle,
       builder: (ctx) {
         final sheetCs = Theme.of(ctx).colorScheme;
         return SafeArea(

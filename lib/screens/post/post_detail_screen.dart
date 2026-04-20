@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/config/app_colors.dart';
+import 'package:flutter_application/config/app_motion.dart';
 import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/models/comment.dart';
 import 'package:flutter_application/models/post.dart';
@@ -115,6 +116,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
     final confirmed = await showDialog<bool>(
       context: context,
+      animationStyle: AppMotion.dialogStyle,
       builder: (_) => AlertDialog(
         title: Text(l10n.reportPost, style: GoogleFonts.spaceGrotesk()),
         content: Text(l10n.reportConfirm, style: GoogleFonts.manrope()),
@@ -147,6 +149,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     final l10n = context.l10n;
     final confirmed = await showDialog<bool>(
       context: context,
+      animationStyle: AppMotion.dialogStyle,
       builder: (_) => AlertDialog(
         title: Text(l10n.markAsResolved, style: GoogleFonts.spaceGrotesk()),
         content: Text(l10n.markResolvedConfirm, style: GoogleFonts.manrope()),
@@ -204,6 +207,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     final l10n = context.l10n;
     final confirmed = await showDialog<bool>(
       context: context,
+      animationStyle: AppMotion.dialogStyle,
       builder: (_) => AlertDialog(
         title: Text(l10n.deletePost, style: GoogleFonts.spaceGrotesk()),
         content: Text(l10n.deletePostConfirm, style: GoogleFonts.manrope()),

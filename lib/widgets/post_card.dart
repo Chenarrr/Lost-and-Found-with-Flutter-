@@ -6,6 +6,7 @@ import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/models/post.dart';
 import 'package:flutter_application/screens/post/post_detail_screen.dart';
+import 'package:flutter_application/utils/app_route.dart';
 import 'package:flutter_application/widgets/app_panel.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -38,11 +39,7 @@ class PostCard extends StatelessWidget {
             color: Colors.transparent,
             child: InkWell(
               onTap: () => Navigator.of(context).push(
-                PageRouteBuilder(
-                  pageBuilder: (_, _, _) => PostDetailScreen(postId: post.id),
-                  transitionsBuilder: (_, animation, _, child) =>
-                      FadeTransition(opacity: animation, child: child),
-                ),
+                smoothRoute(builder: (_) => PostDetailScreen(postId: post.id)),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(14),

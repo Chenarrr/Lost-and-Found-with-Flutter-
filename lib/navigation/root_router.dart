@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application/config/app_motion.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_application/navigation/main_page.dart';
 import 'package:flutter_application/providers/app_state.dart';
@@ -22,8 +23,6 @@ class RootRouter extends StatefulWidget {
 }
 
 class _RootRouterState extends State<RootRouter> {
-  static const _minimumLaunchDuration = Duration(milliseconds: 2100);
-
   // Set once when isInitialized becomes true; never changes after that.
   bool? _initialIsLoggedIn;
   bool _minimumLaunchComplete = false;
@@ -36,7 +35,7 @@ class _RootRouterState extends State<RootRouter> {
       _minimumLaunchComplete = true;
       return;
     }
-    _launchTimer = Timer(_minimumLaunchDuration, () {
+    _launchTimer = Timer(AppMotion.minimumLaunchDuration, () {
       if (!mounted) return;
       setState(() => _minimumLaunchComplete = true);
     });
@@ -65,20 +64,25 @@ class _RootRouterState extends State<RootRouter> {
         : const WelcomeScreen();
 
     return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 680),
-      switchInCurve: Curves.easeOutCubic,
-      switchOutCurve: Curves.easeInCubic,
+      duration: AppMotion.revealDuration,
+      switchInCurve: AppMotion.enterCurve,
+      switchOutCurve: AppMotion.exitCurve,
       transitionBuilder: (child, animation) {
         final fade = CurvedAnimation(
           parent: animation,
-          curve: Curves.easeInOut,
+          curve: AppMotion.enterCurve,
+          reverseCurve: AppMotion.exitCurve,
         );
         final scale =
             Tween<double>(
               begin: child.key == const ValueKey('launch') ? 1.0 : 0.985,
               end: 1.0,
             ).animate(
-              CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+              CurvedAnimation(
+                parent: animation,
+                curve: AppMotion.standardCurve,
+                reverseCurve: AppMotion.exitCurve,
+              ),
             );
         return FadeTransition(
           opacity: fade,

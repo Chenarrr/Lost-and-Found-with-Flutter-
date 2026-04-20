@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application/config/app_colors.dart';
+import 'package:flutter_application/config/app_motion.dart';
 import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/screens/auth/otp_screen.dart';
@@ -34,6 +35,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
   bool _loading = false;
   _AuthMode _authMode = _AuthMode.login;
+  bool _authModeMovesForward = true;
 
   final _phoneReg = RegExp(r'^7\d{9}$');
   final _emailReg = RegExp(r'^[\w\.\-]+@([\w\-]+\.)+[\w\-]{2,4}$');
@@ -51,7 +53,10 @@ class _AuthScreenState extends State<AuthScreen> {
   void _setAuthMode(_AuthMode mode) {
     if (_authMode == mode) return;
     FocusScope.of(context).unfocus();
-    setState(() => _authMode = mode);
+    setState(() {
+      _authModeMovesForward = mode.index > _authMode.index;
+      _authMode = mode;
+    });
   }
 
   void _showMessage(String message, {bool isError = false}) {
@@ -177,26 +182,56 @@ class _AuthScreenState extends State<AuthScreen> {
                           _buildModeSwitcher(l10n),
                           const SizedBox(height: 20),
                           AnimatedSize(
-                            duration: const Duration(milliseconds: 280),
-                            curve: Curves.easeOutCubic,
+                            duration: AppMotion.emphasisDuration,
+                            curve: AppMotion.standardCurve,
                             alignment: Alignment.topCenter,
                             child: AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 240),
-                              switchInCurve: Curves.easeOutCubic,
-                              switchOutCurve: Curves.easeInCubic,
+                              duration: AppMotion.emphasisDuration,
+                              switchInCurve: AppMotion.enterCurve,
+                              switchOutCurve: AppMotion.exitCurve,
+                              layoutBuilder: (currentChild, previousChildren) {
+                                return Stack(
+                                  alignment: Alignment.topCenter,
+                                  children: [
+                                    ...previousChildren,
+                                    // ignore: use_null_aware_elements
+                                    if (currentChild != null) currentChild,
+                                  ],
+                                );
+                              },
                               transitionBuilder: (child, animation) {
+                                final isIncoming =
+                                    child.key == ValueKey<_AuthMode>(_authMode);
+                                final enterFrom = Offset(
+                                  _authModeMovesForward ? 0.22 : -0.22,
+                                  0,
+                                );
+                                final exitTo = Offset(
+                                  _authModeMovesForward ? -0.14 : 0.14,
+                                  0,
+                                );
                                 final offset =
                                     Tween<Offset>(
-                                      begin: const Offset(0.05, 0),
-                                      end: Offset.zero,
+                                      begin: isIncoming
+                                          ? enterFrom
+                                          : Offset.zero,
+                                      end: isIncoming ? Offset.zero : exitTo,
                                     ).animate(
                                       CurvedAnimation(
                                         parent: animation,
-                                        curve: Curves.easeOutCubic,
+                                        curve: AppMotion.standardCurve,
+                                        reverseCurve: AppMotion.exitCurve,
                                       ),
                                     );
+                                final fade = CurvedAnimation(
+                                  parent: animation,
+                                  curve: isIncoming
+                                      ? AppMotion.enterCurve
+                                      : AppMotion.exitCurve,
+                                  reverseCurve: AppMotion.exitCurve,
+                                );
                                 return FadeTransition(
-                                  opacity: animation,
+                                  opacity: fade,
                                   child: SlideTransition(
                                     position: offset,
                                     child: child,
@@ -204,7 +239,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                 );
                               },
                               child: KeyedSubtree(
-                                key: ValueKey(_authMode),
+                                key: ValueKey<_AuthMode>(_authMode),
                                 child: _authMode == _AuthMode.login
                                     ? _buildLoginPane(l10n)
                                     : _buildSignupPane(l10n),
@@ -716,8 +751,8 @@ class _ModeButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        curve: Curves.easeOutCubic,
+        duration: AppMotion.interactiveDuration,
+        curve: AppMotion.standardCurve,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
           gradient: selected
@@ -835,8 +870,8 @@ class _GenderChip extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOutCubic,
+        duration: AppMotion.interactiveDuration,
+        curve: AppMotion.standardCurve,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
           gradient: selected

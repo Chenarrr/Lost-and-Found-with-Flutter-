@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/config/app_colors.dart';
+import 'package:flutter_application/config/app_motion.dart';
 import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/screens/auth/welcome_screen.dart';
@@ -84,6 +85,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     await showDialog<void>(
       context: context,
+      animationStyle: AppMotion.dialogStyle,
       builder: (ctx) {
         bool loading = false;
         String? error;
@@ -163,6 +165,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final app = Provider.of<AppState>(context, listen: false);
     await showDialog<void>(
       context: context,
+      animationStyle: AppMotion.dialogStyle,
       builder: (dialogCtx) => AlertDialog(
         title: Text(
           l10n.language,
@@ -214,6 +217,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final app = Provider.of<AppState>(context, listen: false);
     final shouldLogout = await showDialog<bool>(
       context: context,
+      animationStyle: AppMotion.dialogStyle,
       builder: (dialogCtx) => AlertDialog(
         title: Text(
           l10n.logout,
@@ -255,6 +259,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     final confirmed = await showDialog<bool>(
       context: context,
+      animationStyle: AppMotion.dialogStyle,
       builder: (dialogCtx) => AlertDialog(
         title: Text(
           l10n.deleteAccount,
@@ -317,6 +322,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await showDialog<void>(
       context: context,
       barrierDismissible: false,
+      animationStyle: AppMotion.dialogStyle,
       builder: (ctx) {
         bool sending = false;
         bool codeSent = false;

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/config/app_colors.dart';
+import 'package:flutter_application/config/app_motion.dart';
 import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/models/post.dart';
 import 'package:flutter_application/providers/app_state.dart';
@@ -266,8 +267,8 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
           child: Row(
             children: [
               AnimatedContainer(
-                duration: const Duration(milliseconds: 180),
-                curve: Curves.easeOutCubic,
+                duration: AppMotion.interactiveDuration,
+                curve: AppMotion.standardCurve,
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
@@ -866,8 +867,8 @@ class _ChoiceCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        curve: Curves.easeOutCubic,
+        duration: AppMotion.interactiveDuration,
+        curve: AppMotion.standardCurve,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           gradient: selected

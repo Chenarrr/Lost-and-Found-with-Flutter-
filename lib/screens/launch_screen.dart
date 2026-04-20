@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application/config/app_colors.dart';
+import 'package:flutter_application/config/app_motion.dart';
 import 'package:flutter_application/l10n/l10n.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -18,7 +19,7 @@ class _LaunchScreenState extends State<LaunchScreen>
     with TickerProviderStateMixin {
   late final AnimationController _introController = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 1850),
+    duration: AppMotion.launchIntroDuration,
   )..forward();
 
   @override
@@ -51,11 +52,26 @@ class _LaunchScreenState extends State<LaunchScreen>
           final ambientWave = math.sin(ambientAngle);
           final ambientWaveSoft = math.sin((intro * math.pi * 1.15) + 0.6);
 
-          final glowReveal = _stagger(intro, 0.0, 0.42, Curves.easeOutCubic);
-          final logoReveal = _stagger(intro, 0.14, 0.68, Curves.easeOutBack);
-          final ringReveal = _stagger(intro, 0.2, 0.82, Curves.easeOutCubic);
-          final titleReveal = _stagger(intro, 0.42, 0.82, Curves.easeOutCubic);
-          final captionReveal = _stagger(intro, 0.56, 1.0, Curves.easeOutCubic);
+          final glowReveal = _stagger(intro, 0.0, 0.42, AppMotion.enterCurve);
+          final logoReveal = _stagger(
+            intro,
+            0.14,
+            0.68,
+            AppMotion.standardCurve,
+          );
+          final ringReveal = _stagger(
+            intro,
+            0.2,
+            0.82,
+            AppMotion.standardCurve,
+          );
+          final titleReveal = _stagger(intro, 0.42, 0.82, AppMotion.enterCurve);
+          final captionReveal = _stagger(
+            intro,
+            0.56,
+            1.0,
+            AppMotion.enterCurve,
+          );
 
           final orbDriftX = ambientWave * 20;
           final orbDriftY = ambientWaveSoft * 16;

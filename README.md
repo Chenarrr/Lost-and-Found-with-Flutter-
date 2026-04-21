@@ -8,6 +8,8 @@
 
 Community-driven Flutter app for reporting and recovering lost & found items in Kurdistan, Iraq. Passwordless phone OTP login, real-time Firestore feed, and direct WhatsApp contact.
 
+**[Project Hub →](https://chenarrr.github.io/findit-docs/)** — prototype, design system, marketing assets & handoff docs
+
 ---
 
 ## Screens
@@ -76,6 +78,9 @@ flutter run
 
 - **Onboarding screens** — 3 new post-OTP screens for new signups: city picker (S4), permissions (S5), welcome (S6)
 - **User city field** — `city` added to User model and Firestore; saved during onboarding
+- **Localized city chips** — S4 city picker displays the localized city name (Arabic/Kurdish) while storing the canonical English string to Firestore
+- **Error handling in onboarding** — `updateUserCity` failure now surfaces a snackbar instead of silently ignoring the error
+- **Production audit** — 184 tests passing (up from 143); added widget tests for all 3 onboarding screens + full `city` field coverage in model tests
 - Unified top-area styling across auth, post, profile, and settings screens using shared backdrop/app bar theme tokens
 - Improved post creation UX with image-first layout, in-place add-image actions, and cleaner category selection
 - Fully localized custom-category text in Create Post and persisted description tagging
@@ -524,13 +529,25 @@ test/
 ├── widget_test.dart                  # smoke — app loads without crashing
 ├── models/
 │   ├── post_test.dart
-│   ├── user_test.dart
+│   ├── user_test.dart                # includes city field coverage
 │   └── comment_test.dart
 ├── providers/
-│   └── app_state_test.dart           # mocked FirebaseAuth + Firestore
+│   └── app_state_test.dart           # Firebase-backed; integration tests in integration_test/
+├── screens/
+│   ├── auth_screen_rtl_test.dart     # RTL switcher for Arabic + Kurdish
+│   ├── profile_setup_screen_test.dart
+│   ├── permissions_screen_test.dart
+│   └── done_screen_test.dart
+├── l10n/
+│   └── app_locale_utils_test.dart
+├── utils/
+│   └── phone_input_formatter_test.dart
 └── widgets/
-    └── post_card_test.dart
+    ├── post_card_test.dart
+    └── lang_toggle_test.dart
 ```
+
+**184 tests, all passing.**
 
 `AppState` accepts injected `FirebaseAuth` and `FirebaseFirestore` for unit testing:
 ```dart

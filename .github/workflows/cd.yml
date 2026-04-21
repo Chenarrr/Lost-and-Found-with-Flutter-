@@ -9,11 +9,19 @@ on:
         type: boolean
         default: true
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-ios:
     name: Build iOS Archive
     runs-on: macos-latest
     if: ${{ inputs.build_ios }}
+    timeout-minutes: 45
 
     steps:
       - uses: actions/checkout@v4
@@ -47,7 +55,7 @@ jobs:
         run: echo "IMGBB_API_KEY=ci_placeholder" > .env
 
       - name: Install CocoaPods dependencies
-        run: cd ios && pod install --repo-update
+        run: pod install --project-directory=ios --deployment
 
       # Builds the Xcode archive without code signing.
       # To submit to the App Store: add your distribution certificate +

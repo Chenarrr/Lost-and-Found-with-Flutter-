@@ -5,7 +5,6 @@
 // Never shipped to production.
 
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:integration_test/integration_test.dart';
@@ -20,7 +19,6 @@ import 'package:flutter_application/navigation/root_router.dart';
 
 /// Initialises real Firebase (no emulator hooks).
 Future<void> setupRealFirebase() async {
-  await dotenv.load(fileName: '.env');
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   timeago.setLocaleMessages('ar', timeago.ArMessages());
   timeago.setLocaleMessages('ckb', timeago.KuMessages());

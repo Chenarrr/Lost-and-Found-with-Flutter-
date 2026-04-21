@@ -3,7 +3,6 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'firebase_options.dart';
 import 'package:flutter_application/config/app_colors.dart';
@@ -378,10 +377,7 @@ Future<void> main() async {
   timeago.setLocaleMessages('ar', timeago.ArMessages());
   timeago.setLocaleMessages('ckb', timeago.KuMessages());
 
-  await Future.wait([
-    dotenv.load(fileName: '.env'),
-    Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform),
-  ]);
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   runApp(const FindItApp());
   FlutterNativeSplash.remove();

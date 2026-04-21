@@ -155,6 +155,7 @@ class _AuthScreenState extends State<AuthScreen> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+    final isRtl = Directionality.of(context) == TextDirection.rtl;
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -207,12 +208,15 @@ class _AuthScreenState extends State<AuthScreen> {
                                   final isIncoming =
                                       child.key ==
                                       ValueKey<_AuthMode>(_authMode);
+                                  final horizontalSign = isRtl ? -1.0 : 1.0;
                                   final enterFrom = Offset(
-                                    _authModeMovesForward ? 0.09 : -0.09,
+                                    (_authModeMovesForward ? 0.09 : -0.09) *
+                                        horizontalSign,
                                     0,
                                   );
                                   final exitTo = Offset(
-                                    _authModeMovesForward ? -0.05 : 0.05,
+                                    (_authModeMovesForward ? -0.05 : 0.05) *
+                                        horizontalSign,
                                     0,
                                   );
                                   final slide =
@@ -418,14 +422,15 @@ class _AuthScreenState extends State<AuthScreen> {
             height: 52,
             child: Stack(
               children: [
-                AnimatedPositioned(
+                AnimatedPositionedDirectional(
                   duration: AppMotion.authModeDuration,
                   curve: AppMotion.standardCurve,
-                  left: _authMode == _AuthMode.login ? 0 : segmentWidth + gap,
+                  start: _authMode == _AuthMode.login ? 0 : segmentWidth + gap,
                   top: 0,
                   width: segmentWidth,
                   height: 52,
                   child: DecoratedBox(
+                    key: const ValueKey('auth_mode_indicator'),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
                         colors: [AppColors.primaryBlue, AppColors.accentIndigo],
@@ -445,6 +450,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   children: [
                     Expanded(
                       child: _ModeButton(
+                        key: const ValueKey('auth_mode_login'),
                         label: l10n.loginTab,
                         icon: Icons.login_rounded,
                         selected: _authMode == _AuthMode.login,
@@ -454,6 +460,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     const SizedBox(width: gap),
                     Expanded(
                       child: _ModeButton(
+                        key: const ValueKey('auth_mode_signup'),
                         label: l10n.signupTab,
                         icon: Icons.person_add_alt_1_rounded,
                         selected: _authMode == _AuthMode.signup,
@@ -789,6 +796,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
 class _ModeButton extends StatelessWidget {
   const _ModeButton({
+    super.key,
     required this.label,
     required this.icon,
     required this.selected,

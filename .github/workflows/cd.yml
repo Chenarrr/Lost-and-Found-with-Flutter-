@@ -1,6 +1,6 @@
 name: CD
 
-# Manual trigger only — run from the GitHub Actions tab
+# Manual trigger only — run from the GitHub Actions tab after CI is green
 on:
   workflow_dispatch:
     inputs:
@@ -16,29 +16,48 @@ jobs:
     if: ${{ inputs.build_ios }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
+      # Match the exact Flutter version used in CI and local development
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.38.7'
+          flutter-version: '3.41.6'
           channel: stable
           cache: true
+
+      - name: Cache pub packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-
+
+      - name: Cache CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
+          restore-keys: ${{ runner.os }}-pods-
 
       - name: Install dependencies
         run: flutter pub get
 
+      # .env is a bundled Flutter asset — must exist or build fails
       - name: Create .env
-        run: echo "IMGBB_API_KEY=placeholder" > .env
+        run: echo "IMGBB_API_KEY=ci_placeholder" > .env
+
+      - name: Install CocoaPods dependencies
+        run: cd ios && pod install --repo-update
 
       # Builds the Xcode archive without code signing.
-      # To submit to the App Store, add your signing certificate +
+      # To submit to the App Store: add your distribution certificate +
       # provisioning profile as GitHub secrets and remove --no-codesign.
       - name: Build iOS archive
         run: flutter build ipa --no-codesign
 
       - name: Upload archive
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
-          name: ios-archive
+          name: ios-archive-${{ github.sha }}
           path: build/ios/archive/Runner.xcarchive
           retention-days: 30

@@ -20,9 +20,8 @@ Widget _buildApp(String name, {Locale locale = const Locale('en')}) {
       supportedLocales: AppLocalizations.supportedLocales,
       locale: locale,
       home: PermissionsScreen(name: name),
-      onGenerateRoute: (settings) => MaterialPageRoute(
-        builder: (_) => DoneScreen(name: name),
-      ),
+      onGenerateRoute: (settings) =>
+          MaterialPageRoute(builder: (_) => DoneScreen(name: name)),
     ),
   );
 }

@@ -9,24 +9,18 @@ import 'package:flutter_application/widgets/app_panel.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-const _cities = [
-  'Erbil',
-  'Sulaymaniyah',
-  'Duhok',
-  'Halabja',
-  'Zakho',
-  'Koya',
-];
+const _cities = ['Erbil', 'Sulaymaniyah', 'Duhok', 'Halabja', 'Zakho', 'Koya'];
 
-String _cityLabel(String canonical, AppLocalizations l10n) => switch (canonical) {
-  'Erbil' => l10n.cityErbil,
-  'Sulaymaniyah' => l10n.citySulaymaniyah,
-  'Duhok' => l10n.cityDuhok,
-  'Halabja' => l10n.cityHalabja,
-  'Zakho' => l10n.cityZakho,
-  'Koya' => l10n.cityKoya,
-  _ => canonical,
-};
+String _cityLabel(String canonical, AppLocalizations l10n) =>
+    switch (canonical) {
+      'Erbil' => l10n.cityErbil,
+      'Sulaymaniyah' => l10n.citySulaymaniyah,
+      'Duhok' => l10n.cityDuhok,
+      'Halabja' => l10n.cityHalabja,
+      'Zakho' => l10n.cityZakho,
+      'Koya' => l10n.cityKoya,
+      _ => canonical,
+    };
 
 class ProfileSetupScreen extends StatefulWidget {
   const ProfileSetupScreen({super.key, required this.name});
@@ -81,9 +75,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
     setState(() => _saving = false);
 
     Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => PermissionsScreen(name: widget.name),
-      ),
+      MaterialPageRoute(builder: (_) => PermissionsScreen(name: widget.name)),
     );
   }
 
@@ -150,10 +142,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                           decoration: BoxDecoration(
                             color: AppColors.primaryBlue,
                             shape: BoxShape.circle,
-                            border: Border.all(
-                              color: cs.surface,
-                              width: 2.5,
-                            ),
+                            border: Border.all(color: cs.surface, width: 2.5),
                           ),
                           child: const Icon(
                             Icons.add_rounded,
@@ -211,8 +200,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                           children: _cities.map((city) {
                             final selected = _selectedCity == city;
                             return GestureDetector(
-                              onTap: () =>
-                                  setState(() => _selectedCity = city),
+                              onTap: () => setState(() => _selectedCity = city),
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 180),
                                 padding: const EdgeInsets.symmetric(
@@ -223,9 +211,9 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                                   color: selected
                                       ? AppColors.primaryBlue
                                       : (Theme.of(context).brightness ==
-                                              Brightness.dark
-                                          ? Colors.white.withAlpha(10)
-                                          : AppColors.bgGray),
+                                                Brightness.dark
+                                            ? Colors.white.withAlpha(10)
+                                            : AppColors.bgGray),
                                   borderRadius: BorderRadius.circular(20),
                                   border: Border.all(
                                     color: selected

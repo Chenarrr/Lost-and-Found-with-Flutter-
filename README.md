@@ -594,17 +594,22 @@ xcrun simctl list devices | grep Booted
 
 ### CI — runs on every push / PR to `main`
 
-Single job: **format check → analyze → test** (merged to save one Flutter setup cycle).
+Single job on `ubuntu-latest`: **format → analyze → test**.
+Flutter version pinned to `3.41.6` to match local development exactly.
 
 ```
 dart format --output=none --set-exit-if-changed lib/ test/
 flutter analyze --fatal-warnings
-flutter test --coverage
+flutter test --no-pub --reporter compact --coverage
 ```
+
+Pub packages and Flutter SDK are both cached — typical run is under 2 minutes after the first warm-up.
 
 ### CD — manual trigger only
 
 Run from **GitHub Actions → CD → Run workflow**. Builds an iOS `.xcarchive` on `macos-latest` and uploads it as a downloadable artifact (30-day retention).
+
+Caches pub packages **and** CocoaPods so repeated builds skip the ~10-minute pod compile.
 
 To ship to the App Store: add your distribution certificate + provisioning profile as GitHub secrets and remove `--no-codesign`.
 

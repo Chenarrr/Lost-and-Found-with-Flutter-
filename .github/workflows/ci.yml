@@ -2,51 +2,50 @@ name: CI
 
 on:
   push:
-    branches: [main, master]
+    branches: [main]
   pull_request:
-    branches: [main, master]
+    branches: [main]
 
-# Cancel in-progress runs on the same branch when a new push arrives
+# Cancel in-progress run on the same branch when a new push arrives
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   ci:
-    name: Format, Analyze & Test
+    name: Format · Analyze · Test
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
 
+      # Pin to the exact Flutter version used in local development
       - uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.41.6'
           channel: stable
           cache: true
 
-      # Cache pub packages separately for faster restores
       - name: Cache pub packages
         uses: actions/cache@v4
         with:
           path: ~/.pub-cache
           key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pub-
+          restore-keys: ${{ runner.os }}-pub-
 
       - name: Install dependencies
         run: flutter pub get
 
-      # .env is a Flutter asset — must exist even in CI
+      # .env is a bundled Flutter asset — must exist or asset loading fails
       - name: Create .env
         run: echo "IMGBB_API_KEY=ci_placeholder" > .env
 
-      # Scope to lib/ and test/ — skips Pods, generated files, etc.
-      - name: Verify formatting
+      # Scoped to lib/ and test/ — skips generated files, Pods, build/
+      - name: Check formatting
         run: dart format --output=none --set-exit-if-changed lib/ test/
 
       - name: Analyze
         run: flutter analyze --fatal-warnings
 
-      # --no-pub skips redundant pub get; --reporter compact keeps output tight
       - name: Test
         run: flutter test --no-pub --reporter compact --coverage

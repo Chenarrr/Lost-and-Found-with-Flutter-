@@ -50,7 +50,14 @@ void main() {
     testWidgets('shows all 6 city chips in English', (tester) async {
       await tester.pumpWidget(_buildApp('Ahmed'));
       await tester.pumpAndSettle();
-      for (final city in ['Erbil', 'Sulaymaniyah', 'Duhok', 'Halabja', 'Zakho', 'Koya']) {
+      for (final city in [
+        'Erbil',
+        'Sulaymaniyah',
+        'Duhok',
+        'Halabja',
+        'Zakho',
+        'Koya',
+      ]) {
         expect(find.text(city), findsOneWidget);
       }
     });

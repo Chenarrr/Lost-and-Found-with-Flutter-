@@ -124,11 +124,17 @@ class DoneScreen extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              _Stat(value: '2,847', label: l10n.doneItemsReturned),
+                              _Stat(
+                                value: '2,847',
+                                label: l10n.doneItemsReturned,
+                              ),
                               _Divider(),
                               _Stat(value: '4', label: l10n.doneCitiesCovered),
                               _Divider(),
-                              _Stat(value: '12k', label: l10n.doneActiveMembers),
+                              _Stat(
+                                value: '12k',
+                                label: l10n.doneActiveMembers,
+                              ),
                             ],
                           ),
                         ],
@@ -230,10 +236,6 @@ class _Stat extends StatelessWidget {
 class _Divider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 1,
-      height: 40,
-      color: AppColors.borderGray,
-    );
+    return Container(width: 1, height: 40, color: AppColors.borderGray);
   }
 }

@@ -21,11 +21,9 @@ class _PermissionsScreenState extends State<PermissionsScreen> {
   bool _locationOn = true;
 
   void _allowAndContinue() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => DoneScreen(name: widget.name),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => DoneScreen(name: widget.name)));
   }
 
   @override

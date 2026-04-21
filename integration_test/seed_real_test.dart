@@ -244,22 +244,22 @@ void main() {
       // ── 3. Fill signup form ─────────────────────────────────────────────
       await tester.enterText(
         find.widgetWithText(TextFormField, 'Full Name'),
-        user['name']!,
+        user['name']! as String,
       );
       await _pump(tester, 1);
 
       await tester.enterText(
         find.widgetWithText(TextFormField, 'Phone number'),
-        user['phone']!,
+        user['phone']! as String,
       );
       await _pump(tester, 1);
 
-      await tester.tap(find.text(user['gender']!));
+      await tester.tap(find.text(user['gender']! as String));
       await _pump(tester, 1);
 
       await tester.enterText(
         find.widgetWithText(TextFormField, 'Age'),
-        user['age']!,
+        user['age']! as String,
       );
       await _pump(tester, 1);
 
@@ -307,21 +307,21 @@ void main() {
       await _pump(tester, 2);
 
       // ── 8. Fill post form ────────────────────────────────────────────────
-      await tester.tap(find.text(user['type']!), warnIfMissed: false);
+      await tester.tap(find.text(user['type']! as String), warnIfMissed: false);
       await _pump(tester, 1);
 
-      await tester.tap(find.text(user['category']!), warnIfMissed: false);
+      await tester.tap(find.text(user['category']! as String), warnIfMissed: false);
       await _pump(tester, 1);
 
       await tester.enterText(
         find.widgetWithText(TextFormField, 'Item Name'),
-        user['itemName']!,
+        user['itemName']! as String,
       );
       await _pump(tester, 1);
 
       await tester.enterText(
         find.widgetWithText(TextFormField, 'Description (optional)'),
-        user['description']!,
+        user['description']! as String,
       );
       await _pump(tester, 1);
 
@@ -346,7 +346,7 @@ void main() {
       await _pump(tester, 1);
       await tester.tap(cityFinder, warnIfMissed: false);
       await _pump(tester, 1);
-      await tester.tap(find.text(user['city']!).last, warnIfMissed: false);
+      await tester.tap(find.text(user['city']! as String).last, warnIfMissed: false);
       await _pump(tester, 1);
 
       // Scroll to Street field
@@ -359,7 +359,7 @@ void main() {
       } catch (_) {}
       await tester.enterText(
         find.widgetWithText(TextFormField, 'Street'),
-        user['street']!,
+        user['street']! as String,
       );
       await _pump(tester, 1);
 

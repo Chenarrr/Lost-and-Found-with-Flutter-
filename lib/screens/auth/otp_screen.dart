@@ -6,6 +6,7 @@ import 'package:flutter_application/config/app_motion.dart';
 import 'package:flutter_application/l10n/app_locale_utils.dart';
 import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/navigation/main_page.dart';
+import 'package:flutter_application/screens/auth/profile_setup_screen.dart';
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/widgets/app_backdrop.dart';
 import 'package:flutter_application/widgets/app_panel.dart';
@@ -90,10 +91,21 @@ class _OtpScreenState extends State<OtpScreen> {
       return;
     }
 
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const MainPage()),
-      (route) => false,
-    );
+    if (widget.name.isNotEmpty) {
+      // New signup — walk through onboarding
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (_) => ProfileSetupScreen(name: widget.name),
+        ),
+        (route) => false,
+      );
+    } else {
+      // Returning user — go straight to app
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const MainPage()),
+        (route) => false,
+      );
+    }
   }
 
   Future<void> _resend() async {

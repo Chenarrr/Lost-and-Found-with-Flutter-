@@ -482,6 +482,20 @@ class AppState extends ChangeNotifier {
     }
   }
 
+  Future<String?> updateUserCity(String city) async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null || currentUser == null) return 'Not logged in.';
+    try {
+      await _firestore.collection('users').doc(uid).update({'city': city});
+      currentUser = currentUser!.copyWith(city: city);
+      notifyListeners();
+      return null;
+    } catch (e) {
+      debugPrint('Error updating city: $e');
+      return 'Failed to update city.';
+    }
+  }
+
   // ── Posts & Storage ──────────────────────────────────────────────────────
 
   Future<String?> _uploadToImgBB(

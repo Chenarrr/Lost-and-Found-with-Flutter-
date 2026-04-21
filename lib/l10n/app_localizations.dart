@@ -1143,6 +1143,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Member since {date}'**
   String memberSince(String date);
+
+  /// No description provided for @profileSetupHi.
+  ///
+  /// In en, this message translates to:
+  /// **'Hi, {firstName}!'**
+  String profileSetupHi(String firstName);
+
+  /// No description provided for @profileSetupSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell us where you\'re based.'**
+  String get profileSetupSubtitle;
+
+  /// No description provided for @profileSetupCityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your City'**
+  String get profileSetupCityTitle;
+
+  /// No description provided for @profileSetupCitySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ll show you relevant posts nearby.'**
+  String get profileSetupCitySubtitle;
+
+  /// No description provided for @profileSetupContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue →'**
+  String get profileSetupContinue;
+
+  /// No description provided for @profileSetupSelectCityError.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select your city.'**
+  String get profileSetupSelectCityError;
+
+  /// No description provided for @permissionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Just a couple\nof things.'**
+  String get permissionsTitle;
+
+  /// No description provided for @permissionsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'These help FindIt work better for you.'**
+  String get permissionsSubtitle;
+
+  /// No description provided for @permissionsNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get permissionsNotifications;
+
+  /// No description provided for @permissionsNotificationsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Get alerted when someone finds your item or replies to your post.'**
+  String get permissionsNotificationsDesc;
+
+  /// No description provided for @permissionsLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get permissionsLocation;
+
+  /// No description provided for @permissionsLocationDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Show posts near you and help others find items in your area.'**
+  String get permissionsLocationDesc;
+
+  /// No description provided for @permissionsAllow.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow & continue'**
+  String get permissionsAllow;
+
+  /// No description provided for @permissionsSettingsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'You can change these anytime in Settings.'**
+  String get permissionsSettingsHint;
+
+  /// No description provided for @doneTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re all set,'**
+  String get doneTitle;
+
+  /// No description provided for @doneSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to the FindIt community.'**
+  String get doneSubtitle;
+
+  /// No description provided for @doneCommunitySnapshot.
+  ///
+  /// In en, this message translates to:
+  /// **'Community snapshot'**
+  String get doneCommunitySnapshot;
+
+  /// No description provided for @doneItemsReturned.
+  ///
+  /// In en, this message translates to:
+  /// **'Items\nreturned'**
+  String get doneItemsReturned;
+
+  /// No description provided for @doneCitiesCovered.
+  ///
+  /// In en, this message translates to:
+  /// **'Cities\ncovered'**
+  String get doneCitiesCovered;
+
+  /// No description provided for @doneActiveMembers.
+  ///
+  /// In en, this message translates to:
+  /// **'Active\nmembers'**
+  String get doneActiveMembers;
+
+  /// No description provided for @doneOpenApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Open FindIt →'**
+  String get doneOpenApp;
 }
 
 class _AppLocalizationsDelegate

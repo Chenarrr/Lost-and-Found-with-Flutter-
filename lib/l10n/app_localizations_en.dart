@@ -564,4 +564,73 @@ class AppLocalizationsEn extends AppLocalizations {
   String memberSince(String date) {
     return 'Member since $date';
   }
+
+  @override
+  String profileSetupHi(String firstName) {
+    return 'Hi, $firstName!';
+  }
+
+  @override
+  String get profileSetupSubtitle => 'Tell us where you\'re based.';
+
+  @override
+  String get profileSetupCityTitle => 'Your City';
+
+  @override
+  String get profileSetupCitySubtitle =>
+      'We\'ll show you relevant posts nearby.';
+
+  @override
+  String get profileSetupContinue => 'Continue →';
+
+  @override
+  String get profileSetupSelectCityError => 'Please select your city.';
+
+  @override
+  String get permissionsTitle => 'Just a couple\nof things.';
+
+  @override
+  String get permissionsSubtitle => 'These help FindIt work better for you.';
+
+  @override
+  String get permissionsNotifications => 'Notifications';
+
+  @override
+  String get permissionsNotificationsDesc =>
+      'Get alerted when someone finds your item or replies to your post.';
+
+  @override
+  String get permissionsLocation => 'Location';
+
+  @override
+  String get permissionsLocationDesc =>
+      'Show posts near you and help others find items in your area.';
+
+  @override
+  String get permissionsAllow => 'Allow & continue';
+
+  @override
+  String get permissionsSettingsHint =>
+      'You can change these anytime in Settings.';
+
+  @override
+  String get doneTitle => 'You\'re all set,';
+
+  @override
+  String get doneSubtitle => 'Welcome to the FindIt community.';
+
+  @override
+  String get doneCommunitySnapshot => 'Community snapshot';
+
+  @override
+  String get doneItemsReturned => 'Items\nreturned';
+
+  @override
+  String get doneCitiesCovered => 'Cities\ncovered';
+
+  @override
+  String get doneActiveMembers => 'Active\nmembers';
+
+  @override
+  String get doneOpenApp => 'Open FindIt →';
 }

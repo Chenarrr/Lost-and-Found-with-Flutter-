@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/config/app_motion.dart';
+import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/screens/auth/permissions_screen.dart';
 import 'package:flutter_application/widgets/app_backdrop.dart';
@@ -38,7 +39,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Please select your city.',
+            context.l10n.profileSetupSelectCityError,
             style: GoogleFonts.manrope(),
           ),
           behavior: SnackBarBehavior.floating,
@@ -66,6 +67,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
 
     return Scaffold(
       body: AppBackdrop(
@@ -141,7 +143,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    'Hi, ${widget.name.split(' ').first}!',
+                    l10n.profileSetupHi(widget.name.split(' ').first),
                     style: GoogleFonts.spaceGrotesk(
                       fontSize: 28,
                       fontWeight: FontWeight.w700,
@@ -150,7 +152,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Tell us where you\'re based.',
+                    l10n.profileSetupSubtitle,
                     style: GoogleFonts.manrope(
                       fontSize: 15,
                       color: cs.onSurfaceVariant,
@@ -163,7 +165,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Your City',
+                          l10n.profileSetupCityTitle,
                           style: GoogleFonts.spaceGrotesk(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
@@ -172,7 +174,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          'We\'ll show you relevant posts nearby.',
+                          l10n.profileSetupCitySubtitle,
                           style: GoogleFonts.manrope(
                             fontSize: 13,
                             color: cs.onSurfaceVariant,
@@ -265,7 +267,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                                   ),
                                 )
                               : Text(
-                                  'Continue →',
+                                  l10n.profileSetupContinue,
                                   style: GoogleFonts.manrope(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w800,

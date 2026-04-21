@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/config/app_motion.dart';
+import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/navigation/main_page.dart';
 import 'package:flutter_application/widgets/app_backdrop.dart';
 import 'package:flutter_application/widgets/app_panel.dart';
@@ -16,6 +17,7 @@ class DoneScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
 
     return Scaffold(
       body: AppBackdrop(
@@ -68,7 +70,7 @@ class DoneScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 28),
                     Text(
-                      "You're all set,",
+                      l10n.doneTitle,
                       style: GoogleFonts.spaceGrotesk(
                         fontSize: 32,
                         fontWeight: FontWeight.w700,
@@ -87,7 +89,7 @@ class DoneScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      'Welcome to the FindIt community.',
+                      l10n.doneSubtitle,
                       style: GoogleFonts.manrope(
                         fontSize: 15,
                         color: cs.onSurfaceVariant,
@@ -109,7 +111,7 @@ class DoneScreen extends StatelessWidget {
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                'Community snapshot',
+                                l10n.doneCommunitySnapshot,
                                 style: GoogleFonts.spaceGrotesk(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
@@ -122,11 +124,11 @@ class DoneScreen extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              const _Stat(value: '2,847', label: 'Items\nreturned'),
+                              _Stat(value: '2,847', label: l10n.doneItemsReturned),
                               _Divider(),
-                              const _Stat(value: '4', label: 'Cities\ncovered'),
+                              _Stat(value: '4', label: l10n.doneCitiesCovered),
                               _Divider(),
-                              const _Stat(value: '12k', label: 'Active\nmembers'),
+                              _Stat(value: '12k', label: l10n.doneActiveMembers),
                             ],
                           ),
                         ],
@@ -168,7 +170,7 @@ class DoneScreen extends StatelessWidget {
                             alignment: Alignment.center,
                             padding: const EdgeInsets.symmetric(vertical: 18),
                             child: Text(
-                              'Open FindIt →',
+                              l10n.doneOpenApp,
                               style: GoogleFonts.manrope(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w800,

@@ -251,5 +251,34 @@
     "placeholders": {
       "date": { "type": "String" }
     }
-  }
+  },
+
+  "profileSetupHi": "Hi, {firstName}!",
+  "@profileSetupHi": {
+    "placeholders": {
+      "firstName": { "type": "String" }
+    }
+  },
+  "profileSetupSubtitle": "Tell us where you're based.",
+  "profileSetupCityTitle": "Your City",
+  "profileSetupCitySubtitle": "We'll show you relevant posts nearby.",
+  "profileSetupContinue": "Continue →",
+  "profileSetupSelectCityError": "Please select your city.",
+
+  "permissionsTitle": "Just a couple\nof things.",
+  "permissionsSubtitle": "These help FindIt work better for you.",
+  "permissionsNotifications": "Notifications",
+  "permissionsNotificationsDesc": "Get alerted when someone finds your item or replies to your post.",
+  "permissionsLocation": "Location",
+  "permissionsLocationDesc": "Show posts near you and help others find items in your area.",
+  "permissionsAllow": "Allow & continue",
+  "permissionsSettingsHint": "You can change these anytime in Settings.",
+
+  "doneTitle": "You're all set,",
+  "doneSubtitle": "Welcome to the FindIt community.",
+  "doneCommunitySnapshot": "Community snapshot",
+  "doneItemsReturned": "Items\nreturned",
+  "doneCitiesCovered": "Cities\ncovered",
+  "doneActiveMembers": "Active\nmembers",
+  "doneOpenApp": "Open FindIt →"
 }

@@ -569,4 +569,73 @@ class AppLocalizationsCkb extends AppLocalizations {
   String memberSince(String date) {
     return 'ئەندام لە $date';
   }
+
+  @override
+  String profileSetupHi(String firstName) {
+    return 'سڵاو، $firstName!';
+  }
+
+  @override
+  String get profileSetupSubtitle => 'بمانگە لەکوێیت.';
+
+  @override
+  String get profileSetupCityTitle => 'شارەکەت';
+
+  @override
+  String get profileSetupCitySubtitle => 'پۆستە نزیکەکان پیشانت دەدەین.';
+
+  @override
+  String get profileSetupContinue => 'بەردەوامبە →';
+
+  @override
+  String get profileSetupSelectCityError => 'تکایە شارەکەت هەڵبژێرە.';
+
+  @override
+  String get permissionsTitle => 'چەند شتێکی\nپێویست.';
+
+  @override
+  String get permissionsSubtitle =>
+      'ئەمانە یارمەتی FindIt دەدەن باشتر بۆت کاربکات.';
+
+  @override
+  String get permissionsNotifications => 'ئاگادارکردنەوەکان';
+
+  @override
+  String get permissionsNotificationsDesc =>
+      'کاتێک کەسێک شتەکەت دۆزیەوە یان وەڵامی پۆستەکەت دایەوە ئاگادار بکرەیتەوە.';
+
+  @override
+  String get permissionsLocation => 'شوێن';
+
+  @override
+  String get permissionsLocationDesc =>
+      'پۆستە نزیکەکان پیشانت بدە و یارمەتی خەڵک بدە لە ناوچەکەتدا.';
+
+  @override
+  String get permissionsAllow => 'ڕازیبوون و بەردەوامبوون';
+
+  @override
+  String get permissionsSettingsHint =>
+      'هەر کاتێک دەتوانیت لە ڕێکخستنەکاندا بیگۆڕیت.';
+
+  @override
+  String get doneTitle => 'ئامادەیت،';
+
+  @override
+  String get doneSubtitle => 'بەخێربێیت بۆ کۆمەڵگەی FindIt.';
+
+  @override
+  String get doneCommunitySnapshot => 'پێشاندانی کۆمەڵگە';
+
+  @override
+  String get doneItemsReturned => 'شت\nگەڕاندرایەوە';
+
+  @override
+  String get doneCitiesCovered => 'شار\nتێدەگات';
+
+  @override
+  String get doneActiveMembers => 'ئەندامی\nچالاک';
+
+  @override
+  String get doneOpenApp => 'FindIt کرانەوە →';
 }

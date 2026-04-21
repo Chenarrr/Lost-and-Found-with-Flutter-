@@ -251,5 +251,34 @@
     "placeholders": {
       "date": { "type": "String" }
     }
-  }
+  },
+
+  "profileSetupHi": "أهلاً، {firstName}!",
+  "@profileSetupHi": {
+    "placeholders": {
+      "firstName": { "type": "String" }
+    }
+  },
+  "profileSetupSubtitle": "أخبرنا أين تتواجد.",
+  "profileSetupCityTitle": "مدينتك",
+  "profileSetupCitySubtitle": "سنعرض لك المنشورات القريبة منك.",
+  "profileSetupContinue": "متابعة ←",
+  "profileSetupSelectCityError": "يرجى اختيار مدينتك.",
+
+  "permissionsTitle": "بضعة أشياء\nفقط.",
+  "permissionsSubtitle": "تساعد FindIt على العمل بشكل أفضل لك.",
+  "permissionsNotifications": "الإشعارات",
+  "permissionsNotificationsDesc": "احصل على تنبيه عندما يجد أحد ما عنصرك أو يرد على منشورك.",
+  "permissionsLocation": "الموقع",
+  "permissionsLocationDesc": "اعرض المنشورات القريبة منك وساعد الآخرين في منطقتك.",
+  "permissionsAllow": "السماح والمتابعة",
+  "permissionsSettingsHint": "يمكنك تغيير هذا في أي وقت من الإعدادات.",
+
+  "doneTitle": "أنت جاهز،",
+  "doneSubtitle": "مرحباً بك في مجتمع FindIt.",
+  "doneCommunitySnapshot": "لمحة عن المجتمع",
+  "doneItemsReturned": "عنصر\nأُعيد",
+  "doneCitiesCovered": "مدن\nmشمولة",
+  "doneActiveMembers": "عضو\nنشط",
+  "doneOpenApp": "افتح FindIt ←"
 }

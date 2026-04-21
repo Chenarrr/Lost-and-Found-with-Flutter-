@@ -251,5 +251,34 @@
     "placeholders": {
       "date": { "type": "String" }
     }
-  }
+  },
+
+  "profileSetupHi": "سڵاو، {firstName}!",
+  "@profileSetupHi": {
+    "placeholders": {
+      "firstName": { "type": "String" }
+    }
+  },
+  "profileSetupSubtitle": "بمانگە لەکوێیت.",
+  "profileSetupCityTitle": "شارەکەت",
+  "profileSetupCitySubtitle": "پۆستە نزیکەکان پیشانت دەدەین.",
+  "profileSetupContinue": "بەردەوامبە →",
+  "profileSetupSelectCityError": "تکایە شارەکەت هەڵبژێرە.",
+
+  "permissionsTitle": "چەند شتێکی\nپێویست.",
+  "permissionsSubtitle": "ئەمانە یارمەتی FindIt دەدەن باشتر بۆت کاربکات.",
+  "permissionsNotifications": "ئاگادارکردنەوەکان",
+  "permissionsNotificationsDesc": "کاتێک کەسێک شتەکەت دۆزیەوە یان وەڵامی پۆستەکەت دایەوە ئاگادار بکرەیتەوە.",
+  "permissionsLocation": "شوێن",
+  "permissionsLocationDesc": "پۆستە نزیکەکان پیشانت بدە و یارمەتی خەڵک بدە لە ناوچەکەتدا.",
+  "permissionsAllow": "ڕازیبوون و بەردەوامبوون",
+  "permissionsSettingsHint": "هەر کاتێک دەتوانیت لە ڕێکخستنەکاندا بیگۆڕیت.",
+
+  "doneTitle": "ئامادەیت،",
+  "doneSubtitle": "بەخێربێیت بۆ کۆمەڵگەی FindIt.",
+  "doneCommunitySnapshot": "پێشاندانی کۆمەڵگە",
+  "doneItemsReturned": "شت\nگەڕاندرایەوە",
+  "doneCitiesCovered": "شار\nتێدەگات",
+  "doneActiveMembers": "ئەندامی\nچالاک",
+  "doneOpenApp": "FindIt کرانەوە →"
 }

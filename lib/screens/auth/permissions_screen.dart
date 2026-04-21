@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/config/app_motion.dart';
+import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/screens/auth/done_screen.dart';
 import 'package:flutter_application/widgets/app_backdrop.dart';
 import 'package:flutter_application/widgets/app_panel.dart';
@@ -30,6 +31,7 @@ class _PermissionsScreenState extends State<PermissionsScreen> {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
 
     return Scaffold(
       body: AppBackdrop(
@@ -52,7 +54,7 @@ class _PermissionsScreenState extends State<PermissionsScreen> {
                 children: [
                   const SizedBox(height: 12),
                   Text(
-                    'Just a couple\nof things.',
+                    l10n.permissionsTitle,
                     style: GoogleFonts.spaceGrotesk(
                       fontSize: 32,
                       fontWeight: FontWeight.w700,
@@ -62,7 +64,7 @@ class _PermissionsScreenState extends State<PermissionsScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'These help FindIt work better for you.',
+                    l10n.permissionsSubtitle,
                     style: GoogleFonts.manrope(
                       fontSize: 15,
                       color: cs.onSurfaceVariant,
@@ -74,9 +76,8 @@ class _PermissionsScreenState extends State<PermissionsScreen> {
                     icon: Icons.notifications_outlined,
                     iconColor: AppColors.primaryBlue,
                     iconBg: AppColors.infoBox,
-                    title: 'Notifications',
-                    subtitle:
-                        'Get alerted when someone finds your item or replies to your post.',
+                    title: l10n.permissionsNotifications,
+                    subtitle: l10n.permissionsNotificationsDesc,
                     value: _notificationsOn,
                     onChanged: (v) => setState(() => _notificationsOn = v),
                   ),
@@ -85,9 +86,8 @@ class _PermissionsScreenState extends State<PermissionsScreen> {
                     icon: Icons.location_on_outlined,
                     iconColor: AppColors.foundPrimary,
                     iconBg: AppColors.foundLight,
-                    title: 'Location',
-                    subtitle:
-                        'Show posts near you and help others find items in your area.',
+                    title: l10n.permissionsLocation,
+                    subtitle: l10n.permissionsLocationDesc,
                     value: _locationOn,
                     onChanged: (v) => setState(() => _locationOn = v),
                   ),
@@ -122,7 +122,7 @@ class _PermissionsScreenState extends State<PermissionsScreen> {
                           alignment: Alignment.center,
                           padding: const EdgeInsets.symmetric(vertical: 18),
                           child: Text(
-                            'Allow & continue',
+                            l10n.permissionsAllow,
                             style: GoogleFonts.manrope(
                               fontSize: 15,
                               fontWeight: FontWeight.w800,
@@ -136,7 +136,7 @@ class _PermissionsScreenState extends State<PermissionsScreen> {
                   const SizedBox(height: 16),
                   Center(
                     child: Text(
-                      'You can change these anytime in Settings.',
+                      l10n.permissionsSettingsHint,
                       style: GoogleFonts.manrope(
                         fontSize: 13,
                         color: cs.onSurfaceVariant,

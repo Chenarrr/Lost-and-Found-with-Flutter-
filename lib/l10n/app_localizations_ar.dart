@@ -563,4 +563,72 @@ class AppLocalizationsAr extends AppLocalizations {
   String memberSince(String date) {
     return 'عضو منذ $date';
   }
+
+  @override
+  String profileSetupHi(String firstName) {
+    return 'أهلاً، $firstName!';
+  }
+
+  @override
+  String get profileSetupSubtitle => 'أخبرنا أين تتواجد.';
+
+  @override
+  String get profileSetupCityTitle => 'مدينتك';
+
+  @override
+  String get profileSetupCitySubtitle => 'سنعرض لك المنشورات القريبة منك.';
+
+  @override
+  String get profileSetupContinue => 'متابعة ←';
+
+  @override
+  String get profileSetupSelectCityError => 'يرجى اختيار مدينتك.';
+
+  @override
+  String get permissionsTitle => 'بضعة أشياء\nفقط.';
+
+  @override
+  String get permissionsSubtitle => 'تساعد FindIt على العمل بشكل أفضل لك.';
+
+  @override
+  String get permissionsNotifications => 'الإشعارات';
+
+  @override
+  String get permissionsNotificationsDesc =>
+      'احصل على تنبيه عندما يجد أحد ما عنصرك أو يرد على منشورك.';
+
+  @override
+  String get permissionsLocation => 'الموقع';
+
+  @override
+  String get permissionsLocationDesc =>
+      'اعرض المنشورات القريبة منك وساعد الآخرين في منطقتك.';
+
+  @override
+  String get permissionsAllow => 'السماح والمتابعة';
+
+  @override
+  String get permissionsSettingsHint =>
+      'يمكنك تغيير هذا في أي وقت من الإعدادات.';
+
+  @override
+  String get doneTitle => 'أنت جاهز،';
+
+  @override
+  String get doneSubtitle => 'مرحباً بك في مجتمع FindIt.';
+
+  @override
+  String get doneCommunitySnapshot => 'لمحة عن المجتمع';
+
+  @override
+  String get doneItemsReturned => 'عنصر\nأُعيد';
+
+  @override
+  String get doneCitiesCovered => 'مدن\nmشمولة';
+
+  @override
+  String get doneActiveMembers => 'عضو\nنشط';
+
+  @override
+  String get doneOpenApp => 'افتح FindIt ←';
 }

@@ -10,6 +10,18 @@ Community-driven Flutter app for reporting and recovering lost & found items in 
 
 ---
 
+## Screens
+
+### Onboarding (new users only)
+
+| S4 — Your City | S5 — Permissions | S6 — You're all set |
+|:---:|:---:|:---:|
+| ![City picker](screenshots/onboarding_s4_city.png) | ![Permissions](screenshots/onboarding_s5_permissions.png) | ![Done](screenshots/onboarding_s6_done.png) |
+
+New signups flow through these 3 screens after OTP verification before reaching the home feed. Returning users skip straight to the app.
+
+---
+
 ## Quick Start
 
 ```bash
@@ -47,6 +59,7 @@ flutter run
 
 - **Phone OTP auth** — SMS login, no password, Iraqi `+964` format auto-applied from spaced input like `750 222 22 22`
 - **Single auth flow** — Login first, then Signup in one continuous scroll screen
+- **Onboarding flow** — new signups go through city picker → permissions → welcome screen before reaching the app
 - **Lost / Found posts** — type, category (Electronics, Documents, Personal Items, Pets), city, street, up to 3 photos
 - **Real-time feed** — live Firestore listener, search, city filter, type filter, live stats
 - **Post actions** — Mark as Resolved, Delete, Edit (owner); Report, Share, Comment (any user)
@@ -61,6 +74,8 @@ flutter run
 
 ## Recent Improvements (Apr 2026)
 
+- **Onboarding screens** — 3 new post-OTP screens for new signups: city picker (S4), permissions (S5), welcome (S6)
+- **User city field** — `city` added to User model and Firestore; saved during onboarding
 - Unified top-area styling across auth, post, profile, and settings screens using shared backdrop/app bar theme tokens
 - Improved post creation UX with image-first layout, in-place add-image actions, and cleaner category selection
 - Fully localized custom-category text in Create Post and persisted description tagging
@@ -118,7 +133,7 @@ lib/
 │   ├── root_router.dart             # Auth guard: WelcomeScreen ↔ MainPage
 │   └── main_page.dart               # Bottom nav shell (Home / Activity / Profile)
 ├── screens/
-│   ├── auth/                        # welcome, auth, otp screens
+│   ├── auth/                        # welcome, auth, otp, profile_setup, permissions, done screens
 │   ├── post/                        # post_detail_screen, create_post_sheet
 │   ├── home_screen.dart
 │   ├── activity_screen.dart
@@ -152,7 +167,7 @@ Write methods: `addPost`, `deletePost`, `addComment`, `reportPost`, `markPostRes
 
 ```
 users/{uid}
-  id, name, phone, email?, createdAt
+  id, name, phone, email?, createdAt, city?, gender?, age?
 
 posts/{postId}
   id, type ("lost"|"found"), category, itemName, description?

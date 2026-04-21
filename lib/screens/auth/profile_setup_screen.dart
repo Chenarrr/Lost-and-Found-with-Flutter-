@@ -18,6 +18,16 @@ const _cities = [
   'Koya',
 ];
 
+String _cityLabel(String canonical, AppLocalizations l10n) => switch (canonical) {
+  'Erbil' => l10n.cityErbil,
+  'Sulaymaniyah' => l10n.citySulaymaniyah,
+  'Duhok' => l10n.cityDuhok,
+  'Halabja' => l10n.cityHalabja,
+  'Zakho' => l10n.cityZakho,
+  'Koya' => l10n.cityKoya,
+  _ => canonical,
+};
+
 class ProfileSetupScreen extends StatefulWidget {
   const ProfileSetupScreen({super.key, required this.name});
 
@@ -52,9 +62,22 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
     setState(() => _saving = true);
 
     final app = Provider.of<AppState>(context, listen: false);
-    await app.updateUserCity(_selectedCity!);
+    final error = await app.updateUserCity(_selectedCity!);
 
     if (!mounted) return;
+
+    if (error != null) {
+      setState(() => _saving = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error, style: GoogleFonts.manrope()),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.red.shade700,
+        ),
+      );
+      return;
+    }
+
     setState(() => _saving = false);
 
     Navigator.of(context).push(
@@ -211,7 +234,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                                   ),
                                 ),
                                 child: Text(
-                                  city,
+                                  _cityLabel(city, l10n),
                                   style: GoogleFonts.manrope(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,

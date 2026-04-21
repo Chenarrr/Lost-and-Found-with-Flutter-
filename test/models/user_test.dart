@@ -83,5 +83,83 @@ void main() {
       expect(updated.id, user.id);
       expect(updated.phone, user.phone);
     });
+
+    // city field tests
+    test('constructs with city', () {
+      final user = User(
+        id: 'u1',
+        name: 'Ahmed',
+        phone: '07501234567',
+        createdAt: baseDate,
+        city: 'Erbil',
+      );
+      expect(user.city, 'Erbil');
+    });
+
+    test('constructs without city defaults to null', () {
+      expect(makeUser().city, isNull);
+    });
+
+    test('toJson includes city when set', () {
+      final user = User(
+        id: 'u1',
+        name: 'Ahmed',
+        phone: '07501234567',
+        createdAt: baseDate,
+        city: 'Sulaymaniyah',
+      );
+      expect(user.toJson()['city'], 'Sulaymaniyah');
+    });
+
+    test('toJson city is null when not set', () {
+      expect(makeUser().toJson()['city'], isNull);
+    });
+
+    test('fromJson deserializes city', () {
+      final json = {
+        'id': 'u1',
+        'name': 'Ahmed',
+        'phone': '07501234567',
+        'createdAt': baseDate.toIso8601String(),
+        'city': 'Duhok',
+      };
+      expect(User.fromJson(json).city, 'Duhok');
+    });
+
+    test('fromJson handles missing city', () {
+      final json = {
+        'id': 'u1',
+        'name': 'Ahmed',
+        'phone': '07501234567',
+        'createdAt': baseDate.toIso8601String(),
+      };
+      expect(User.fromJson(json).city, isNull);
+    });
+
+    test('toJson → fromJson round-trip preserves city', () {
+      final user = User(
+        id: 'u1',
+        name: 'Ahmed',
+        phone: '07501234567',
+        createdAt: baseDate,
+        city: 'Erbil',
+      );
+      expect(User.fromJson(user.toJson()).city, 'Erbil');
+    });
+
+    test('copyWith updates city', () {
+      expect(makeUser().copyWith(city: 'Koya').city, 'Koya');
+    });
+
+    test('copyWith preserves existing city when not specified', () {
+      final user = User(
+        id: 'u1',
+        name: 'Ahmed',
+        phone: '07501234567',
+        createdAt: baseDate,
+        city: 'Zakho',
+      );
+      expect(user.copyWith(name: 'Ali').city, 'Zakho');
+    });
   });
 }

@@ -30,7 +30,6 @@ New signups flow through these 3 screens after OTP verification before reaching 
 git clone https://github.com/Chenarrr/Lost-and-Found-with-Flutter-.git
 cd Lost-and-Found-with-Flutter-
 flutter pub get
-echo "IMGBB_API_KEY=your_key_here" > .env   # get free key at api.imgbb.com
 flutter run
 ```
 
@@ -46,7 +45,7 @@ flutter run
 - [Architecture](#architecture)
 - [Development](#development)
 - [Firebase Setup](#firebase-setup)
-- [Environment Variables](#environment-variables)
+- [Runtime Configuration](#runtime-configuration)
 - [Localization](#localization)
 - [Adding a Language](#adding-a-language)
 - [Testing](#testing)
@@ -99,18 +98,17 @@ flutter run
 | State | `provider` (ChangeNotifier) | ^6.1.5+1 |
 | Auth | `firebase_auth` | ^6.2.0 |
 | Database | `cloud_firestore` | ^6.1.3 |
-| Image hosting | ImgBB REST API via `http` | ^1.6.0 |
+| Image storage | `firebase_storage` | ^13.0.3 |
 | Image picker | `image_picker` | ^1.2.1 |
 | Image cache | `cached_network_image` | ^3.4.1 |
 | Deep links | `url_launcher` | ^6.3.2 |
 | Share | `share_plus` | ^12.0.1 |
-| Env vars | `flutter_dotenv` | ^6.0.0 |
 | IDs | `uuid` | ^4.5.3 |
 | Timestamps | `timeago` | ^3.7.1 |
 | i18n | `flutter_localizations` + `intl` | ^0.20.2 |
 | App info | `package_info_plus` | ^9.0.0 |
 
-> Firebase Storage is intentionally not used — billing accounts are unavailable in Iraq. Images are hosted on ImgBB (free, no billing required).
+> Post images are stored in Firebase Storage under owner-scoped paths (`post_images/{uid}/{postId}/...`) and protected by `storage.rules`.
 
 ---
 
@@ -179,7 +177,7 @@ posts/{postId}
   city, street, imageUrls[], userName, userPhone, userId
   createdAt, isResolved, isHidden
   comments  [{ id, postId, userId, userName, text, createdAt }]
-  reports   [userId, ...]          ← isHidden = true when reports.length ≥ 10
+  reports   [userId, ...]          ← caller UID can be appended once; no client-side auto-hide
 ```
 
 ---
@@ -193,7 +191,7 @@ posts/{postId}
 | Flutter SDK | ≥ 3.32 (`flutter doctor`) |
 | Xcode | ≥ 14 (iOS builds) |
 | Firebase CLI | `npm i -g firebase-tools` |
-| ImgBB account | Free at [imgbb.com](https://imgbb.com) |
+| Firebase project | Auth + Firestore + Storage enabled |
 
 ### Run commands
 
@@ -262,7 +260,7 @@ dart run flutter_native_splash:remove
 `main.dart` is optimized for fast first frame:
 
 - `FlutterNativeSplash.preserve()` keeps the native splash visible while the Dart VM boots
-- `dotenv.load()` and `Firebase.initializeApp()` run in parallel via `Future.wait`
+- `Firebase.initializeApp()` completes before the app boots so auth, Firestore, and Storage all share the same configured project
 - Theme data is built once at module load (`_cachedLightTheme` / `_cachedDarkTheme`) — locale or theme-mode changes do **not** rebuild `ThemeData`
 - `FlutterNativeSplash.remove()` is called immediately after `runApp` so the first real frame replaces the splash
 
@@ -300,9 +298,10 @@ rm -rf ~/Library/Developer/Xcode/DerivedData/Runner-*
 
 1. Firebase Console → **Authentication → Sign-in method → Phone → Enable**
 2. Firebase Console → **Firestore Database → Create database** (test mode, then add rules)
-3. Register iOS app with bundle ID `com.FindIt.KRD`
-4. Download `GoogleService-Info.plist` → `ios/Runner/`
-5. Regenerate `firebase_options.dart` if needed:
+3. Firebase Console → **Storage → Get started** so post image uploads have a bucket
+4. Register iOS app with bundle ID `com.FindIt.KRD`
+5. Download `GoogleService-Info.plist` → `ios/Runner/`
+6. Regenerate `firebase_options.dart` if needed:
    ```bash
    dart pub global activate flutterfire_cli
    flutterfire configure
@@ -330,41 +329,26 @@ In `ios/Runner/Info.plist`:
 
 Deploy with `firebase deploy --only firestore` (rules file: `firestore.rules`).
 
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
+The current rules intentionally block broad client-side mutation:
 
-    function isAuthenticated() { return request.auth != null; }
-    function isOwner(userId) { return isAuthenticated() && request.auth.uid == userId; }
+- Only the profile owner can write their user document.
+- Only the post owner can edit core post fields or delete a post.
+- View count can only increase by exactly `+1` per update.
+- Reports can only append the caller's UID once.
+- Comments can only append one authored comment with the caller's UID.
 
-    match /users/{userId} {
-      allow read:   if isAuthenticated();
-      allow create,
-            update: if isOwner(userId)
-                    && request.resource.data.name is string
-                    && request.resource.data.name.size() >= 2;
-      allow delete: if isOwner(userId);
-    }
+Read the source-of-truth rules in [`firestore.rules`](firestore.rules).
 
-    match /posts/{postId} {
-      allow read:   if true;
-      allow create: if isAuthenticated()
-                    && request.resource.data.userId == request.auth.uid
-                    && request.resource.data.itemName is string
-                    && request.resource.data.itemName.size() >= 2;
-      allow update: if isAuthenticated() && (
-        resource.data.userId == request.auth.uid
-        || request.resource.data.diff(resource.data).affectedKeys()
-             .hasOnly(['comments', 'reports', 'viewCount', 'isResolved', 'isHidden'])
-      );
-      allow delete: if isOwner(resource.data.userId);
-    }
+### Storage security rules
 
-    match /{document=**} { allow read, write: if false; }
-  }
-}
-```
+Deploy with `firebase deploy --only storage` (rules file: `storage.rules`).
+
+Uploads are limited to:
+
+- authenticated users only
+- owner-scoped paths: `post_images/{uid}/{postId}/{fileName}`
+- image MIME types only
+- max object size: 10 MB
 
 ### Firebase Emulator Suite (local development)
 
@@ -464,13 +448,13 @@ The following test numbers are registered in this project (all use code `123456`
 
 ---
 
-## Environment Variables
+## Runtime Configuration
 
-| Variable | Required | Description |
-|---|---|---|
-| `IMGBB_API_KEY` | Yes | From [api.imgbb.com](https://api.imgbb.com) — free, no billing |
+No app-level runtime secrets are required.
 
-`.env` is declared as a Flutter asset in `pubspec.yaml` so it bundles into the app. It is git-ignored — **never commit it**.
+- Firebase client config lives in `lib/firebase_options.dart`.
+- Post image uploads go directly to Firebase Storage and are authorized by Firebase Auth + `storage.rules`.
+- There is no bundled `.env` file in the Flutter app anymore.
 
 ---
 
@@ -592,24 +576,24 @@ xcrun simctl list devices | grep Booted
 
 ## CI/CD
 
-### CI — runs on every push / PR to `main`
+### CI — runs on relevant pushes / PRs to `main`
 
-Single job on `ubuntu-latest`: **format → analyze → test**.
+Single job on `ubuntu-latest`: **l10n drift check → format → analyze → test**.
 Flutter version pinned to `3.41.6` to match local development exactly.
 
 ```
-dart format --output=none --set-exit-if-changed lib/ test/
-flutter analyze --fatal-warnings
+flutter gen-l10n && git diff --exit-code -- lib/l10n/
+dart format --output=none --set-exit-if-changed lib/ test/ integration_test/
+flutter analyze --no-pub --fatal-warnings
 flutter test --no-pub --reporter compact --coverage
 ```
 
-Pub packages and Flutter SDK are both cached — typical run is under 2 minutes after the first warm-up.
+CI only triggers when app, platform, rules, or workflow files change. Pub packages and Flutter SDK are cached, and `coverage/lcov.info` is uploaded as an artifact on every successful run.
 
 ### CD — manual trigger only
 
-Run from **GitHub Actions → CD → Run workflow**. Builds an iOS `.xcarchive` on `macos-latest` and uploads it as a downloadable artifact (30-day retention).
+Run from **GitHub Actions → CD → Run workflow** on `main`. The job targets the `release` environment, builds an iOS `.xcarchive` on `macos-latest`, and uploads it as a downloadable artifact (30-day retention).
 
 Caches pub packages **and** CocoaPods so repeated builds skip the ~10-minute pod compile.
 
 To ship to the App Store: add your distribution certificate + provisioning profile as GitHub secrets and remove `--no-codesign`.
-

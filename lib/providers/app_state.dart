@@ -1,12 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide User;
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
 
 import 'package:flutter_application/models/comment.dart';
 import 'package:flutter_application/models/post.dart';
@@ -65,6 +63,7 @@ class AppState extends ChangeNotifier {
   FirebaseAuth get _auth => _mockAuth ?? FirebaseAuth.instance;
   FirebaseFirestore get _firestore =>
       _mockFirestore ?? FirebaseFirestore.instance;
+  FirebaseStorage get _storage => FirebaseStorage.instance;
 
   bool get isInitialized => _isInitialized;
 
@@ -403,12 +402,19 @@ class AppState extends ChangeNotifier {
           .collection('posts')
           .where('userId', isEqualTo: uid)
           .get();
+      final imageUrls = <String>[];
+      for (final doc in snap.docs) {
+        imageUrls.addAll(
+          List<String>.from(doc.data()['imageUrls'] as List? ?? []),
+        );
+      }
       final batch = _firestore.batch();
       for (final doc in snap.docs) {
         batch.delete(doc.reference);
       }
       batch.delete(_firestore.collection('users').doc(uid));
       await batch.commit();
+      await _deleteStoredImages(imageUrls);
       await _auth.currentUser!.delete();
       return null;
     } on FirebaseAuthException catch (e) {
@@ -450,12 +456,19 @@ class AppState extends ChangeNotifier {
           .collection('posts')
           .where('userId', isEqualTo: uid)
           .get();
+      final imageUrls = <String>[];
+      for (final doc in snap.docs) {
+        imageUrls.addAll(
+          List<String>.from(doc.data()['imageUrls'] as List? ?? []),
+        );
+      }
       final batch = _firestore.batch();
       for (final doc in snap.docs) {
         batch.delete(doc.reference);
       }
       batch.delete(_firestore.collection('users').doc(uid));
       await batch.commit();
+      await _deleteStoredImages(imageUrls);
       await user.delete();
       return null;
     } on FirebaseAuthException catch (e) {
@@ -498,41 +511,105 @@ class AppState extends ChangeNotifier {
 
   // ── Posts & Storage ──────────────────────────────────────────────────────
 
-  Future<String?> _uploadToImgBB(
+  String _storageSafeSegment(String value) {
+    final sanitized = value.replaceAll(RegExp(r'[^A-Za-z0-9_-]+'), '_');
+    return sanitized.replaceAll(RegExp(r'_+'), '_').trim();
+  }
+
+  String _storageFileName(String filePath) {
+    final rawName = filePath.split(RegExp(r'[\\/]')).last;
+    final extensionIndex = rawName.lastIndexOf('.');
+    final extension = extensionIndex >= 0
+        ? rawName.substring(extensionIndex).toLowerCase()
+        : '';
+    final baseName = extensionIndex >= 0
+        ? rawName.substring(0, extensionIndex)
+        : rawName;
+    final safeBaseName = _storageSafeSegment(baseName).isEmpty
+        ? 'image'
+        : _storageSafeSegment(baseName);
+    final timestamp = DateTime.now().microsecondsSinceEpoch;
+    return '${timestamp}_$safeBaseName$extension';
+  }
+
+  String _imageContentType(String filePath) {
+    final extensionIndex = filePath.lastIndexOf('.');
+    if (extensionIndex < 0) return 'image/jpeg';
+
+    switch (filePath.substring(extensionIndex).toLowerCase()) {
+      case '.png':
+        return 'image/png';
+      case '.gif':
+        return 'image/gif';
+      case '.webp':
+        return 'image/webp';
+      case '.heic':
+      case '.heif':
+        return 'image/heic';
+      default:
+        return 'image/jpeg';
+    }
+  }
+
+  Future<String?> _uploadPostImageToStorage(
     String filePath, {
-    required String name,
+    required String userId,
+    required String postId,
   }) async {
     try {
-      final bytes = await File(filePath).readAsBytes();
-      final base64Image = base64Encode(bytes);
-      final response = await http.post(
-        Uri.parse(
-          'https://api.imgbb.com/1/upload?key=${dotenv.env['IMGBB_API_KEY']}',
-        ),
-        body: {'image': base64Image, 'name': name},
-      );
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return data['data']['url'] as String;
+      final file = File(filePath);
+      if (!await file.exists()) {
+        debugPrint('Image file does not exist: $filePath');
+        return null;
       }
-      debugPrint('ImgBB upload failed: ${response.body}');
+
+      final ref = _storage.ref().child(
+        'post_images/$userId/$postId/${_storageFileName(filePath)}',
+      );
+      await ref.putFile(
+        file,
+        SettableMetadata(
+          contentType: _imageContentType(filePath),
+          cacheControl: 'public,max-age=31536000',
+        ),
+      );
+      return await ref.getDownloadURL();
     } catch (e) {
       debugPrint('Error uploading image: $e');
     }
     return null;
   }
 
+  Future<void> _deleteStoredImages(Iterable<String> imageUrls) async {
+    for (final imageUrl in imageUrls) {
+      try {
+        await _storage.refFromURL(imageUrl).delete();
+      } catch (e) {
+        debugPrint('Skipping image cleanup for $imageUrl: $e');
+      }
+    }
+  }
+
   Future<void> addPost(Post post, List<String> localImagePaths) async {
+    final uploadedStorageUrls = <String>[];
     try {
-      final futures = localImagePaths.map((path) async {
-        if (path.startsWith('http')) return path;
-        return await _uploadToImgBB(
+      final uploadedUrls = <String>[];
+      for (final path in localImagePaths) {
+        if (path.startsWith('http')) {
+          uploadedUrls.add(path);
+          continue;
+        }
+        final uploadedUrl = await _uploadPostImageToStorage(
           path,
-          name: '${post.itemName}_${post.userPhone}',
+          userId: post.userId,
+          postId: post.id,
         );
-      });
-      final results = await Future.wait(futures);
-      final uploadedUrls = results.whereType<String>().toList();
+        if (uploadedUrl == null) {
+          throw Exception('Failed to upload image.');
+        }
+        uploadedUrls.add(uploadedUrl);
+        uploadedStorageUrls.add(uploadedUrl);
+      }
 
       final postToSave = post.copyWith(imageUrls: uploadedUrls);
       final data = postToSave.toJson();
@@ -547,6 +624,7 @@ class AppState extends ChangeNotifier {
       await _firestore.collection('posts').doc(post.id).set(data);
     } catch (e) {
       debugPrint('Error adding post: $e');
+      await _deleteStoredImages(uploadedStorageUrls);
       rethrow;
     }
   }
@@ -569,8 +647,12 @@ class AppState extends ChangeNotifier {
 
   Future<void> incrementViewCount(String postId) async {
     try {
-      await _firestore.collection('posts').doc(postId).update({
-        'viewCount': FieldValue.increment(1),
+      final ref = _firestore.collection('posts').doc(postId);
+      await _firestore.runTransaction((tx) async {
+        final snap = await tx.get(ref);
+        if (!snap.exists) return;
+        final currentCount = (snap.data()?['viewCount'] as num?)?.toInt() ?? 0;
+        tx.update(ref, {'viewCount': currentCount + 1});
       });
     } catch (e) {
       debugPrint('Error incrementing view count: $e');
@@ -579,7 +661,13 @@ class AppState extends ChangeNotifier {
 
   Future<void> deletePost(String postId) async {
     try {
-      await _firestore.collection('posts').doc(postId).delete();
+      final ref = _firestore.collection('posts').doc(postId);
+      final snap = await ref.get();
+      final imageUrls = List<String>.from(
+        snap.data()?['imageUrls'] as List? ?? [],
+      );
+      await ref.delete();
+      await _deleteStoredImages(imageUrls);
     } catch (e) {
       debugPrint('Error deleting post: $e');
       rethrow;
@@ -590,9 +678,21 @@ class AppState extends ChangeNotifier {
     try {
       final commentData = comment.toJson();
       commentData['createdAt'] = Timestamp.fromDate(comment.createdAt);
+      final ref = _firestore.collection('posts').doc(postId);
+      await _firestore.runTransaction((tx) async {
+        final snap = await tx.get(ref);
+        if (!snap.exists) {
+          throw StateError('Post not found.');
+        }
 
-      await _firestore.collection('posts').doc(postId).update({
-        'comments': FieldValue.arrayUnion([commentData]),
+        final comments = List<Map<String, dynamic>>.from(
+          (snap.data()?['comments'] as List? ?? []).map(
+            (entry) => Map<String, dynamic>.from(entry as Map),
+          ),
+        );
+        comments.add(commentData);
+
+        tx.update(ref, {'comments': comments});
       });
     } catch (e) {
       debugPrint('Error adding comment: $e');
@@ -608,9 +708,7 @@ class AppState extends ChangeNotifier {
       final reports = List<String>.from(snap.data()?['reports'] as List? ?? []);
       if (reports.contains(userId)) return; // already reported
       reports.add(userId);
-      final updates = <String, dynamic>{'reports': reports};
-      if (reports.length >= 10) updates['isHidden'] = true;
-      tx.update(ref, updates);
+      tx.update(ref, {'reports': reports});
     });
   }
 }

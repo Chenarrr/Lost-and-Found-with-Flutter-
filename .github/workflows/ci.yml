@@ -83,10 +83,6 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      # .env is a bundled Flutter asset — must exist or asset loading fails
-      - name: Create .env
-        run: echo "IMGBB_API_KEY=ci_placeholder" > .env
-
       - name: Verify generated localizations are up to date
         run: |
           flutter gen-l10n

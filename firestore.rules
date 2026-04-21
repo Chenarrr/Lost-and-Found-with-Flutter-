@@ -11,6 +11,155 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
+    function isValidPostCategory(category) {
+      return category in ['electronics', 'documents', 'personalItems', 'pets'];
+    }
+
+    function hasValidPostFields(data) {
+      return data.keys().hasAll([
+               'id',
+               'type',
+               'category',
+               'itemName',
+               'street',
+               'city',
+               'imageUrls',
+               'userName',
+               'userPhone',
+               'createdAt',
+               'userId',
+               'isResolved',
+               'isHidden',
+               'viewCount',
+             ])
+             && data.keys().hasOnly([
+               'id',
+               'type',
+               'category',
+               'itemName',
+               'description',
+               'street',
+               'city',
+               'imageUrls',
+               'userName',
+               'userPhone',
+               'createdAt',
+               'userId',
+               'comments',
+               'reports',
+               'isResolved',
+               'isHidden',
+               'viewCount',
+             ])
+             && data.id is string
+             && data.type in ['lost', 'found']
+             && isValidPostCategory(data.category)
+             && data.itemName is string
+             && data.itemName.size() >= 2
+             && (!data.keys().hasAny(['description']) || data.description is string)
+             && data.street is string
+             && data.street.size() >= 2
+             && data.city is string
+             && data.city.size() >= 2
+             && data.imageUrls is list
+             && data.imageUrls.size() > 0
+             && data.imageUrls.size() <= 3
+             && data.userName is string
+             && data.userName.size() >= 2
+             && data.userPhone is string
+             && data.userPhone.size() >= 8
+             && data.userId is string
+             && data.isResolved is bool
+             && data.isHidden is bool
+             && data.viewCount is int;
+    }
+
+    function existingComments() {
+      return resource.data.comments is list ? resource.data.comments : [];
+    }
+
+    function requestedComments() {
+      return request.resource.data.comments is list ? request.resource.data.comments : [];
+    }
+
+    function requestedComment() {
+      return requestedComments()[requestedComments().size() - 1];
+    }
+
+    function existingReports() {
+      return resource.data.reports is list ? resource.data.reports : [];
+    }
+
+    function requestedReports() {
+      return request.resource.data.reports is list ? request.resource.data.reports : [];
+    }
+
+    function currentViewCount() {
+      return resource.data.viewCount is int ? resource.data.viewCount : 0;
+    }
+
+    function canOwnerUpdatePost() {
+      return isOwner(resource.data.userId)
+             && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+               'type',
+               'category',
+               'itemName',
+               'description',
+               'street',
+               'city',
+               'isResolved',
+             ])
+             && hasValidPostFields(request.resource.data)
+             && request.resource.data.id == resource.data.id
+             && request.resource.data.userId == resource.data.userId
+             && request.resource.data.imageUrls == resource.data.imageUrls
+             && request.resource.data.userName == resource.data.userName
+             && request.resource.data.userPhone == resource.data.userPhone
+             && request.resource.data.createdAt == resource.data.createdAt
+             && request.resource.data.isHidden == resource.data.isHidden
+             && request.resource.data.viewCount == currentViewCount()
+             && request.resource.data.comments == resource.data.comments
+             && request.resource.data.reports == resource.data.reports;
+    }
+
+    function canIncrementViewCount() {
+      return isAuthenticated()
+             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['viewCount'])
+             && request.resource.data.viewCount == currentViewCount() + 1;
+    }
+
+    function canAddReport() {
+      return isAuthenticated()
+             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reports'])
+             && requestedReports().size() == existingReports().size() + 1
+             && requestedReports().hasAll(existingReports())
+             && requestedReports().hasAny([request.auth.uid])
+             && !existingReports().hasAny([request.auth.uid]);
+    }
+
+    function canAddComment(postId) {
+      return isAuthenticated()
+             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['comments'])
+             && requestedComments().size() == existingComments().size() + 1
+             && requestedComments().hasAll(existingComments())
+             && requestedComment().keys().hasOnly([
+               'id',
+               'postId',
+               'userId',
+               'userName',
+               'text',
+               'createdAt',
+             ])
+             && requestedComment().id is string
+             && requestedComment().postId == postId
+             && requestedComment().userId == request.auth.uid
+             && requestedComment().userName is string
+             && requestedComment().userName.size() >= 2
+             && requestedComment().text is string
+             && requestedComment().text.size() >= 1
+             && requestedComment().createdAt is timestamp;
+    }
+
     // ── Users ────────────────────────────────────────────────────────────────
     // Anyone logged in can read profiles (needed to show names on posts).
     // Only the owner can write their own profile.
@@ -26,27 +175,26 @@ service cloud.firestore {
     }
 
     // ── Posts ────────────────────────────────────────────────────────────────
-    // Anyone can read posts (public feed).
-    // Only authenticated users can create, and they must set userId = their own UID.
-    // Owner can update/delete freely.
-    // Other authenticated users can touch comments, reports, viewCount,
-    //   isResolved, or isHidden — nothing else.
     match /posts/{postId} {
       allow read: if true;
 
       allow create: if isAuthenticated()
+                    && hasValidPostFields(request.resource.data)
+                    && request.resource.data.id == postId
                     && request.resource.data.userId == request.auth.uid
-                    && request.resource.data.itemName is string
-                    && request.resource.data.itemName.size() >= 2;
+                    && request.resource.data.createdAt == request.time
+                    && request.resource.data.isResolved == false
+                    && request.resource.data.isHidden == false
+                    && request.resource.data.viewCount == 0
+                    && (!request.resource.data.keys().hasAny(['comments'])
+                        || request.resource.data.comments.size() == 0)
+                    && (!request.resource.data.keys().hasAny(['reports'])
+                        || request.resource.data.reports.size() == 0);
 
-      allow update: if isAuthenticated() && (
-        // Post owner can change anything
-        resource.data.userId == request.auth.uid
-        ||
-        // Non-owners can only modify these specific fields
-        request.resource.data.diff(resource.data).affectedKeys()
-          .hasOnly(['comments', 'reports', 'viewCount', 'isResolved', 'isHidden'])
-      );
+      allow update: if canOwnerUpdatePost()
+                    || canIncrementViewCount()
+                    || canAddReport()
+                    || canAddComment(postId);
 
       allow delete: if isOwner(resource.data.userId);
     }

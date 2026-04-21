@@ -20,7 +20,8 @@ jobs:
   build-ios:
     name: Build iOS Archive
     runs-on: macos-latest
-    if: ${{ inputs.build_ios }}
+    if: ${{ inputs.build_ios && github.ref == 'refs/heads/main' }}
+    environment: release
     timeout-minutes: 45
 
     steps:
@@ -49,10 +50,6 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
-
-      # .env is a bundled Flutter asset — must exist or build fails
-      - name: Create .env
-        run: echo "IMGBB_API_KEY=ci_placeholder" > .env
 
       - name: Install CocoaPods dependencies
         run: pod install --project-directory=ios --deployment

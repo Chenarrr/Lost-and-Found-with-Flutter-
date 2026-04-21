@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/config/app_colors.dart';
+import 'package:flutter_application/l10n/app_locale_utils.dart';
 import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/models/post.dart';
 import 'package:flutter_application/providers/app_state.dart';
@@ -9,24 +10,6 @@ import 'package:flutter_application/widgets/app_panel.dart';
 import 'package:flutter_application/widgets/post_card.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-
-String _memberSince(DateTime dt) {
-  const months = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
-  return '${months[dt.month - 1]} ${dt.year}';
-}
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -67,6 +50,7 @@ class ProfileScreen extends StatelessWidget {
     final userPosts = app.posts
         .where((post) => post.userId == user.id)
         .toList();
+    final userDisplayName = localizedUserName(user.name, l10n);
     final lostCount = userPosts
         .where((post) => post.type == PostType.lost)
         .length;
@@ -136,8 +120,8 @@ class ProfileScreen extends StatelessWidget {
                             ),
                             alignment: Alignment.center,
                             child: Text(
-                              user.name.isNotEmpty
-                                  ? user.name[0].toUpperCase()
+                              userDisplayName.isNotEmpty
+                                  ? userDisplayName[0].toUpperCase()
                                   : '?',
                               style: GoogleFonts.spaceGrotesk(
                                 color: AppColors.primaryBlue,
@@ -153,7 +137,7 @@ class ProfileScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                user.name,
+                                userDisplayName,
                                 style: GoogleFonts.spaceGrotesk(
                                   fontSize: 28,
                                   fontWeight: FontWeight.w700,
@@ -182,7 +166,9 @@ class ProfileScreen extends StatelessWidget {
                       children: [
                         _ProfilePill(
                           icon: Icons.calendar_today_rounded,
-                          label: l10n.memberSince(_memberSince(user.createdAt)),
+                          label: l10n.memberSince(
+                            formatMemberSinceDate(user.createdAt, l10n),
+                          ),
                         ),
                         if (user.email?.isNotEmpty == true)
                           _ProfilePill(

@@ -2,7 +2,7 @@
   "@@locale": "ar",
 
   "appName": "Find It",
-  "tagline": "إعادة الأشياء المفقودة في كردستان",
+  "tagline": "إعادة المفقودات إلى أصحابها في كردستان",
   "getStarted": "ابدأ الآن",
 
   "loginOrSignup": "تسجيل الدخول أو إنشاء حساب",
@@ -52,7 +52,7 @@
       "count": { "type": "int" }
     }
   },
-  "foundBadge": "{count} موجود",
+  "foundBadge": "{count} معثور عليه",
   "@foundBadge": {
     "placeholders": {
       "count": { "type": "int" }
@@ -67,7 +67,7 @@
   "filterByCity": "تصفية حسب المدينة",
   "all": "الكل",
   "lost": "مفقود",
-  "found": "موجود",
+  "found": "معثور عليه",
   "noItemsFound": "لا توجد عناصر",
   "noItemsFoundHint": "جرب مدينة أخرى أو امسح حقل البحث.",
 
@@ -122,13 +122,20 @@
   "english": "English",
   "arabic": "العربية",
   "kurdish": "کوردی",
+  "unknownUser": "غير معروف",
+  "appVersionLabel": "Find It v{version}",
+  "@appVersionLabel": {
+    "placeholders": {
+      "version": { "type": "String" }
+    }
+  },
   "preferences": "التفضيلات",
   "darkMode": "الوضع الداكن",
 
   "postDetails": "تفاصيل المنشور",
   "postNotFound": "المنشور غير موجود.",
   "couldNotOpenWhatsapp": "تعذر فتح واتساب.",
-  "sharedVia": "مشاركة عبر تطبيق Find It",
+  "sharedVia": "تمت المشاركة عبر تطبيق Find It",
   "whatsappMessagePrefix": "مرحباً، رأيت منشورك عن:",
   "loginToReport": "يرجى تسجيل الدخول للإبلاغ عن هذا المنشور.",
   "cannotReportOwn": "لا يمكنك الإبلاغ عن منشورك الخاص.",
@@ -138,10 +145,10 @@
   "report": "إبلاغ",
   "reported": "تم الإبلاغ",
   "postReported": "تم الإبلاغ عن المنشور. شكرًا.",
-  "markAsResolved": "وضع علامة محلول",
-  "markResolvedConfirm": "وضع علامة محلول على هذا المنشور؟ سيرى الآخرون أنه تم إغلاقه.",
-  "markResolved": "تحديد كمحلول",
-  "postMarkedResolved": "تم وضع علامة محلول على المنشور.",
+  "markAsResolved": "تحديد الحالة كمغلقة",
+  "markResolvedConfirm": "هل تريد تحديد هذا المنشور كمغلق؟ سيرى الآخرون أنه تم إغلاقه.",
+  "markResolved": "تحديد كمغلق",
+  "postMarkedResolved": "تم تحديد المنشور كمغلق.",
   "loginToComment": "يرجى تسجيل الدخول للتعليق.",
   "commentAdded": "تمت إضافة التعليق.",
   "deletePost": "حذف المنشور",
@@ -157,8 +164,8 @@
   },
   "noCommentsSection": "لا توجد تعليقات بعد. كن أول من يعلق.",
   "typeComment": "اكتب تعليقك...",
-  "itemResolved": "تم حل العنصر",
-  "resolvedBadge": "✓ محلول",
+  "itemResolved": "تم إغلاق الحالة",
+  "resolvedBadge": "✓ مُغلق",
   "viewPost": "عرض",
   "share": "مشاركة",
 
@@ -207,6 +214,17 @@
   },
   "sendingCode": "جارٍ الإرسال…",
   "confirmDelete": "تأكيد وحذف",
+  "errorInvalidPhoneNumberFormat": "تنسيق رقم الهاتف غير صحيح.",
+  "errorTooManyAttempts": "هناك محاولات كثيرة جدًا. حاول مرة أخرى لاحقًا.",
+  "errorPhoneAuthDisabled": "تسجيل الدخول برقم الهاتف غير مفعّل. يرجى التواصل مع الدعم.",
+  "errorVerificationFailed": "فشل التحقق. يرجى المحاولة مرة أخرى.",
+  "errorVerificationIdMissing": "جلسة التحقق مفقودة. يرجى المحاولة مرة أخرى.",
+  "errorInvalidCode": "الرمز غير صحيح. يرجى المحاولة مرة أخرى.",
+  "errorMissingPhoneNumberFlow": "رقم الهاتف مفقود. ارجع وحاول مرة أخرى.",
+  "errorNotLoggedIn": "أنت غير مسجل الدخول.",
+  "errorDeleteAccountFailed": "تعذر حذف الحساب.",
+  "errorPhoneNumberNotFound": "تعذر العثور على رقم الهاتف.",
+  "errorUpdateNameFailed": "تعذر تحديث الاسم.",
 
   "editPost": "تعديل المنشور",
   "editPostTitle": "تعديل المنشور",

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/config/app_motion.dart';
+import 'package:flutter_application/l10n/app_locale_utils.dart';
 import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/screens/auth/welcome_screen.dart';
@@ -24,7 +25,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void initState() {
     super.initState();
     PackageInfo.fromPlatform().then((info) {
-      if (mounted) setState(() => _appVersion = 'FindIt  v${info.version}');
+      if (mounted) setState(() => _appVersion = info.version);
     });
   }
 
@@ -130,7 +131,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           if (err != null) {
                             setState(() {
                               loading = false;
-                              error = err;
+                              error = localizeAppError(err, l10n);
                             });
                           } else {
                             navigator.pop();
@@ -299,7 +300,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (err != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(err, style: GoogleFonts.inter()),
+          content: Text(
+            localizeAppError(err, l10n),
+            style: GoogleFonts.inter(),
+          ),
           backgroundColor: AppColors.lostPrimary,
           behavior: SnackBarBehavior.floating,
         ),
@@ -392,7 +396,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               } else if (err.isNotEmpty) {
                                 setState(() {
                                   sending = false;
-                                  error = err;
+                                  error = localizeAppError(err, l10n);
                                 });
                               } else {
                                 // empty = user cancelled reCAPTCHA
@@ -436,7 +440,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             if (deleteErr != null) {
                               setState(() {
                                 deleting = false;
-                                error = deleteErr;
+                                error = localizeAppError(deleteErr, l10n);
                               });
                             } else {
                               dialogNavigator.pop();
@@ -493,6 +497,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         : currentLangCode == 'ckb'
         ? l10n.kurdish
         : l10n.english;
+    final displayUserName = localizedUserName(userName, l10n);
     final isDark =
         context.select<AppState, ThemeMode>((state) => state.themeMode) ==
         ThemeMode.dark;
@@ -528,7 +533,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         radius: 30,
                         backgroundColor: Colors.white,
                         child: Text(
-                          userName.isNotEmpty ? userName[0].toUpperCase() : '?',
+                          displayUserName.isNotEmpty
+                              ? displayUserName[0].toUpperCase()
+                              : '?',
                           style: GoogleFonts.spaceGrotesk(
                             color: AppColors.primaryBlue,
                             fontSize: 24,
@@ -543,7 +550,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            userName.isNotEmpty ? userName : 'Unknown',
+                            displayUserName,
                             style: GoogleFonts.spaceGrotesk(
                               fontSize: 26,
                               fontWeight: FontWeight.w700,
@@ -561,7 +568,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           const SizedBox(height: 8),
                           if (_appVersion.isNotEmpty)
                             Text(
-                              _appVersion,
+                              l10n.appVersionLabel(_appVersion),
                               style: GoogleFonts.manrope(
                                 color: Colors.white.withAlpha(190),
                                 fontWeight: FontWeight.w700,

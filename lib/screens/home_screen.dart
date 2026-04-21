@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/config/app_motion.dart';
 import 'package:flutter_application/l10n/l10n.dart';
+import 'package:flutter_application/l10n/app_locale_utils.dart';
 import 'package:flutter_application/models/post.dart';
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/widgets/app_backdrop.dart';
@@ -24,19 +25,9 @@ class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
   Timer? _searchDebounce;
   String _searchQuery = '';
-  String _cityFilter = 'All Cities';
+  AppCity? _cityFilter;
   PostType? _typeFilter;
   PostCategory? _categoryFilter;
-
-  final List<String> _cities = [
-    'All Cities',
-    'Erbil',
-    'Sulaymaniyah',
-    'Duhok',
-    'Halabja',
-    'Zakho',
-    'Koya',
-  ];
 
   @override
   void dispose() {
@@ -55,27 +46,6 @@ class _HomeScreenState extends State<HomeScreen> {
       if (!mounted) return;
       setState(() => _searchQuery = value.trim().toLowerCase());
     });
-  }
-
-  String _cityDisplayName(String city, AppLocalizations l10n) {
-    switch (city) {
-      case 'All Cities':
-        return l10n.allCities;
-      case 'Erbil':
-        return l10n.cityErbil;
-      case 'Sulaymaniyah':
-        return l10n.citySulaymaniyah;
-      case 'Duhok':
-        return l10n.cityDuhok;
-      case 'Halabja':
-        return l10n.cityHalabja;
-      case 'Zakho':
-        return l10n.cityZakho;
-      case 'Koya':
-        return l10n.cityKoya;
-      default:
-        return city;
-    }
   }
 
   Widget _typeChip(String label, PostType? type) {
@@ -216,7 +186,55 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  for (final city in _cities)
+                  ListTile(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 2,
+                    ),
+                    leading: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: _cityFilter == null
+                            ? AppColors.primaryBlue.withAlpha(18)
+                            : sheetCs.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.public_rounded,
+                        size: 18,
+                        color: _cityFilter == null
+                            ? AppColors.primaryBlue
+                            : sheetCs.onSurfaceVariant,
+                      ),
+                    ),
+                    title: Text(
+                      l10n.allCities,
+                      style: GoogleFonts.manrope(
+                        fontWeight: _cityFilter == null
+                            ? FontWeight.w800
+                            : FontWeight.w600,
+                        color: _cityFilter == null
+                            ? AppColors.primaryBlue
+                            : sheetCs.onSurface,
+                      ),
+                    ),
+                    trailing: _cityFilter == null
+                        ? const Icon(
+                            Icons.check_circle_rounded,
+                            color: AppColors.primaryBlue,
+                            size: 18,
+                          )
+                        : null,
+                    onTap: () {
+                      setState(() => _cityFilter = null);
+                      Navigator.pop(ctx);
+                    },
+                  ),
+                  for (final city in AppCity.values)
                     ListTile(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18),
@@ -235,9 +253,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(
-                          city == 'All Cities'
-                              ? Icons.public_rounded
-                              : Icons.location_on_rounded,
+                          Icons.location_on_rounded,
                           size: 18,
                           color: city == _cityFilter
                               ? AppColors.primaryBlue
@@ -245,7 +261,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       title: Text(
-                        _cityDisplayName(city, l10n),
+                        city.localizedLabel(l10n),
                         style: GoogleFonts.manrope(
                           fontWeight: city == _cityFilter
                               ? FontWeight.w800
@@ -282,11 +298,16 @@ class _HomeScreenState extends State<HomeScreen> {
     final cs = Theme.of(context).colorScheme;
     final allPosts = context.select<AppState, List<Post>>((app) => app.posts);
     final posts = allPosts.where((post) {
+      final localizedCity = localizeStoredCityName(
+        post.city,
+        l10n,
+      ).toLowerCase();
       final matchesCity =
-          _cityFilter == 'All Cities' || post.city == _cityFilter;
+          _cityFilter == null || post.city == _cityFilter!.storageValue;
       final matchesSearch =
           _searchQuery.isEmpty ||
           post.itemName.toLowerCase().contains(_searchQuery) ||
+          localizedCity.contains(_searchQuery) ||
           post.city.toLowerCase().contains(_searchQuery) ||
           post.street.toLowerCase().contains(_searchQuery);
       final matchesType = _typeFilter == null || post.type == _typeFilter;
@@ -392,7 +413,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               vertical: 8,
                             ),
                             decoration: BoxDecoration(
-                              color: _cityFilter != 'All Cities'
+                              color: _cityFilter != null
                                   ? AppColors.primaryBlue.withAlpha(18)
                                   : (Theme.of(context).brightness ==
                                             Brightness.dark
@@ -400,7 +421,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         : Colors.white),
                               borderRadius: BorderRadius.circular(999),
                               border: Border.all(
-                                color: _cityFilter != 'All Cities'
+                                color: _cityFilter != null
                                     ? AppColors.primaryBlue.withAlpha(80)
                                     : cs.outlineVariant,
                               ),
@@ -411,17 +432,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Icon(
                                   Icons.location_on_rounded,
                                   size: 14,
-                                  color: _cityFilter != 'All Cities'
+                                  color: _cityFilter != null
                                       ? AppColors.primaryBlue
                                       : cs.onSurfaceVariant,
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  _cityDisplayName(_cityFilter, l10n),
+                                  _cityFilter?.localizedLabel(l10n) ??
+                                      l10n.allCities,
                                   style: GoogleFonts.manrope(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w800,
-                                    color: _cityFilter != 'All Cities'
+                                    color: _cityFilter != null
                                         ? AppColors.primaryBlue
                                         : cs.onSurface,
                                   ),

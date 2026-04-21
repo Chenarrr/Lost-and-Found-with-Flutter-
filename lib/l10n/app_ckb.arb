@@ -2,7 +2,7 @@
   "@@locale": "ckb",
 
   "appName": "Find It",
-  "tagline": "گەڕانەوەی شتە وەڵاوبووەکان لە کوردستان",
+  "tagline": "یارمەتیدان بۆ گەڕاندنەوەی شتە ونبووەکان لە کوردستان",
   "getStarted": "دەستپێبکە",
 
   "loginOrSignup": "چوونەژوورەوە یان تۆمارکردن",
@@ -122,6 +122,13 @@
   "english": "English",
   "arabic": "العربية",
   "kurdish": "کوردی",
+  "unknownUser": "ناسراو نییە",
+  "appVersionLabel": "Find It v{version}",
+  "@appVersionLabel": {
+    "placeholders": {
+      "version": { "type": "String" }
+    }
+  },
   "preferences": "ئارەزووەکان",
   "darkMode": "شێوازی تاریک",
 
@@ -133,15 +140,15 @@
   "loginToReport": "تکایە بچۆ ژوورەوە بۆ ئاگادارکردنەوە لەم پۆستە.",
   "cannotReportOwn": "ناتوانیت پۆستی خۆت ئاگادار بکەیتەوە.",
   "alreadyReported": "پێشتر ئاگادارت کردووەتەوە لەم پۆستە.",
-  "reportPost": "ئاگادارکردنەوە لەم پۆستە",
+  "reportPost": "ڕاپۆرتکردنی پۆست",
   "reportConfirm": "ئایا ئاگادار بکەیتەوە لەم پۆستە وەک درۆ یان نەگونجاو؟",
   "report": "ئاگادارکردنەوە",
   "reported": "ئاگادارکرایەوە",
   "postReported": "پۆستەکە ئاگادارکرایەوە. سپاس.",
-  "markAsResolved": "وەک چارەسەرکراو نیشانبکە",
-  "markResolvedConfirm": "ئایا ئەم پۆستە وەک چارەسەرکراو نیشانبکەیت؟ تریش دەیبینن کە داخراوە.",
-  "markResolved": "وەک چارەسەرکراو نیشانبکە",
-  "postMarkedResolved": "پۆستەکە وەک چارەسەرکراو نیشانکرا.",
+  "markAsResolved": "وەک داخراو نیشان بکە",
+  "markResolvedConfirm": "ئایا دەتەوێت ئەم پۆستە وەک داخراو نیشان بکەیت؟ خەڵکی تر دەبینن کە داخراوە.",
+  "markResolved": "وەک داخراو نیشان بکە",
+  "postMarkedResolved": "پۆستەکە وەک داخراو نیشانکرا.",
   "loginToComment": "تکایە بچۆ ژوورەوە بۆ لێدوانکردن.",
   "commentAdded": "لێدوانەکە زیادکرا.",
   "deletePost": "سڕینەوەی پۆست",
@@ -155,10 +162,10 @@
       "count": { "type": "int" }
     }
   },
-  "noCommentsSection": "هێشتا هیچ لێدوانێک نییە. یەکەم بە.",
+  "noCommentsSection": "هێشتا هیچ لێدوانێک نییە. تۆ یەکەم لێدوان بنووسە.",
   "typeComment": "لێدوانەکەت بنووسە...",
-  "itemResolved": "شتەکە چارەسەرکرا",
-  "resolvedBadge": "✓ چارەسەرکرا",
+  "itemResolved": "حاڵەتەکە داخراوە",
+  "resolvedBadge": "✓ داخراو",
   "viewPost": "بینین",
   "share": "هاوبەشکردن",
 
@@ -180,7 +187,7 @@
     }
   },
   "noImagesSelected": "هیچ وێنەیەک هەڵنەبژێردراوە",
-  "maxImagesReached": "زۆربەی ٣ وێنە ڕێپێدراوە.",
+  "maxImagesReached": "زیاترین ژمارەی ڕێپێدراو ٣ وێنەیە.",
   "couldNotPickImage": "نەتوانرا وێنە هەڵبژێردرێت. تکایە دووبارە هەوڵبدەرەوە.",
   "loginToPost": "تکایە بچۆ ژوورەوە بۆ دروستکردنی پۆست.",
   "addImage": "زیادکردنی وێنە",
@@ -207,6 +214,17 @@
   },
   "sendingCode": "کۆد دەنێردرێت…",
   "confirmDelete": "دووپاتکردنەوە و سڕینەوە",
+  "errorInvalidPhoneNumberFormat": "شێوازی ژمارەی مۆبایل دروست نییە.",
+  "errorTooManyAttempts": "هەوڵدان زۆر بووە. تکایە دواتر دووبارە هەوڵبدە.",
+  "errorPhoneAuthDisabled": "چوونەژوورەوە بە ژمارەی مۆبایل چالاک نییە. تکایە پەیوەندی بە پاڵپشتی بکە.",
+  "errorVerificationFailed": "دووپاتکردنەوە سەرکەوتوو نەبوو. تکایە دووبارە هەوڵبدە.",
+  "errorVerificationIdMissing": "کۆدی پەسەندکردن ون بووە. تکایە دووبارە هەوڵبدە.",
+  "errorInvalidCode": "کۆدەکە دروست نییە. تکایە دووبارە هەوڵبدە.",
+  "errorMissingPhoneNumberFlow": "ژمارەی مۆبایل ون بووە. تکایە بگەڕێوە و دووبارە هەوڵبدە.",
+  "errorNotLoggedIn": "تۆ نەچووویتە ژوورەوە.",
+  "errorDeleteAccountFailed": "سڕینەوەی ئەکاونت سەرکەوتوو نەبوو.",
+  "errorPhoneNumberNotFound": "نەتوانرا ژمارەی مۆبایل بدۆزرێتەوە.",
+  "errorUpdateNameFailed": "نوێکردنەوەی ناو سەرکەوتوو نەبوو.",
 
   "editPost": "دەستکاریکردنی پۆست",
   "editPostTitle": "دەستکاریکردنی پۆست",
@@ -214,10 +232,10 @@
   "postUpdated": "پۆستەکە بە سەرکەوتوویی نوێکرایەوە.",
   "filterByCategory": "جۆر",
   "allCategories": "هەموو",
-  "categoryElectronics": "ئەلیکترۆنی",
+  "categoryElectronics": "ئەلیکترۆنیات",
   "categoryDocuments": "بەڵگەنامە",
   "categoryPersonalItems": "شتی کەسی",
-  "categoryPets": "ئاژەڵ",
+  "categoryPets": "ئاژەڵە ماڵییەکان",
   "customCategoryOption": "جۆری تایبەت",
   "customCategoryField": "جۆری تایبەت",
   "customCategoryRequired": "تکایە جۆرێکی تایبەت بنووسە.",

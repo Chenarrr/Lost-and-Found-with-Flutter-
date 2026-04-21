@@ -580,6 +580,18 @@ abstract class AppLocalizations {
   /// **'کوردی'**
   String get kurdish;
 
+  /// No description provided for @unknownUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get unknownUser;
+
+  /// No description provided for @appVersionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Find It v{version}'**
+  String appVersionLabel(String version);
+
   /// No description provided for @preferences.
   ///
   /// In en, this message translates to:
@@ -969,6 +981,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Confirm & Delete'**
   String get confirmDelete;
+
+  /// No description provided for @errorInvalidPhoneNumberFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid phone number format.'**
+  String get errorInvalidPhoneNumberFormat;
+
+  /// No description provided for @errorTooManyAttempts.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many attempts. Try again later.'**
+  String get errorTooManyAttempts;
+
+  /// No description provided for @errorPhoneAuthDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone authentication is not enabled. Please contact support.'**
+  String get errorPhoneAuthDisabled;
+
+  /// No description provided for @errorVerificationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification failed. Please try again.'**
+  String get errorVerificationFailed;
+
+  /// No description provided for @errorVerificationIdMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification session is missing. Please try again.'**
+  String get errorVerificationIdMissing;
+
+  /// No description provided for @errorInvalidCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid code. Please try again.'**
+  String get errorInvalidCode;
+
+  /// No description provided for @errorMissingPhoneNumberFlow.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number is missing. Please go back and try again.'**
+  String get errorMissingPhoneNumberFlow;
+
+  /// No description provided for @errorNotLoggedIn.
+  ///
+  /// In en, this message translates to:
+  /// **'You are not logged in.'**
+  String get errorNotLoggedIn;
+
+  /// No description provided for @errorDeleteAccountFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete account.'**
+  String get errorDeleteAccountFailed;
+
+  /// No description provided for @errorPhoneNumberNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not find the phone number.'**
+  String get errorPhoneNumberNotFound;
+
+  /// No description provided for @errorUpdateNameFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update the name.'**
+  String get errorUpdateNameFailed;
 
   /// No description provided for @editPost.
   ///

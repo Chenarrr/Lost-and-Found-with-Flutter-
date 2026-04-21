@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/config/app_motion.dart';
+import 'package:flutter_application/l10n/app_locale_utils.dart';
 import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/models/post.dart';
 import 'package:flutter_application/providers/app_state.dart';
@@ -27,14 +28,6 @@ class CreatePostSheet extends StatefulWidget {
 
 class _CreatePostSheetState extends State<CreatePostSheet> {
   static const _uuid = Uuid();
-  static const _cityOptions = [
-    'Erbil',
-    'Sulaymaniyah',
-    'Duhok',
-    'Halabja',
-    'Zakho',
-    'Koya',
-  ];
 
   final _formKey = GlobalKey<FormState>();
   final _itemNameController = TextEditingController();
@@ -47,7 +40,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
   PostType _postType = PostType.lost;
   PostCategory _category = PostCategory.electronics;
   bool _useCustomCategory = false;
-  String? _selectedCity;
+  AppCity? _selectedCity;
   bool _isLoading = false;
 
   bool get _isEditing => widget.existingPost != null;
@@ -62,7 +55,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
       _streetController.text = post.street;
       _postType = post.type;
       _category = post.category;
-      _selectedCity = post.city;
+      _selectedCity = appCityFromStorageValue(post.city);
       _imagePaths.addAll(post.imageUrls);
     }
   }
@@ -115,25 +108,6 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
     );
   }
 
-  String _cityDisplayName(String city, AppLocalizations l10n) {
-    switch (city) {
-      case 'Erbil':
-        return l10n.cityErbil;
-      case 'Sulaymaniyah':
-        return l10n.citySulaymaniyah;
-      case 'Duhok':
-        return l10n.cityDuhok;
-      case 'Halabja':
-        return l10n.cityHalabja;
-      case 'Zakho':
-        return l10n.cityZakho;
-      case 'Koya':
-        return l10n.cityKoya;
-      default:
-        return city;
-    }
-  }
-
   Future<void> _pickImage() async {
     if (_imagePaths.length >= 3) {
       _showMessage(context.l10n.maxImagesReached, isError: true);
@@ -183,7 +157,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
           itemName: _itemNameController.text.trim(),
           description: _buildFinalDescription(),
           street: _streetController.text.trim(),
-          city: _selectedCity!,
+          city: _selectedCity!.storageValue,
         );
         await app.updatePost(updated);
 
@@ -204,7 +178,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
           itemName: _itemNameController.text.trim(),
           description: _buildFinalDescription(),
           street: _streetController.text.trim(),
-          city: _selectedCity!,
+          city: _selectedCity!.storageValue,
           imageUrls: List.from(_imagePaths),
           userName: currentUser.name,
           userPhone: currentUser.phone,
@@ -698,7 +672,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        DropdownButtonFormField<String>(
+                        DropdownButtonFormField<AppCity>(
                           initialValue: _selectedCity,
                           isExpanded: true,
                           decoration: InputDecoration(
@@ -715,12 +689,12 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                          items: _cityOptions
+                          items: AppCity.values
                               .map(
-                                (city) => DropdownMenuItem<String>(
+                                (city) => DropdownMenuItem<AppCity>(
                                   value: city,
                                   child: Text(
-                                    _cityDisplayName(city, l10n),
+                                    city.localizedLabel(l10n),
                                     style: GoogleFonts.manrope(),
                                   ),
                                 ),

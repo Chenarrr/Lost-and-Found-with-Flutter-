@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/config/app_motion.dart';
+import 'package:flutter_application/l10n/app_locale_utils.dart';
 import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/models/comment.dart';
 import 'package:flutter_application/models/post.dart';
@@ -80,6 +81,8 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
   void _sharePost(Post post) {
     final l10n = context.l10n;
+    final localizedCity = localizeStoredCityName(post.city, l10n);
+    final userDisplayName = localizedUserName(post.userName, l10n);
     final type = post.type == PostType.lost
         ? l10n.typeLostUpper
         : l10n.typeFoundUpper;
@@ -90,8 +93,8 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
       ShareParams(
         text:
             '$type: ${post.itemName}\n'
-            '📍 ${post.city}, ${post.street}\n'
-            '👤 ${post.userName}  📞 ${post.userPhone}'
+            '📍 $localizedCity, ${post.street}\n'
+            '👤 $userDisplayName  📞 ${post.userPhone}'
             '$desc\n\n'
             '${l10n.sharedVia}',
       ),
@@ -280,6 +283,8 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     final post = app.posts[postIndex];
     final isOwner = app.currentUser?.id == post.userId;
     final isLost = post.type == PostType.lost;
+    final localizedCity = localizeStoredCityName(post.city, l10n);
+    final userDisplayName = localizedUserName(post.userName, l10n);
     final typeColor = isLost ? AppColors.lostPrimary : AppColors.foundPrimary;
     final softColor = isLost ? AppColors.lostLight : AppColors.foundLight;
     final adaptedSoftColor = isDark ? typeColor.withAlpha(28) : softColor;
@@ -352,7 +357,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                 color: typeColor,
                               ),
                               _OverlayPill(
-                                text: post.category.displayName,
+                                text: post.category.localizedLabel(l10n),
                                 color: Colors.white.withAlpha(36),
                               ),
                               if (post.isResolved)
@@ -376,7 +381,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            '${post.city}, ${post.street}',
+                            '$localizedCity, ${post.street}',
                             style: GoogleFonts.manrope(
                               color: Colors.white.withAlpha(220),
                               fontWeight: FontWeight.w700,
@@ -407,7 +412,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                       ),
                       _MetaPill(
                         icon: Icons.person_rounded,
-                        label: post.userName,
+                        label: userDisplayName,
                       ),
                       _MetaPill(
                         icon: Icons.visibility_outlined,
@@ -564,8 +569,14 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                     radius: 18,
                                     backgroundColor: AppColors.primaryBlue,
                                     child: Text(
-                                      comment.userName.isNotEmpty
-                                          ? comment.userName[0].toUpperCase()
+                                      localizedUserName(
+                                            comment.userName,
+                                            l10n,
+                                          ).isNotEmpty
+                                          ? localizedUserName(
+                                              comment.userName,
+                                              l10n,
+                                            )[0].toUpperCase()
                                           : '?',
                                       style: GoogleFonts.spaceGrotesk(
                                         color: Colors.white,
@@ -576,7 +587,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                   const SizedBox(width: 10),
                                   Expanded(
                                     child: Text(
-                                      comment.userName,
+                                      localizedUserName(comment.userName, l10n),
                                       style: GoogleFonts.manrope(
                                         fontWeight: FontWeight.w800,
                                         color: cs.onSurface,

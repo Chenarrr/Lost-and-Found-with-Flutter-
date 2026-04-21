@@ -12,7 +12,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get appName => 'Find It';
 
   @override
-  String get tagline => 'إعادة الأشياء المفقودة في كردستان';
+  String get tagline => 'إعادة المفقودات إلى أصحابها في كردستان';
 
   @override
   String get getStarted => 'ابدأ الآن';
@@ -128,7 +128,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String foundBadge(int count) {
-    return '$count موجود';
+    return '$count معثور عليه';
   }
 
   @override
@@ -146,7 +146,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get lost => 'مفقود';
 
   @override
-  String get found => 'موجود';
+  String get found => 'معثور عليه';
 
   @override
   String get noItemsFound => 'لا توجد عناصر';
@@ -264,6 +264,14 @@ class AppLocalizationsAr extends AppLocalizations {
   String get kurdish => 'کوردی';
 
   @override
+  String get unknownUser => 'غير معروف';
+
+  @override
+  String appVersionLabel(String version) {
+    return 'Find It v$version';
+  }
+
+  @override
   String get preferences => 'التفضيلات';
 
   @override
@@ -279,7 +287,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get couldNotOpenWhatsapp => 'تعذر فتح واتساب.';
 
   @override
-  String get sharedVia => 'مشاركة عبر تطبيق Find It';
+  String get sharedVia => 'تمت المشاركة عبر تطبيق Find It';
 
   @override
   String get whatsappMessagePrefix => 'مرحباً، رأيت منشورك عن:';
@@ -310,17 +318,17 @@ class AppLocalizationsAr extends AppLocalizations {
   String get postReported => 'تم الإبلاغ عن المنشور. شكرًا.';
 
   @override
-  String get markAsResolved => 'وضع علامة محلول';
+  String get markAsResolved => 'تحديد الحالة كمغلقة';
 
   @override
   String get markResolvedConfirm =>
-      'وضع علامة محلول على هذا المنشور؟ سيرى الآخرون أنه تم إغلاقه.';
+      'هل تريد تحديد هذا المنشور كمغلق؟ سيرى الآخرون أنه تم إغلاقه.';
 
   @override
-  String get markResolved => 'تحديد كمحلول';
+  String get markResolved => 'تحديد كمغلق';
 
   @override
-  String get postMarkedResolved => 'تم وضع علامة محلول على المنشور.';
+  String get postMarkedResolved => 'تم تحديد المنشور كمغلق.';
 
   @override
   String get loginToComment => 'يرجى تسجيل الدخول للتعليق.';
@@ -355,10 +363,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get typeComment => 'اكتب تعليقك...';
 
   @override
-  String get itemResolved => 'تم حل العنصر';
+  String get itemResolved => 'تم إغلاق الحالة';
 
   @override
-  String get resolvedBadge => '✓ محلول';
+  String get resolvedBadge => '✓ مُغلق';
 
   @override
   String get viewPost => 'عرض';
@@ -466,6 +474,43 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get confirmDelete => 'تأكيد وحذف';
+
+  @override
+  String get errorInvalidPhoneNumberFormat => 'تنسيق رقم الهاتف غير صحيح.';
+
+  @override
+  String get errorTooManyAttempts =>
+      'هناك محاولات كثيرة جدًا. حاول مرة أخرى لاحقًا.';
+
+  @override
+  String get errorPhoneAuthDisabled =>
+      'تسجيل الدخول برقم الهاتف غير مفعّل. يرجى التواصل مع الدعم.';
+
+  @override
+  String get errorVerificationFailed => 'فشل التحقق. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errorVerificationIdMissing =>
+      'جلسة التحقق مفقودة. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errorInvalidCode => 'الرمز غير صحيح. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errorMissingPhoneNumberFlow =>
+      'رقم الهاتف مفقود. ارجع وحاول مرة أخرى.';
+
+  @override
+  String get errorNotLoggedIn => 'أنت غير مسجل الدخول.';
+
+  @override
+  String get errorDeleteAccountFailed => 'تعذر حذف الحساب.';
+
+  @override
+  String get errorPhoneNumberNotFound => 'تعذر العثور على رقم الهاتف.';
+
+  @override
+  String get errorUpdateNameFailed => 'تعذر تحديث الاسم.';
 
   @override
   String get editPost => 'تعديل المنشور';

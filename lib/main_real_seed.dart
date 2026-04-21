@@ -7,7 +7,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:provider/provider.dart';
@@ -15,27 +14,16 @@ import 'package:timeago/timeago.dart' as timeago;
 import 'firebase_options.dart';
 import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/l10n/app_localizations.dart';
+import 'package:flutter_application/l10n/app_locale_utils.dart';
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/navigation/root_router.dart';
-
-class _CkbMaterialLocalizationsDelegate
-    extends LocalizationsDelegate<MaterialLocalizations> {
-  const _CkbMaterialLocalizationsDelegate();
-  @override
-  bool isSupported(Locale locale) => locale.languageCode == 'ckb';
-  @override
-  Future<MaterialLocalizations> load(Locale locale) =>
-      GlobalMaterialLocalizations.delegate.load(const Locale('ar'));
-  @override
-  bool shouldReload(_CkbMaterialLocalizationsDelegate old) => false;
-}
 
 /// Initialises real Firebase (no emulator hooks).
 Future<void> setupRealFirebase() async {
   await dotenv.load(fileName: '.env');
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   timeago.setLocaleMessages('ar', timeago.ArMessages());
-  timeago.setLocaleMessages('ckb', timeago.ArMessages());
+  timeago.setLocaleMessages('ckb', timeago.KuMessages());
 }
 
 Widget buildRealApp() => const _RealApp();
@@ -64,7 +52,8 @@ class _RealApp extends StatelessWidget {
             title: 'Find It',
             locale: locale,
             localizationsDelegates: const [
-              _CkbMaterialLocalizationsDelegate(),
+              CkbMaterialLocalizationsDelegate(),
+              CkbCupertinoLocalizationsDelegate(),
               ...AppLocalizations.localizationsDelegates,
             ],
             supportedLocales: AppLocalizations.supportedLocales,

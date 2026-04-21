@@ -9,7 +9,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:provider/provider.dart';
@@ -17,20 +16,9 @@ import 'package:timeago/timeago.dart' as timeago;
 import 'firebase_options.dart';
 import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/l10n/app_localizations.dart';
+import 'package:flutter_application/l10n/app_locale_utils.dart';
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/navigation/root_router.dart';
-
-class _CkbMaterialLocalizationsDelegate
-    extends LocalizationsDelegate<MaterialLocalizations> {
-  const _CkbMaterialLocalizationsDelegate();
-  @override
-  bool isSupported(Locale locale) => locale.languageCode == 'ckb';
-  @override
-  Future<MaterialLocalizations> load(Locale locale) =>
-      GlobalMaterialLocalizations.delegate.load(const Locale('ar'));
-  @override
-  bool shouldReload(_CkbMaterialLocalizationsDelegate old) => false;
-}
 
 /// Called from the integration test before pumping the widget.
 Future<void> setupEmulators() async {
@@ -42,7 +30,7 @@ Future<void> setupEmulators() async {
   FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
 
   timeago.setLocaleMessages('ar', timeago.ArMessages());
-  timeago.setLocaleMessages('ckb', timeago.ArMessages());
+  timeago.setLocaleMessages('ckb', timeago.KuMessages());
 }
 
 Widget buildIntegrationApp() => const _IntegrationApp();
@@ -71,7 +59,8 @@ class _IntegrationApp extends StatelessWidget {
             title: 'Find It',
             locale: locale,
             localizationsDelegates: const [
-              _CkbMaterialLocalizationsDelegate(),
+              CkbMaterialLocalizationsDelegate(),
+              CkbCupertinoLocalizationsDelegate(),
               ...AppLocalizations.localizationsDelegates,
             ],
             supportedLocales: AppLocalizations.supportedLocales,

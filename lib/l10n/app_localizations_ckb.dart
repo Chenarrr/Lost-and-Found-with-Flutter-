@@ -12,7 +12,7 @@ class AppLocalizationsCkb extends AppLocalizations {
   String get appName => 'Find It';
 
   @override
-  String get tagline => 'گەڕانەوەی شتە وەڵاوبووەکان لە کوردستان';
+  String get tagline => 'یارمەتیدان بۆ گەڕاندنەوەی شتە ونبووەکان لە کوردستان';
 
   @override
   String get getStarted => 'دەستپێبکە';
@@ -267,6 +267,14 @@ class AppLocalizationsCkb extends AppLocalizations {
   String get kurdish => 'کوردی';
 
   @override
+  String get unknownUser => 'ناسراو نییە';
+
+  @override
+  String appVersionLabel(String version) {
+    return 'Find It v$version';
+  }
+
+  @override
   String get preferences => 'ئارەزووەکان';
 
   @override
@@ -297,7 +305,7 @@ class AppLocalizationsCkb extends AppLocalizations {
   String get alreadyReported => 'پێشتر ئاگادارت کردووەتەوە لەم پۆستە.';
 
   @override
-  String get reportPost => 'ئاگادارکردنەوە لەم پۆستە';
+  String get reportPost => 'ڕاپۆرتکردنی پۆست';
 
   @override
   String get reportConfirm =>
@@ -313,17 +321,17 @@ class AppLocalizationsCkb extends AppLocalizations {
   String get postReported => 'پۆستەکە ئاگادارکرایەوە. سپاس.';
 
   @override
-  String get markAsResolved => 'وەک چارەسەرکراو نیشانبکە';
+  String get markAsResolved => 'وەک داخراو نیشان بکە';
 
   @override
   String get markResolvedConfirm =>
-      'ئایا ئەم پۆستە وەک چارەسەرکراو نیشانبکەیت؟ تریش دەیبینن کە داخراوە.';
+      'ئایا دەتەوێت ئەم پۆستە وەک داخراو نیشان بکەیت؟ خەڵکی تر دەبینن کە داخراوە.';
 
   @override
-  String get markResolved => 'وەک چارەسەرکراو نیشانبکە';
+  String get markResolved => 'وەک داخراو نیشان بکە';
 
   @override
-  String get postMarkedResolved => 'پۆستەکە وەک چارەسەرکراو نیشانکرا.';
+  String get postMarkedResolved => 'پۆستەکە وەک داخراو نیشانکرا.';
 
   @override
   String get loginToComment => 'تکایە بچۆ ژوورەوە بۆ لێدوانکردن.';
@@ -352,16 +360,17 @@ class AppLocalizationsCkb extends AppLocalizations {
   }
 
   @override
-  String get noCommentsSection => 'هێشتا هیچ لێدوانێک نییە. یەکەم بە.';
+  String get noCommentsSection =>
+      'هێشتا هیچ لێدوانێک نییە. تۆ یەکەم لێدوان بنووسە.';
 
   @override
   String get typeComment => 'لێدوانەکەت بنووسە...';
 
   @override
-  String get itemResolved => 'شتەکە چارەسەرکرا';
+  String get itemResolved => 'حاڵەتەکە داخراوە';
 
   @override
-  String get resolvedBadge => '✓ چارەسەرکرا';
+  String get resolvedBadge => '✓ داخراو';
 
   @override
   String get viewPost => 'بینین';
@@ -411,7 +420,7 @@ class AppLocalizationsCkb extends AppLocalizations {
   String get noImagesSelected => 'هیچ وێنەیەک هەڵنەبژێردراوە';
 
   @override
-  String get maxImagesReached => 'زۆربەی ٣ وێنە ڕێپێدراوە.';
+  String get maxImagesReached => 'زیاترین ژمارەی ڕێپێدراو ٣ وێنەیە.';
 
   @override
   String get couldNotPickImage =>
@@ -471,6 +480,45 @@ class AppLocalizationsCkb extends AppLocalizations {
   String get confirmDelete => 'دووپاتکردنەوە و سڕینەوە';
 
   @override
+  String get errorInvalidPhoneNumberFormat =>
+      'شێوازی ژمارەی مۆبایل دروست نییە.';
+
+  @override
+  String get errorTooManyAttempts =>
+      'هەوڵدان زۆر بووە. تکایە دواتر دووبارە هەوڵبدە.';
+
+  @override
+  String get errorPhoneAuthDisabled =>
+      'چوونەژوورەوە بە ژمارەی مۆبایل چالاک نییە. تکایە پەیوەندی بە پاڵپشتی بکە.';
+
+  @override
+  String get errorVerificationFailed =>
+      'دووپاتکردنەوە سەرکەوتوو نەبوو. تکایە دووبارە هەوڵبدە.';
+
+  @override
+  String get errorVerificationIdMissing =>
+      'کۆدی پەسەندکردن ون بووە. تکایە دووبارە هەوڵبدە.';
+
+  @override
+  String get errorInvalidCode => 'کۆدەکە دروست نییە. تکایە دووبارە هەوڵبدە.';
+
+  @override
+  String get errorMissingPhoneNumberFlow =>
+      'ژمارەی مۆبایل ون بووە. تکایە بگەڕێوە و دووبارە هەوڵبدە.';
+
+  @override
+  String get errorNotLoggedIn => 'تۆ نەچووویتە ژوورەوە.';
+
+  @override
+  String get errorDeleteAccountFailed => 'سڕینەوەی ئەکاونت سەرکەوتوو نەبوو.';
+
+  @override
+  String get errorPhoneNumberNotFound => 'نەتوانرا ژمارەی مۆبایل بدۆزرێتەوە.';
+
+  @override
+  String get errorUpdateNameFailed => 'نوێکردنەوەی ناو سەرکەوتوو نەبوو.';
+
+  @override
   String get editPost => 'دەستکاریکردنی پۆست';
 
   @override
@@ -489,7 +537,7 @@ class AppLocalizationsCkb extends AppLocalizations {
   String get allCategories => 'هەموو';
 
   @override
-  String get categoryElectronics => 'ئەلیکترۆنی';
+  String get categoryElectronics => 'ئەلیکترۆنیات';
 
   @override
   String get categoryDocuments => 'بەڵگەنامە';
@@ -498,7 +546,7 @@ class AppLocalizationsCkb extends AppLocalizations {
   String get categoryPersonalItems => 'شتی کەسی';
 
   @override
-  String get categoryPets => 'ئاژەڵ';
+  String get categoryPets => 'ئاژەڵە ماڵییەکان';
 
   @override
   String get customCategoryOption => 'جۆری تایبەت';

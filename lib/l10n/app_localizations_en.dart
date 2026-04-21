@@ -266,6 +266,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get kurdish => 'کوردی';
 
   @override
+  String get unknownUser => 'Unknown';
+
+  @override
+  String appVersionLabel(String version) {
+    return 'Find It v$version';
+  }
+
+  @override
   String get preferences => 'Preferences';
 
   @override
@@ -467,6 +475,43 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get confirmDelete => 'Confirm & Delete';
+
+  @override
+  String get errorInvalidPhoneNumberFormat => 'Invalid phone number format.';
+
+  @override
+  String get errorTooManyAttempts => 'Too many attempts. Try again later.';
+
+  @override
+  String get errorPhoneAuthDisabled =>
+      'Phone authentication is not enabled. Please contact support.';
+
+  @override
+  String get errorVerificationFailed =>
+      'Verification failed. Please try again.';
+
+  @override
+  String get errorVerificationIdMissing =>
+      'Verification session is missing. Please try again.';
+
+  @override
+  String get errorInvalidCode => 'Invalid code. Please try again.';
+
+  @override
+  String get errorMissingPhoneNumberFlow =>
+      'Phone number is missing. Please go back and try again.';
+
+  @override
+  String get errorNotLoggedIn => 'You are not logged in.';
+
+  @override
+  String get errorDeleteAccountFailed => 'Failed to delete account.';
+
+  @override
+  String get errorPhoneNumberNotFound => 'Could not find the phone number.';
+
+  @override
+  String get errorUpdateNameFailed => 'Failed to update the name.';
 
   @override
   String get editPost => 'Edit Post';

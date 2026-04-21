@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_application/l10n/app_locale_utils.dart';
 import 'package:flutter_application/models/comment.dart';
 import 'package:flutter_application/models/post.dart';
 import 'package:flutter_application/providers/app_state.dart';
@@ -9,6 +10,7 @@ import 'package:flutter_application/widgets/post_card.dart';
 import 'package:flutter_application/l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 /// Override HTTP to prevent network image requests during tests.
 class _TestHttpOverrides extends HttpOverrides {
@@ -20,13 +22,17 @@ class _TestHttpOverrides extends HttpOverrides {
 }
 
 /// Helper to build a PostCard inside the required Provider + Localization tree.
-Widget _buildTestApp(Post post) {
+Widget _buildTestApp(Post post, {Locale locale = const Locale('en')}) {
   return ChangeNotifierProvider(
     create: (_) => AppState(),
     child: MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      localizationsDelegates: const [
+        CkbMaterialLocalizationsDelegate(),
+        CkbCupertinoLocalizationsDelegate(),
+        ...AppLocalizations.localizationsDelegates,
+      ],
       supportedLocales: AppLocalizations.supportedLocales,
-      locale: const Locale('en'),
+      locale: locale,
       home: Scaffold(
         body: SingleChildScrollView(child: PostCard(post: post)),
       ),
@@ -66,6 +72,8 @@ void main() {
   setUpAll(() {
     HttpOverrides.global = _TestHttpOverrides();
     GoogleFonts.config.allowRuntimeFetching = false;
+    timeago.setLocaleMessages('ar', timeago.ArMessages());
+    timeago.setLocaleMessages('ckb', timeago.KuMessages());
   });
 
   group('PostCard', () {
@@ -210,6 +218,32 @@ void main() {
         await tester.pumpAndSettle();
         expect(find.text(cat.displayName), findsOneWidget);
       }
+    });
+
+    testWidgets('localizes category and city in Arabic', (tester) async {
+      await tester.pumpWidget(
+        _buildTestApp(
+          _makePost(category: PostCategory.documents, city: 'Erbil'),
+          locale: const Locale('ar'),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('وثائق'), findsOneWidget);
+      expect(find.textContaining('أربيل'), findsWidgets);
+    });
+
+    testWidgets('localizes city and relative time in Kurdish', (tester) async {
+      await tester.pumpWidget(
+        _buildTestApp(
+          _makePost(city: 'Sulaymaniyah'),
+          locale: const Locale('ckb'),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('سلێمانی'), findsWidgets);
+      expect(find.textContaining('لەمەوپێش'), findsWidgets);
     });
   });
 }

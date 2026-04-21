@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/config/app_motion.dart';
+import 'package:flutter_application/l10n/app_locale_utils.dart';
 import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/navigation/main_page.dart';
 import 'package:flutter_application/providers/app_state.dart';
@@ -83,7 +84,7 @@ class _OtpScreenState extends State<OtpScreen> {
 
     if (errorMsg != null) {
       setState(() {
-        _error = errorMsg;
+        _error = localizeAppError(errorMsg, context.l10n);
         _loading = false;
       });
       return;
@@ -107,7 +108,7 @@ class _OtpScreenState extends State<OtpScreen> {
       if (!mounted) return;
       setState(() => _resendLoading = false);
       if (error != null && error.isNotEmpty) {
-        setState(() => _error = error);
+        setState(() => _error = localizeAppError(error, context.l10n));
       } else if (error == null) {
         _startCountdown();
         ScaffoldMessenger.of(context).showSnackBar(

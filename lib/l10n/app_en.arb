@@ -122,6 +122,13 @@
   "english": "English",
   "arabic": "العربية",
   "kurdish": "کوردی",
+  "unknownUser": "Unknown",
+  "appVersionLabel": "Find It v{version}",
+  "@appVersionLabel": {
+    "placeholders": {
+      "version": { "type": "String" }
+    }
+  },
   "preferences": "Preferences",
   "darkMode": "Dark Mode",
 
@@ -207,6 +214,17 @@
   },
   "sendingCode": "Sending code…",
   "confirmDelete": "Confirm & Delete",
+  "errorInvalidPhoneNumberFormat": "Invalid phone number format.",
+  "errorTooManyAttempts": "Too many attempts. Try again later.",
+  "errorPhoneAuthDisabled": "Phone authentication is not enabled. Please contact support.",
+  "errorVerificationFailed": "Verification failed. Please try again.",
+  "errorVerificationIdMissing": "Verification session is missing. Please try again.",
+  "errorInvalidCode": "Invalid code. Please try again.",
+  "errorMissingPhoneNumberFlow": "Phone number is missing. Please go back and try again.",
+  "errorNotLoggedIn": "You are not logged in.",
+  "errorDeleteAccountFailed": "Failed to delete account.",
+  "errorPhoneNumberNotFound": "Could not find the phone number.",
+  "errorUpdateNameFailed": "Failed to update the name.",
 
   "editPost": "Edit Post",
   "editPostTitle": "Edit Post",

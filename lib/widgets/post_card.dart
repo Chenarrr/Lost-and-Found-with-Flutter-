@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/config/app_colors.dart';
+import 'package:flutter_application/l10n/app_locale_utils.dart';
 import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/models/post.dart';
 import 'package:flutter_application/screens/post/post_detail_screen.dart';
@@ -24,6 +25,7 @@ class PostCard extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isLost = post.type == PostType.lost;
+    final localizedCity = localizeStoredCityName(post.city, l10n);
     final accentColor = isLost ? AppColors.lostPrimary : AppColors.foundPrimary;
     final softColor = isLost ? AppColors.lostLight : AppColors.foundLight;
     final adaptedSoftColor = isDark ? accentColor.withAlpha(26) : softColor;
@@ -133,7 +135,7 @@ class PostCard extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(999),
                                 ),
                                 child: Text(
-                                  post.category.displayName,
+                                  post.category.localizedLabel(l10n),
                                   style: GoogleFonts.manrope(
                                     color: accentColor,
                                     fontSize: 10,
@@ -167,7 +169,7 @@ class PostCard extends StatelessWidget {
                           const SizedBox(height: 6),
                           // Location · time
                           Text(
-                            '${post.city} · ${timeago.format(post.createdAt, locale: l10n.localeName)}',
+                            '$localizedCity · ${timeago.format(post.createdAt, locale: l10n.localeName)}',
                             style: GoogleFonts.manrope(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,

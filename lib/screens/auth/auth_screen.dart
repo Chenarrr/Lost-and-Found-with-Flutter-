@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/config/app_motion.dart';
+import 'package:flutter_application/l10n/app_locale_utils.dart';
 import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/screens/auth/otp_screen.dart';
@@ -119,7 +120,7 @@ class _AuthScreenState extends State<AuthScreen> {
             ),
           );
         } else if (error.isNotEmpty) {
-          _showMessage(error, isError: true);
+          _showMessage(localizeAppError(error, context.l10n), isError: true);
         }
       },
     );
@@ -144,7 +145,7 @@ class _AuthScreenState extends State<AuthScreen> {
             ),
           );
         } else if (error.isNotEmpty) {
-          _showMessage(error, isError: true);
+          _showMessage(localizeAppError(error, context.l10n), isError: true);
         }
       },
     );

@@ -1,4 +1,5 @@
 // ignore_for_file: avoid_print
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -20,6 +21,10 @@ const _users = [
         'مۆبایلەکەم لە مۆڵی ئێسکان وەرمەگرا، رەشە و کیسی جەرمەیەکی بۆی هەیە.',
     'city': 'Erbil',
     'street': 'مۆڵی ئێسکان',
+    'images': [
+      'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&q=80&fit=crop',
+      'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=800&q=80&fit=crop',
+    ],
   },
   {
     'name': 'دیلان ڕەشید',
@@ -32,6 +37,9 @@ const _users = [
     'description': 'جزدانێکی ڕەشم لە نزیک پارکی ئازادی دۆزیەوە.',
     'city': 'Sulaymaniyah',
     'street': 'پارکی ئازادی',
+    'images': [
+      'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800&q=80&fit=crop',
+    ],
   },
   {
     'name': 'سۆران عەزیز',
@@ -44,6 +52,9 @@ const _users = [
     'description': 'کارتی ناسنامەکەم لە بازاڕی شارەوانی وەردەچێت.',
     'city': 'Duhok',
     'street': 'بازاری شارەوانی',
+    'images': [
+      'https://images.unsplash.com/photo-1606761568499-6d2451b23c66?w=800&q=80&fit=crop',
+    ],
   },
   {
     'name': 'شنۆ کەریم',
@@ -56,6 +67,10 @@ const _users = [
     'description': 'ئەنگووستێکی زێڕینم لە نزیک کاڤەی ئێسکان دۆزیەوە.',
     'city': 'Erbil',
     'street': 'شەقامی ئێسکان',
+    'images': [
+      'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=800&q=80&fit=crop',
+      'https://images.unsplash.com/photo-1610694955371-d4a3e0ce4b52?w=800&q=80&fit=crop',
+    ],
   },
   // Arabic users
   {
@@ -69,6 +84,10 @@ const _users = [
     'description': 'فقدت قطتي البرتقالية بالقرب من حي كويه الجديد.',
     'city': 'Koya',
     'street': 'حي كويه الجديد',
+    'images': [
+      'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=800&q=80&fit=crop',
+      'https://images.unsplash.com/photo-1573865526739-10659fec78a5?w=800&q=80&fit=crop',
+    ],
   },
   {
     'name': 'أرز جلال',
@@ -81,6 +100,9 @@ const _users = [
     'description': 'عثرت على تابلت سامسونج في مطعم سيتي سنتر زاخو.',
     'city': 'Zakho',
     'street': 'شارع سيتي سنتر',
+    'images': [
+      'https://images.unsplash.com/photo-1561154464-82e9adf32764?w=800&q=80&fit=crop',
+    ],
   },
   // English users
   {
@@ -94,6 +116,9 @@ const _users = [
     'description': 'Lost my Iraqi passport near Family Mall in Sulaymaniyah.',
     'city': 'Sulaymaniyah',
     'street': 'Family Mall Area',
+    'images': [
+      'https://images.unsplash.com/photo-1575505586569-646b2ca898fc?w=800&q=80&fit=crop',
+    ],
   },
   {
     'name': 'Bryar Tahir',
@@ -107,6 +132,10 @@ const _users = [
         'Found Toyota car keys with a red keychain near Gulan Street.',
     'city': 'Erbil',
     'street': 'Gulan Street',
+    'images': [
+      'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80&fit=crop',
+      'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=800&q=80&fit=crop',
+    ],
   },
   {
     'name': 'Lava Said',
@@ -120,6 +149,10 @@ const _users = [
         'Lost my Dell Inspiron 15 laptop at Duhok University library.',
     'city': 'Duhok',
     'street': 'Duhok University',
+    'images': [
+      'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&q=80&fit=crop',
+      'https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?w=800&q=80&fit=crop',
+    ],
   },
 ];
 
@@ -344,6 +377,22 @@ void main() {
       await _pump(tester, 8);
 
       print('   ✅ Post created: ${user['itemName']}');
+
+      // ── 9b. Patch imageUrls directly in Firestore ───────────────────────
+      final images = user['images'] as List<String>? ?? [];
+      if (images.isNotEmpty) {
+        final phone = '+964${user['phone']}';
+        final snap = await FirebaseFirestore.instance
+            .collection('posts')
+            .where('userPhone', isEqualTo: phone)
+            .orderBy('createdAt', descending: true)
+            .limit(1)
+            .get();
+        if (snap.docs.isNotEmpty) {
+          await snap.docs.first.reference.update({'imageUrls': images});
+          print('   🖼  Images patched: ${images.length}');
+        }
+      }
 
       // ── 10. Sign out (skip for last user) ──────────────────────────────
       if (i < _users.length - 1) {

@@ -290,6 +290,10 @@ class AppState extends ChangeNotifier {
               errorMsg =
                   'Verification failed. Check your connection and try again.';
               break;
+            case 'network-request-failed':
+              errorMsg =
+                  'Network error. Check your internet connection and try again.';
+              break;
             default:
               errorMsg = e.message ?? 'Verification failed. Please try again.';
           }

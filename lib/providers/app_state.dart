@@ -614,6 +614,9 @@ class AppState extends ChangeNotifier {
       final postToSave = post.copyWith(imageUrls: uploadedUrls);
       final data = postToSave.toJson();
       data['createdAt'] = FieldValue.serverTimestamp();
+      if (data['description'] == null) {
+        data.remove('description');
+      }
       if ((data['comments'] as List?)?.isEmpty ?? true) {
         data.remove('comments');
       }
@@ -631,14 +634,15 @@ class AppState extends ChangeNotifier {
 
   Future<void> updatePost(Post post) async {
     try {
-      await _firestore.collection('posts').doc(post.id).update({
+      final data = {
         'type': post.type.name,
         'category': post.category.name,
         'itemName': post.itemName,
-        'description': post.description,
         'street': post.street,
         'city': post.city,
-      });
+        'description': post.description ?? FieldValue.delete(),
+      };
+      await _firestore.collection('posts').doc(post.id).update(data);
     } catch (e) {
       debugPrint('Error updating post: $e');
       rethrow;

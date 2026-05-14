@@ -435,8 +435,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get postCreated => 'تم إنشاء المنشور بنجاح.';
 
   @override
-  String get postSaveFailed =>
-      'تعذر حفظ المنشور. تحقق من الاتصال وحاول مرة أخرى.';
+  String get postSaveFailed => 'تعذر حفظ المنشور. يرجى المحاولة مرة أخرى.';
 
   @override
   String get homeNav => 'الرئيسية';

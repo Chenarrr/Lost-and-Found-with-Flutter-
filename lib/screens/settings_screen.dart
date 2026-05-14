@@ -498,9 +498,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ? l10n.kurdish
         : l10n.english;
     final displayUserName = localizedUserName(userName, l10n);
-    final isDark =
-        context.select<AppState, ThemeMode>((state) => state.themeMode) ==
-        ThemeMode.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: Colors.transparent,

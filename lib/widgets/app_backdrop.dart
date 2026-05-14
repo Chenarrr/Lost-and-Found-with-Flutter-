@@ -33,60 +33,46 @@ class AppBackdrop extends StatelessWidget {
             ),
           ),
         ),
-        IgnorePointer(
-          child: Stack(
-            children: [
-              Positioned(
-                top: -110,
-                right: -40,
-                child: _GlowOrb(
-                  size: 260,
-                  colors: isDark
-                      ? [
-                          AppColors.primaryBlue.withAlpha(80),
-                          AppColors.primaryBlue.withAlpha(6),
-                        ]
-                      : [
-                          AppColors.primaryBlue.withAlpha(52),
-                          AppColors.primaryBlue.withAlpha(4),
-                        ],
+        if (!isDark)
+          IgnorePointer(
+            child: Stack(
+              children: [
+                Positioned(
+                  top: -110,
+                  right: -40,
+                  child: _GlowOrb(
+                    size: 260,
+                    colors: [
+                      AppColors.primaryBlue.withAlpha(52),
+                      AppColors.primaryBlue.withAlpha(4),
+                    ],
+                  ),
                 ),
-              ),
-              Positioned(
-                top: 180,
-                left: -80,
-                child: _GlowOrb(
-                  size: 220,
-                  colors: isDark
-                      ? [
-                          AppColors.accentIndigo.withAlpha(72),
-                          AppColors.accentIndigo.withAlpha(4),
-                        ]
-                      : [
-                          AppColors.accentIndigo.withAlpha(40),
-                          AppColors.accentIndigo.withAlpha(3),
-                        ],
+                Positioned(
+                  top: 180,
+                  left: -80,
+                  child: _GlowOrb(
+                    size: 220,
+                    colors: [
+                      AppColors.accentIndigo.withAlpha(40),
+                      AppColors.accentIndigo.withAlpha(3),
+                    ],
+                  ),
                 ),
-              ),
-              Positioned(
-                bottom: -130,
-                right: -30,
-                child: _GlowOrb(
-                  size: 280,
-                  colors: isDark
-                      ? [
-                          AppColors.accentGold.withAlpha(44),
-                          AppColors.accentGold.withAlpha(2),
-                        ]
-                      : [
-                          AppColors.accentGold.withAlpha(26),
-                          AppColors.accentGold.withAlpha(1),
-                        ],
+                Positioned(
+                  bottom: -130,
+                  right: -30,
+                  child: _GlowOrb(
+                    size: 280,
+                    colors: [
+                      AppColors.accentGold.withAlpha(26),
+                      AppColors.accentGold.withAlpha(1),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
         child,
       ],
     );

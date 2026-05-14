@@ -907,7 +907,7 @@ abstract class AppLocalizations {
   /// No description provided for @postSaveFailed.
   ///
   /// In en, this message translates to:
-  /// **'Could not save the post. Check your connection and try again.'**
+  /// **'Could not save the post. Please try again.'**
   String get postSaveFailed;
 
   /// No description provided for @homeNav.

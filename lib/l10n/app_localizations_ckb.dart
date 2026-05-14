@@ -440,7 +440,7 @@ class AppLocalizationsCkb extends AppLocalizations {
 
   @override
   String get postSaveFailed =>
-      'نەتوانرا پۆستەکە پاشەکەوت بکرێت. پەیوەندیت بپشکنە و دووبارە هەوڵبدەرەوە.';
+      'نەتوانرا پۆستەکە پاشەکەوت بکرێت. تکایە دووبارە هەوڵبدەرەوە.';
 
   @override
   String get homeNav => 'سەرەتا';

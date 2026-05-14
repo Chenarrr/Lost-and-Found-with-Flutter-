@@ -59,14 +59,7 @@ class _MainPageState extends State<MainPage> {
               leadingWidth: 60,
               leading: Padding(
                 padding: const EdgeInsets.fromLTRB(14, 10, 0, 10),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(14),
-                  child: Image.asset(
-                    'assets/find-it-app-icon-official.png',
-                    fit: BoxFit.cover,
-                    filterQuality: FilterQuality.high,
-                  ),
-                ),
+                child: _AppLogo(isDark: isDark),
               ),
               title: Text(
                 currentUserName?.isNotEmpty == true
@@ -165,6 +158,42 @@ class _MainPageState extends State<MainPage> {
   }
 }
 
+class _AppLogo extends StatelessWidget {
+  const _AppLogo({required this.isDark});
+
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!isDark) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(14),
+        child: Image.asset(
+          'assets/find-it-app-icon-official.png',
+          fit: BoxFit.cover,
+          filterQuality: FilterQuality.high,
+        ),
+      );
+    }
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: const Color(0xFF102038),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFF233955)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(7),
+        child: Image.asset(
+          'assets/find-it-symbol-transparent.png',
+          fit: BoxFit.contain,
+          filterQuality: FilterQuality.high,
+        ),
+      ),
+    );
+  }
+}
+
 class _TopAction extends StatelessWidget {
   const _TopAction({required this.icon, required this.onTap});
 
@@ -180,13 +209,14 @@ class _TopAction extends StatelessWidget {
       child: AppPanel(
         padding: const EdgeInsets.all(8),
         borderRadius: BorderRadius.circular(14),
-        color: isDark
-            ? Colors.white.withAlpha(10)
-            : Colors.white.withAlpha(218),
+        color: isDark ? const Color(0xFF102038) : Colors.white.withAlpha(218),
+        borderColor: isDark ? const Color(0xFF233955) : null,
         child: Icon(
           icon,
           size: 20,
-          color: Theme.of(context).colorScheme.onSurface,
+          color: isDark
+              ? const Color(0xFFF2F7FF)
+              : Theme.of(context).colorScheme.onSurface,
         ),
       ),
     );
@@ -209,6 +239,7 @@ class _NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return GestureDetector(
       onTap: onTap,
@@ -218,7 +249,7 @@ class _NavItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         decoration: BoxDecoration(
           color: selected
-              ? AppColors.primaryBlue.withAlpha(20)
+              ? AppColors.primaryBlue.withAlpha(isDark ? 42 : 20)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(18),
         ),

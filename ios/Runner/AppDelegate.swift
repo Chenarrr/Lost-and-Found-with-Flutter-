@@ -8,6 +8,7 @@ import FirebaseCore
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
+    FirebaseApp.configure()
     FirebaseConfiguration.shared.setLoggerLevel(.min)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }

@@ -45,13 +45,10 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final app = context.read<AppState>();
-    final themeMode = context.select<AppState, ThemeMode>(
-      (state) => state.themeMode,
-    );
     final currentUserName = context.select<AppState, String?>(
       (state) => state.currentUser?.name,
     );
-    final isDark = themeMode == ThemeMode.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final showHomeAppBar = _selectedIndex == 0;
 
     return Scaffold(

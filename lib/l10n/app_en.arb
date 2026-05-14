@@ -193,6 +193,7 @@
   "addImage": "Add Image",
   "submit": "Submit",
   "postCreated": "Post created successfully.",
+  "postSaveFailed": "Could not save the post. Check your connection and try again.",
 
   "homeNav": "Home",
   "activityNav": "Activity",

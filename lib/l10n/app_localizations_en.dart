@@ -436,6 +436,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get postCreated => 'Post created successfully.';
 
   @override
+  String get postSaveFailed =>
+      'Could not save the post. Check your connection and try again.';
+
+  @override
   String get homeNav => 'Home';
 
   @override

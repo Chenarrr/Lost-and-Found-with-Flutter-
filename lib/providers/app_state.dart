@@ -25,7 +25,7 @@ class AppState extends ChangeNotifier {
   }
 
   // Theme
-  ThemeMode _themeMode = ThemeMode.light;
+  ThemeMode _themeMode = ThemeMode.system;
   ThemeMode get themeMode => _themeMode;
   void setThemeMode(ThemeMode mode) {
     if (_themeMode == mode) return;

@@ -107,13 +107,6 @@ class _GlowOrb extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         gradient: RadialGradient(colors: colors),
-        boxShadow: [
-          BoxShadow(
-            color: colors.first,
-            blurRadius: size * 0.35,
-            spreadRadius: size * 0.02,
-          ),
-        ],
       ),
     );
   }

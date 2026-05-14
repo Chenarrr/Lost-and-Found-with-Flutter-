@@ -439,6 +439,10 @@ class AppLocalizationsCkb extends AppLocalizations {
   String get postCreated => 'پۆستەکە بە سەرکەوتوویی دروستکرا.';
 
   @override
+  String get postSaveFailed =>
+      'نەتوانرا پۆستەکە پاشەکەوت بکرێت. پەیوەندیت بپشکنە و دووبارە هەوڵبدەرەوە.';
+
+  @override
   String get homeNav => 'سەرەتا';
 
   @override

@@ -198,10 +198,11 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
           ),
         );
       }
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Create post failed: $e');
       if (!mounted) return;
       setState(() => _isLoading = false);
-      _showMessage(l10n.requiredField, isError: true);
+      _showMessage(l10n.postSaveFailed, isError: true);
     }
   }
 
@@ -675,6 +676,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                         DropdownButtonFormField<AppCity>(
                           initialValue: _selectedCity,
                           isExpanded: true,
+                          dropdownColor: cs.surface,
                           decoration: InputDecoration(
                             labelText: l10n.city,
                             prefixIcon: const Icon(

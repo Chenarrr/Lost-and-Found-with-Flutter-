@@ -13,12 +13,12 @@ import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/navigation/root_router.dart';
 
 // ── Dark palette ────────────────────────────────────────────────────────────
-const _darkBg = Color(0xFF071323);
-const _darkSurface = Color(0xFF102038);
-const _darkSurfaceSoft = Color(0xFF162741);
-const _darkBorder = Color(0xFF213551);
-const _darkOnSurface = Color(0xFFF2F7FF);
-const _darkOnSurface2 = Color(0xFF94A9C0);
+const _darkBg = Color(0xFF0B111C);
+const _darkSurface = Color(0xFF151E2E);
+const _darkSurfaceSoft = Color(0xFF1E293B);
+const _darkBorder = Color(0xFF334155);
+const _darkOnSurface = Color(0xFFF8FAFC);
+const _darkOnSurface2 = Color(0xFFCBD5E1);
 
 TextTheme _appTextTheme(Brightness brightness) {
   final base = ThemeData(useMaterial3: true, brightness: brightness).textTheme;
@@ -28,32 +28,32 @@ TextTheme _appTextTheme(Brightness brightness) {
     displayLarge: GoogleFonts.spaceGrotesk(
       textStyle: bodyTheme.displayLarge,
       fontWeight: FontWeight.w700,
-      letterSpacing: -1.2,
+      letterSpacing: 0,
     ),
     displayMedium: GoogleFonts.spaceGrotesk(
       textStyle: bodyTheme.displayMedium,
       fontWeight: FontWeight.w700,
-      letterSpacing: -1,
+      letterSpacing: 0,
     ),
     headlineLarge: GoogleFonts.spaceGrotesk(
       textStyle: bodyTheme.headlineLarge,
       fontWeight: FontWeight.w700,
-      letterSpacing: -0.8,
+      letterSpacing: 0,
     ),
     headlineMedium: GoogleFonts.spaceGrotesk(
       textStyle: bodyTheme.headlineMedium,
       fontWeight: FontWeight.w700,
-      letterSpacing: -0.6,
+      letterSpacing: 0,
     ),
     titleLarge: GoogleFonts.spaceGrotesk(
       textStyle: bodyTheme.titleLarge,
       fontWeight: FontWeight.w700,
-      letterSpacing: -0.4,
+      letterSpacing: 0,
     ),
     titleMedium: GoogleFonts.spaceGrotesk(
       textStyle: bodyTheme.titleMedium,
       fontWeight: FontWeight.w700,
-      letterSpacing: -0.2,
+      letterSpacing: 0,
     ),
   );
 }
@@ -91,7 +91,7 @@ ThemeData _lightTheme() {
         color: AppColors.textPrimary,
         fontWeight: FontWeight.w700,
         fontSize: 24,
-        letterSpacing: -0.5,
+        letterSpacing: 0,
       ),
       iconTheme: const IconThemeData(color: AppColors.textPrimary),
     ),
@@ -228,7 +228,7 @@ ThemeData _darkTheme() {
         onSurface: _darkOnSurface,
         onSurfaceVariant: _darkOnSurface2,
         outline: _darkBorder,
-        outlineVariant: const Color(0xFF233955),
+        outlineVariant: const Color(0xFF3B4A60),
       );
 
   return ThemeData(
@@ -247,13 +247,13 @@ ThemeData _darkTheme() {
         color: _darkOnSurface,
         fontWeight: FontWeight.w700,
         fontSize: 24,
-        letterSpacing: -0.5,
+        letterSpacing: 0,
       ),
       iconTheme: const IconThemeData(color: _darkOnSurface),
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: _darkSurfaceSoft.withAlpha(236),
+      fillColor: _darkSurfaceSoft,
       hintStyle: GoogleFonts.manrope(
         color: _darkOnSurface2,
         fontWeight: FontWeight.w500,
@@ -319,7 +319,7 @@ ThemeData _darkTheme() {
       ),
     ),
     chipTheme: ChipThemeData(
-      backgroundColor: _darkSurfaceSoft.withAlpha(222),
+      backgroundColor: _darkSurfaceSoft,
       selectedColor: AppColors.primaryBlue,
       disabledColor: _darkBorder,
       showCheckmark: false,

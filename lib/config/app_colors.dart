@@ -12,9 +12,9 @@ class AppColors {
   static const Color backdropLightTop = Color(0xFFF7FBFF);
   static const Color backdropLightMid = Color(0xFFEAF4FF);
   static const Color backdropLightBottom = Color(0xFFFDFEFF);
-  static const Color backdropDarkTop = Color(0xFF071323);
-  static const Color backdropDarkMid = Color(0xFF0C1D34);
-  static const Color backdropDarkBottom = Color(0xFF08111E);
+  static const Color backdropDarkTop = Color(0xFF0B111C);
+  static const Color backdropDarkMid = Color(0xFF101827);
+  static const Color backdropDarkBottom = Color(0xFF0B111C);
   static const Color skyTop = Color(0xFFF2F8FF);
   static const Color skyBottom = Color(0xFFE7F2FF);
   static const Color infoBox = Color(0xFFE7F4FF);

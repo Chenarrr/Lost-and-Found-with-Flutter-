@@ -12,7 +12,8 @@ class AppLocalizationsCkb extends AppLocalizations {
   String get appName => 'Find It';
 
   @override
-  String get tagline => 'یارمەتیدان بۆ گەڕاندنەوەی شتە ونبووەکان لە کوردستان';
+  String get tagline =>
+      'یارمەتیدان بۆ دۆزینەوە و گەڕاندنەوەی شتەکان لە کوردستان';
 
   @override
   String get getStarted => 'دەستپێبکە';
@@ -119,16 +120,16 @@ class AppLocalizationsCkb extends AppLocalizations {
   String get cityKoya => 'کۆیە';
 
   @override
-  String get searchHint => 'بگەڕێ بۆ شت، شار، کوچە...';
+  String get searchHint => 'بە ناوی شت، شار یان کوچە بگەڕێ...';
 
   @override
   String lostBadge(int count) {
-    return '$count وەڵاوبوو';
+    return '$count ونبوو';
   }
 
   @override
   String foundBadge(int count) {
-    return '$count دۆزرایەوە';
+    return '$count دۆزراوە';
   }
 
   @override
@@ -143,10 +144,10 @@ class AppLocalizationsCkb extends AppLocalizations {
   String get all => 'هەموو';
 
   @override
-  String get lost => 'وەڵاوبوو';
+  String get lost => 'ونبوو';
 
   @override
-  String get found => 'دۆزرایەوە';
+  String get found => 'دۆزراوە';
 
   @override
   String get noItemsFound => 'هیچ شتێک نەدۆزرایەوە';
@@ -160,14 +161,14 @@ class AppLocalizationsCkb extends AppLocalizations {
 
   @override
   String get logInToTrack =>
-      'بچۆ ژوورەوە بۆ شوێنکەوتنی پۆستەکانت و لێدوانەکانت.';
+      'چوونەژوورەوە بکە بۆ بەدواداچوونی ڕاپۆرت و لێدوانەکانت.';
 
   @override
   String get activityTitle => 'چالاکی';
 
   @override
   String myPostsTab(int count) {
-    return 'پۆستەکانم ($count)';
+    return 'ڕاپۆرتەکانم ($count)';
   }
 
   @override
@@ -176,17 +177,17 @@ class AppLocalizationsCkb extends AppLocalizations {
   }
 
   @override
-  String get noPostsYet => 'هێشتا هیچ پۆستێک نییە';
+  String get noPostsYet => 'هێشتا هیچ ڕاپۆرتێک نییە';
 
   @override
-  String get createFirstPost => 'یەکەم پۆستەکەت دروست بکە بۆ دەستپێکردن.';
+  String get createFirstPost => 'یەکەم ڕاپۆرتت بڵاو بکەرەوە بۆ دەستپێکردن.';
 
   @override
   String get noCommentsYet => 'هێشتا هیچ لێدوانێک نییە';
 
   @override
   String get commentToEngage =>
-      'لێدوان لەسەر پۆستەکان بدە بۆ پەیوەندیکردن بە کۆمەڵگەوە.';
+      'لێدوان لەسەر ڕاپۆرتەکان بدە بۆ پەیوەندیکردن بە کۆمەڵگەوە.';
 
   @override
   String get pleaseLogInProfile => 'تکایە بچۆ ژوورەوە بۆ بینینی پرۆفایلەکەت.';
@@ -195,10 +196,10 @@ class AppLocalizationsCkb extends AppLocalizations {
   String get profileTitle => 'پرۆفایل';
 
   @override
-  String get posts => 'پۆستەکان';
+  String get posts => 'ڕاپۆرتەکان';
 
   @override
-  String get yourPosts => 'پۆستەکانت';
+  String get yourPosts => 'ڕاپۆرتەکانت';
 
   @override
   String totalPosts(int count) {
@@ -206,7 +207,7 @@ class AppLocalizationsCkb extends AppLocalizations {
   }
 
   @override
-  String get noItemsPosted => 'هێشتا هیچ شتێکت نەناردووە.';
+  String get noItemsPosted => 'هێشتا هیچ ڕاپۆرتێکت بڵاو نەکردووەتەوە.';
 
   @override
   String get settingsTitle => 'ڕێکخستنەکان';
@@ -243,10 +244,10 @@ class AppLocalizationsCkb extends AppLocalizations {
 
   @override
   String get deleteAccountConfirm =>
-      'ئەمە ئەکاونت و هەموو پۆستەکانت بۆ هەمیشە دەسڕێتەوە. ناتوانرێت پاشگەزبوونەوە.';
+      'ئەمە ئەکاونت و هەموو ڕاپۆرتەکانت بۆ هەمیشە دەسڕێتەوە. ناتوانرێت پاشگەزبوونەوە.';
 
   @override
-  String get permanentlyRemove => 'بۆ هەمیشە ئەکاونت و پۆستەکانت دەسڕێتەوە';
+  String get permanentlyRemove => 'بۆ هەمیشە ئەکاونت و ڕاپۆرتەکانت دەسڕێتەوە';
 
   @override
   String get delete => 'سڕینەوە';
@@ -281,10 +282,10 @@ class AppLocalizationsCkb extends AppLocalizations {
   String get darkMode => 'شێوازی تاریک';
 
   @override
-  String get postDetails => 'وردەکاری پۆست';
+  String get postDetails => 'وردەکاری ڕاپۆرت';
 
   @override
-  String get postNotFound => 'پۆستەکە نەدۆزرایەوە.';
+  String get postNotFound => 'ڕاپۆرتەکە نەدۆزرایەوە.';
 
   @override
   String get couldNotOpenWhatsapp => 'نەتوانرا واتساپ کرانەوە.';
@@ -293,45 +294,46 @@ class AppLocalizationsCkb extends AppLocalizations {
   String get sharedVia => 'بە ئەپی Find It هاوبەشکرا';
 
   @override
-  String get whatsappMessagePrefix => 'سڵاو، پۆستەکەت دیتم دەربارەی:';
+  String get whatsappMessagePrefix => 'سڵاو، ڕاپۆرتەکەت دیتم دەربارەی:';
 
   @override
-  String get loginToReport => 'تکایە بچۆ ژوورەوە بۆ ئاگادارکردنەوە لەم پۆستە.';
+  String get loginToReport =>
+      'تکایە چوونەژوورەوە بکە بۆ سکاڵاکردن لەم ڕاپۆرتە.';
 
   @override
-  String get cannotReportOwn => 'ناتوانیت پۆستی خۆت ئاگادار بکەیتەوە.';
+  String get cannotReportOwn => 'ناتوانیت لە ڕاپۆرتی خۆت سکاڵا بکەیت.';
 
   @override
-  String get alreadyReported => 'پێشتر ئاگادارت کردووەتەوە لەم پۆستە.';
+  String get alreadyReported => 'پێشتر لەم ڕاپۆرتە سکاڵات کردووە.';
 
   @override
-  String get reportPost => 'ڕاپۆرتکردنی پۆست';
+  String get reportPost => 'سکاڵاکردن لەم ڕاپۆرتە';
 
   @override
   String get reportConfirm =>
-      'ئایا ئاگادار بکەیتەوە لەم پۆستە وەک درۆ یان نەگونجاو؟';
+      'ئایا لەم ڕاپۆرتە وەک درۆ یان نەگونجاو سکاڵا دەکەیت؟';
 
   @override
-  String get report => 'ئاگادارکردنەوە';
+  String get report => 'سکاڵاکردن';
 
   @override
-  String get reported => 'ئاگادارکرایەوە';
+  String get reported => 'سکاڵا کراوە';
 
   @override
-  String get postReported => 'پۆستەکە ئاگادارکرایەوە. سپاس.';
+  String get postReported => 'سکاڵاکەت نێردرا. سپاس.';
 
   @override
   String get markAsResolved => 'وەک داخراو نیشان بکە';
 
   @override
   String get markResolvedConfirm =>
-      'ئایا دەتەوێت ئەم پۆستە وەک داخراو نیشان بکەیت؟ خەڵکی تر دەبینن کە داخراوە.';
+      'ئایا دەتەوێت ئەم ڕاپۆرتە وەک داخراو نیشان بکەیت؟ خەڵکی تر دەبینن کە داخراوە.';
 
   @override
   String get markResolved => 'وەک داخراو نیشان بکە';
 
   @override
-  String get postMarkedResolved => 'پۆستەکە وەک داخراو نیشانکرا.';
+  String get postMarkedResolved => 'ڕاپۆرتەکە وەک داخراو نیشانکرا.';
 
   @override
   String get loginToComment => 'تکایە بچۆ ژوورەوە بۆ لێدوانکردن.';
@@ -340,10 +342,10 @@ class AppLocalizationsCkb extends AppLocalizations {
   String get commentAdded => 'لێدوانەکە زیادکرا.';
 
   @override
-  String get deletePost => 'سڕینەوەی پۆست';
+  String get deletePost => 'سڕینەوەی ڕاپۆرت';
 
   @override
-  String get deletePostConfirm => 'دڵنیایت دەتەوێت ئەم پۆستە بسڕیتەوە؟';
+  String get deletePostConfirm => 'دڵنیایت دەتەوێت ئەم ڕاپۆرتە بسڕیتەوە؟';
 
   @override
   String get contactWhatsapp => 'پەیوەندی بە واتساپ';
@@ -379,7 +381,7 @@ class AppLocalizationsCkb extends AppLocalizations {
   String get share => 'هاوبەشکردن';
 
   @override
-  String get createPost => 'دروستکردنی پۆست';
+  String get createPost => 'ڕاپۆرتی نوێ';
 
   @override
   String get goHome => 'سەرەتا';
@@ -395,6 +397,19 @@ class AppLocalizationsCkb extends AppLocalizations {
 
   @override
   String get descriptionOptional => 'وەسف (دەکرێت بەتاڵ بێت)';
+
+  @override
+  String get photosOptional =>
+      'وێنە پێویست نییە، بەڵام یارمەتی دەدات شتەکە خێراتر بناسرێتەوە.';
+
+  @override
+  String get postTypeSection => 'جۆری حاڵەت';
+
+  @override
+  String get itemDetailsSection => 'وردەکاری شتەکە';
+
+  @override
+  String get locationSection => 'شوێن';
 
   @override
   String get city => 'شار';
@@ -427,20 +442,32 @@ class AppLocalizationsCkb extends AppLocalizations {
       'نەتوانرا وێنە هەڵبژێردرێت. تکایە دووبارە هەوڵبدەرەوە.';
 
   @override
-  String get loginToPost => 'تکایە بچۆ ژوورەوە بۆ دروستکردنی پۆست.';
+  String get loginToPost => 'تکایە چوونەژوورەوە بکە بۆ بڵاوکردنەوەی ڕاپۆرت.';
 
   @override
   String get addImage => 'زیادکردنی وێنە';
 
   @override
-  String get submit => 'ناردن';
+  String get submit => 'بڵاوکردنەوە';
 
   @override
-  String get postCreated => 'پۆستەکە بە سەرکەوتوویی دروستکرا.';
+  String get postCreated => 'ڕاپۆرتەکە بڵاوکرایەوە.';
 
   @override
   String get postSaveFailed =>
-      'نەتوانرا پۆستەکە پاشەکەوت بکرێت. تکایە دووبارە هەوڵبدەرەوە.';
+      'نەتوانرا ڕاپۆرتەکە بڵاو بکرێتەوە. تکایە دووبارە هەوڵبدەرەوە.';
+
+  @override
+  String get postImageUploadFailed =>
+      'بارکردنی وێنە سەرکەوتوو نەبوو. وێنەیەکی بچووکتر هەڵبژێرە یان بێ وێنە بڵاوی بکەرەوە.';
+
+  @override
+  String get postPermissionDenied =>
+      'نەتوانرا بڵاو بکرێتەوە. تکایە دووبارە بچۆ ژوورەوە.';
+
+  @override
+  String get postNetworkFailed =>
+      'کێشەی پەیوەندی هەیە. ئینتەرنێت بپشکنە و دووبارە هەوڵبدەرەوە.';
 
   @override
   String get homeNav => 'سەرەتا';
@@ -452,22 +479,22 @@ class AppLocalizationsCkb extends AppLocalizations {
   String get profileNav => 'پرۆفایل';
 
   @override
-  String get postFab => 'پۆست';
+  String get postFab => 'ڕاپۆرت';
 
   @override
-  String get createPostTooltip => 'دروستکردنی پۆست';
+  String get createPostTooltip => 'ڕاپۆرتی نوێ';
 
   @override
-  String get typeLost => 'وەڵاوبوو';
+  String get typeLost => 'ونبوو';
 
   @override
-  String get typeFound => 'دۆزرایەوە';
+  String get typeFound => 'دۆزراوە';
 
   @override
-  String get typeLostUpper => 'وەڵاوبوو';
+  String get typeLostUpper => 'ونبوو';
 
   @override
-  String get typeFoundUpper => 'دۆزرایەوە';
+  String get typeFoundUpper => 'دۆزراوە';
 
   @override
   String get reauthTitle => 'دووپاتکردنەوەی ناسنامە';
@@ -523,16 +550,16 @@ class AppLocalizationsCkb extends AppLocalizations {
   String get errorUpdateNameFailed => 'نوێکردنەوەی ناو سەرکەوتوو نەبوو.';
 
   @override
-  String get editPost => 'دەستکاریکردنی پۆست';
+  String get editPost => 'دەستکاریکردنی ڕاپۆرت';
 
   @override
-  String get editPostTitle => 'دەستکاریکردنی پۆست';
+  String get editPostTitle => 'دەستکاریکردنی ڕاپۆرت';
 
   @override
   String get update => 'نوێکردنەوە';
 
   @override
-  String get postUpdated => 'پۆستەکە بە سەرکەوتوویی نوێکرایەوە.';
+  String get postUpdated => 'ڕاپۆرتەکە بە سەرکەوتوویی نوێکرایەوە.';
 
   @override
   String get filterByCategory => 'جۆر';
@@ -586,7 +613,7 @@ class AppLocalizationsCkb extends AppLocalizations {
   String get profileSetupCityTitle => 'شارەکەت';
 
   @override
-  String get profileSetupCitySubtitle => 'پۆستە نزیکەکان پیشانت دەدەین.';
+  String get profileSetupCitySubtitle => 'ڕاپۆرتە نزیکەکان پیشانت دەدەین.';
 
   @override
   String get profileSetupContinue => 'بەردەوامبە →';
@@ -606,14 +633,14 @@ class AppLocalizationsCkb extends AppLocalizations {
 
   @override
   String get permissionsNotificationsDesc =>
-      'کاتێک کەسێک شتەکەت دۆزیەوە یان وەڵامی پۆستەکەت دایەوە ئاگادار بکرەیتەوە.';
+      'کاتێک کەسێک شتەکەت دۆزیەوە یان وەڵامی ڕاپۆرتەکەت دایەوە ئاگادار بکرەیتەوە.';
 
   @override
   String get permissionsLocation => 'شوێن';
 
   @override
   String get permissionsLocationDesc =>
-      'پۆستە نزیکەکان پیشانت بدە و یارمەتی خەڵک بدە لە ناوچەکەتدا.';
+      'ڕاپۆرتە نزیکەکان پیشانت بدە و یارمەتی خەڵک بدە لە ناوچەکەتدا.';
 
   @override
   String get permissionsAllow => 'ڕازیبوون و بەردەوامبوون';

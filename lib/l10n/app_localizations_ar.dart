@@ -375,7 +375,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get share => 'مشاركة';
 
   @override
-  String get createPost => 'إنشاء منشور';
+  String get createPost => 'بلاغ جديد';
 
   @override
   String get goHome => 'الرئيسية';
@@ -392,6 +392,19 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get descriptionOptional => 'الوصف (اختياري)';
+
+  @override
+  String get photosOptional =>
+      'الصور اختيارية، لكنها تساعد الآخرين على التعرف على العنصر بسرعة.';
+
+  @override
+  String get postTypeSection => 'نوع البلاغ';
+
+  @override
+  String get itemDetailsSection => 'تفاصيل العنصر';
+
+  @override
+  String get locationSection => 'الموقع';
 
   @override
   String get city => 'المدينة';
@@ -426,16 +439,28 @@ class AppLocalizationsAr extends AppLocalizations {
   String get loginToPost => 'يرجى تسجيل الدخول لإنشاء منشور.';
 
   @override
-  String get addImage => 'إضافة صورة';
+  String get addImage => 'إضافة صور';
 
   @override
-  String get submit => 'إرسال';
+  String get submit => 'نشر';
 
   @override
-  String get postCreated => 'تم إنشاء المنشور بنجاح.';
+  String get postCreated => 'تم نشر البلاغ.';
 
   @override
-  String get postSaveFailed => 'تعذر حفظ المنشور. يرجى المحاولة مرة أخرى.';
+  String get postSaveFailed => 'تعذر نشر البلاغ. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get postImageUploadFailed =>
+      'فشل رفع الصورة. جرّب صورة أصغر أو انشر بدون صور.';
+
+  @override
+  String get postPermissionDenied =>
+      'تعذر النشر. يرجى تسجيل الدخول مرة أخرى والمحاولة.';
+
+  @override
+  String get postNetworkFailed =>
+      'مشكلة في الاتصال. تحقق من الإنترنت وحاول مرة أخرى.';
 
   @override
   String get homeNav => 'الرئيسية';
@@ -447,10 +472,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get profileNav => 'الملف الشخصي';
 
   @override
-  String get postFab => 'نشر';
+  String get postFab => 'بلاغ';
 
   @override
-  String get createPostTooltip => 'إنشاء منشور';
+  String get createPostTooltip => 'بلاغ جديد';
 
   @override
   String get typeLost => 'مفقود';

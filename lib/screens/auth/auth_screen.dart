@@ -377,7 +377,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   style: GoogleFonts.spaceGrotesk(
                     fontSize: 32,
                     fontWeight: FontWeight.w700,
-                    letterSpacing: -0.9,
+                    letterSpacing: 0,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
@@ -618,7 +618,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   style: GoogleFonts.spaceGrotesk(
                     fontSize: 28,
                     fontWeight: FontWeight.w700,
-                    letterSpacing: -0.6,
+                    letterSpacing: 0,
                     color: cs.onSurface,
                   ),
                 ),

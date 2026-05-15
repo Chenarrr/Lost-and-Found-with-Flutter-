@@ -605,7 +605,7 @@ class AppState extends ChangeNotifier {
           postId: post.id,
         );
         if (uploadedUrl == null) {
-          throw Exception('Failed to upload image.');
+          throw StateError('post-image-upload-failed');
         }
         uploadedUrls.add(uploadedUrl);
         uploadedStorageUrls.add(uploadedUrl);

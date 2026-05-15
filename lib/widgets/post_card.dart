@@ -32,10 +32,11 @@ class PostCard extends StatelessWidget {
 
     return RepaintBoundary(
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.only(bottom: 8),
         child: AppPanel(
           padding: EdgeInsets.zero,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: const [],
           clipBehavior: Clip.antiAlias,
           child: Material(
             color: Colors.transparent,
@@ -44,7 +45,7 @@ class PostCard extends StatelessWidget {
                 smoothRoute(builder: (_) => PostDetailScreen(postId: post.id)),
               ),
               child: Padding(
-                padding: const EdgeInsets.all(14),
+                padding: const EdgeInsets.all(12),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -101,56 +102,26 @@ class PostCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // Badges
-                          Row(
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 6,
                             children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: accentColor,
-                                  borderRadius: BorderRadius.circular(999),
-                                ),
-                                child: Text(
-                                  isLost
-                                      ? l10n.typeLostUpper
-                                      : l10n.typeFoundUpper,
-                                  style: GoogleFonts.manrope(
-                                    color: Colors.white,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
+                              _PostPill(
+                                label: isLost
+                                    ? l10n.typeLostUpper
+                                    : l10n.typeFoundUpper,
+                                color: accentColor,
+                                textColor: Colors.white,
                               ),
-                              const SizedBox(width: 6),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: adaptedSoftColor,
-                                  borderRadius: BorderRadius.circular(999),
-                                ),
-                                child: Text(
-                                  post.category.localizedLabel(l10n),
-                                  style: GoogleFonts.manrope(
-                                    color: accentColor,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w800,
+                              if (post.isResolved)
+                                _PostPill(
+                                  label: l10n.resolvedBadge,
+                                  color: AppColors.foundPrimary.withAlpha(
+                                    isDark ? 42 : 24,
                                   ),
+                                  textColor: AppColors.foundPrimary,
+                                  icon: Icons.check_circle_rounded,
                                 ),
-                              ),
-                              if (post.isResolved) ...[
-                                const SizedBox(width: 6),
-                                const Icon(
-                                  Icons.check_circle_rounded,
-                                  size: 15,
-                                  color: AppColors.foundPrimary,
-                                ),
-                              ],
                             ],
                           ),
                           const SizedBox(height: 8),
@@ -207,6 +178,51 @@ class PostCard extends StatelessWidget {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PostPill extends StatelessWidget {
+  const _PostPill({
+    required this.label,
+    required this.color,
+    required this.textColor,
+    this.icon,
+  });
+
+  final String label;
+  final Color color;
+  final Color textColor;
+  final IconData? icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[
+              Icon(icon, size: 11, color: textColor),
+              const SizedBox(width: 3),
+            ],
+            Text(
+              label,
+              style: GoogleFonts.manrope(
+                color: textColor,
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.2,
+              ),
+            ),
+          ],
         ),
       ),
     );

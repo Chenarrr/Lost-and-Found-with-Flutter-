@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/config/app_colors.dart';
 import 'package:flutter_application/config/app_motion.dart';
@@ -202,8 +203,27 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
       debugPrint('Create post failed: $e');
       if (!mounted) return;
       setState(() => _isLoading = false);
-      _showMessage(l10n.postSaveFailed, isError: true);
+      _showMessage(_postFailureMessage(e, l10n), isError: true);
     }
+  }
+
+  String _postFailureMessage(Object error, AppLocalizations l10n) {
+    if (error is StateError && error.message == 'post-image-upload-failed') {
+      return l10n.postImageUploadFailed;
+    }
+
+    if (error is FirebaseException) {
+      switch (error.code) {
+        case 'permission-denied':
+          return l10n.postPermissionDenied;
+        case 'unavailable':
+        case 'deadline-exceeded':
+        case 'network-request-failed':
+          return l10n.postNetworkFailed;
+      }
+    }
+
+    return l10n.postSaveFailed;
   }
 
   String? _buildFinalDescription() {
@@ -399,21 +419,21 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
           children: [
             _SectionTitle(
               title: l10n.imagesSection(_imagePaths.length),
-              subtitle: l10n.addImage,
+              subtitle: l10n.photosOptional,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             if (_imagePaths.isEmpty)
               InkWell(
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(18),
                 onTap: _pickImage,
                 child: Container(
                   width: double.infinity,
-                  height: 180,
+                  height: 148,
                   decoration: BoxDecoration(
                     color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white.withAlpha(8)
+                        ? Colors.white.withAlpha(6)
                         : AppColors.frost,
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: BorderRadius.circular(18),
                     border: Border.all(color: cs.outlineVariant),
                   ),
                   child: Column(
@@ -435,7 +455,10 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        l10n.noImagesSelected,
+                        l10n.photosOptional,
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.manrope(
                           color: cs.onSurfaceVariant,
                           fontWeight: FontWeight.w700,
@@ -460,14 +483,14 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                 itemBuilder: (context, index) {
                   if (index == _imagePaths.length && _imagePaths.length < 3) {
                     return InkWell(
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: BorderRadius.circular(18),
                       onTap: _pickImage,
                       child: Container(
                         decoration: BoxDecoration(
                           color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.white.withAlpha(8)
+                              ? Colors.white.withAlpha(6)
                               : AppColors.frost,
-                          borderRadius: BorderRadius.circular(24),
+                          borderRadius: BorderRadius.circular(18),
                           border: Border.all(color: cs.outlineVariant),
                         ),
                         child: Column(
@@ -497,7 +520,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                   return Stack(
                     children: [
                       ClipRRect(
-                        borderRadius: BorderRadius.circular(24),
+                        borderRadius: BorderRadius.circular(18),
                         child: SizedBox.expand(child: _buildImagePreview(path)),
                       ),
                       Positioned(
@@ -546,8 +569,8 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
             padding: const EdgeInsets.only(right: 14),
             child: DecoratedBox(
               decoration: BoxDecoration(
-                color: isDark ? Colors.white.withAlpha(14) : Colors.white,
-                borderRadius: BorderRadius.circular(16),
+                color: isDark ? const Color(0xFF102038) : Colors.white,
+                borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: cs.outlineVariant.withAlpha(160)),
               ),
               child: IconButton(
@@ -582,9 +605,15 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                     const SizedBox(height: 16),
                   ],
                   AppPanel(
+                    padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        _SectionTitle(
+                          title: l10n.postTypeSection,
+                          subtitle: l10n.shareDetails,
+                        ),
+                        const SizedBox(height: 12),
                         Row(
                           children: [
                             Expanded(
@@ -610,7 +639,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 14),
+                        const SizedBox(height: 12),
                         Text(
                           l10n.filterByCategory,
                           style: GoogleFonts.manrope(
@@ -627,11 +656,12 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                   ),
                   const SizedBox(height: 16),
                   AppPanel(
+                    padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _SectionTitle(
-                          title: l10n.itemName,
+                          title: l10n.itemDetailsSection,
                           subtitle: l10n.descriptionOptional,
                         ),
                         const SizedBox(height: 14),
@@ -673,6 +703,20 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                           ),
                         ),
                         const SizedBox(height: 10),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  AppPanel(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _SectionTitle(
+                          title: l10n.locationSection,
+                          subtitle: l10n.city,
+                        ),
+                        const SizedBox(height: 14),
                         DropdownButtonFormField<AppCity>(
                           initialValue: _selectedCity,
                           isExpanded: true,
@@ -746,12 +790,12 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                               AppColors.accentIndigo,
                             ],
                           ),
-                          borderRadius: BorderRadius.circular(24),
+                          borderRadius: BorderRadius.circular(18),
                           boxShadow: [
                             BoxShadow(
                               color: AppColors.primaryBlue.withAlpha(62),
-                              blurRadius: 24,
-                              offset: const Offset(0, 14),
+                              blurRadius: 16,
+                              offset: const Offset(0, 8),
                             ),
                           ],
                         ),
@@ -803,7 +847,7 @@ class _SectionTitle extends StatelessWidget {
         Text(
           title,
           style: GoogleFonts.spaceGrotesk(
-            fontSize: 22,
+            fontSize: 20,
             fontWeight: FontWeight.w700,
             color: Theme.of(context).colorScheme.onSurface,
           ),
@@ -845,7 +889,7 @@ class _ChoiceCard extends StatelessWidget {
       child: AnimatedContainer(
         duration: AppMotion.interactiveDuration,
         curve: AppMotion.standardCurve,
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           gradient: selected
               ? LinearGradient(colors: [color, color.withAlpha(180)])
@@ -855,7 +899,7 @@ class _ChoiceCard extends StatelessWidget {
               : isDark
               ? Colors.white.withAlpha(8)
               : Colors.white,
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(18),
           border: Border.all(
             color: selected
                 ? Colors.transparent

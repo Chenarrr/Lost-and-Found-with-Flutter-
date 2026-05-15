@@ -56,7 +56,9 @@ service cloud.firestore {
              && isValidPostCategory(data.category)
              && data.itemName is string
              && data.itemName.size() >= 2
-             && (!data.keys().hasAny(['description']) || data.description is string)
+             && (!data.keys().hasAny(['description'])
+                 || data.description is string
+                 || data.description == null)
              && data.street is string
              && data.street.size() >= 2
              && data.city is string

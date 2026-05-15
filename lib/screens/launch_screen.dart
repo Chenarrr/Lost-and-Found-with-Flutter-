@@ -250,7 +250,7 @@ class _LaunchScreenState extends State<LaunchScreen>
                               style: GoogleFonts.spaceGrotesk(
                                 fontSize: size.width < 380 ? 38 : 46,
                                 fontWeight: FontWeight.w700,
-                                letterSpacing: -1.2,
+                                letterSpacing: 0,
                                 color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),

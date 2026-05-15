@@ -100,13 +100,15 @@ void main() {
       expect(find.text('Samsung Galaxy'), findsOneWidget);
     });
 
-    testWidgets('displays category name', (tester) async {
+    testWidgets('does not display category name on compact card', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         _buildTestApp(_makePost(category: PostCategory.documents)),
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Documents'), findsOneWidget);
+      expect(find.text('Documents'), findsNothing);
     });
 
     testWidgets('displays city in location row', (tester) async {
@@ -210,17 +212,19 @@ void main() {
       expect(find.textContaining('ago'), findsWidgets);
     });
 
-    testWidgets('all category displayNames are shown correctly', (
+    testWidgets('category displayNames stay hidden on compact card', (
       tester,
     ) async {
       for (final cat in PostCategory.values) {
         await tester.pumpWidget(_buildTestApp(_makePost(category: cat)));
         await tester.pumpAndSettle();
-        expect(find.text(cat.displayName), findsOneWidget);
+        expect(find.text(cat.displayName), findsNothing);
       }
     });
 
-    testWidgets('localizes category and city in Arabic', (tester) async {
+    testWidgets('localizes city in Arabic without category text', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         _buildTestApp(
           _makePost(category: PostCategory.documents, city: 'Erbil'),
@@ -229,7 +233,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('وثائق'), findsOneWidget);
+      expect(find.text('وثائق'), findsNothing);
       expect(find.textContaining('أربيل'), findsWidgets);
     });
 

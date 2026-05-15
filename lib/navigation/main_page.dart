@@ -70,7 +70,7 @@ class _MainPageState extends State<MainPage> {
                 style: GoogleFonts.spaceGrotesk(
                   fontWeight: FontWeight.w700,
                   fontSize: 20,
-                  letterSpacing: -0.5,
+                  letterSpacing: 0,
                 ),
               ),
               actions: [
@@ -88,13 +88,12 @@ class _MainPageState extends State<MainPage> {
           : null,
       body: IndexedStack(index: _selectedIndex, children: _tabs),
       bottomNavigationBar: SafeArea(
-        minimum: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        minimum: const EdgeInsets.fromLTRB(18, 0, 18, 8),
         child: AppPanel(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          borderRadius: BorderRadius.circular(26),
-          color: isDark
-              ? const Color(0xFF102038).withAlpha(236)
-              : Colors.white.withAlpha(236),
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+          borderRadius: BorderRadius.circular(18),
+          color: isDark ? const Color(0xFF151E2E) : Colors.white.withAlpha(236),
+          borderColor: isDark ? const Color(0xFF334155) : null,
           child: Row(
             children: [
               Expanded(
@@ -178,9 +177,9 @@ class _AppLogo extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: const Color(0xFF102038),
+        color: const Color(0xFF151E2E),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFF233955)),
+        border: Border.all(color: const Color(0xFF334155)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(7),
@@ -209,8 +208,8 @@ class _TopAction extends StatelessWidget {
       child: AppPanel(
         padding: const EdgeInsets.all(8),
         borderRadius: BorderRadius.circular(14),
-        color: isDark ? const Color(0xFF102038) : Colors.white.withAlpha(218),
-        borderColor: isDark ? const Color(0xFF233955) : null,
+        color: isDark ? const Color(0xFF151E2E) : Colors.white.withAlpha(218),
+        borderColor: isDark ? const Color(0xFF334155) : null,
         child: Icon(
           icon,
           size: 20,
@@ -246,12 +245,12 @@ class _NavItem extends StatelessWidget {
       child: AnimatedContainer(
         duration: AppMotion.interactiveDuration,
         curve: AppMotion.standardCurve,
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         decoration: BoxDecoration(
           color: selected
               ? AppColors.primaryBlue.withAlpha(isDark ? 42 : 20)
               : Colors.transparent,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(14),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -259,13 +258,13 @@ class _NavItem extends StatelessWidget {
             Icon(
               icon,
               color: selected ? AppColors.primaryBlue : cs.onSurfaceVariant,
-              size: 22,
+              size: 19,
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             Text(
               label,
               style: GoogleFonts.manrope(
-                fontSize: 11,
+                fontSize: 10,
                 fontWeight: FontWeight.w800,
                 color: selected ? AppColors.primaryBlue : cs.onSurfaceVariant,
               ),

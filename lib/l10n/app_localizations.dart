@@ -793,7 +793,7 @@ abstract class AppLocalizations {
   /// No description provided for @createPost.
   ///
   /// In en, this message translates to:
-  /// **'Create Post'**
+  /// **'New Report'**
   String get createPost;
 
   /// No description provided for @goHome.
@@ -825,6 +825,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Description (optional)'**
   String get descriptionOptional;
+
+  /// No description provided for @photosOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos are optional, but help people identify the item faster.'**
+  String get photosOptional;
+
+  /// No description provided for @postTypeSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Report type'**
+  String get postTypeSection;
+
+  /// No description provided for @itemDetailsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Item details'**
+  String get itemDetailsSection;
+
+  /// No description provided for @locationSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get locationSection;
 
   /// No description provided for @city.
   ///
@@ -889,26 +913,44 @@ abstract class AppLocalizations {
   /// No description provided for @addImage.
   ///
   /// In en, this message translates to:
-  /// **'Add Image'**
+  /// **'Add Photos'**
   String get addImage;
 
   /// No description provided for @submit.
   ///
   /// In en, this message translates to:
-  /// **'Submit'**
+  /// **'Publish'**
   String get submit;
 
   /// No description provided for @postCreated.
   ///
   /// In en, this message translates to:
-  /// **'Post created successfully.'**
+  /// **'Report published.'**
   String get postCreated;
 
   /// No description provided for @postSaveFailed.
   ///
   /// In en, this message translates to:
-  /// **'Could not save the post. Please try again.'**
+  /// **'Could not publish the report. Please try again.'**
   String get postSaveFailed;
+
+  /// No description provided for @postImageUploadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo upload failed. Try a smaller image or publish without photos.'**
+  String get postImageUploadFailed;
+
+  /// No description provided for @postPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not publish. Please sign in again and retry.'**
+  String get postPermissionDenied;
+
+  /// No description provided for @postNetworkFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection problem. Check your internet and try again.'**
+  String get postNetworkFailed;
 
   /// No description provided for @homeNav.
   ///
@@ -931,13 +973,13 @@ abstract class AppLocalizations {
   /// No description provided for @postFab.
   ///
   /// In en, this message translates to:
-  /// **'Post'**
+  /// **'Report'**
   String get postFab;
 
   /// No description provided for @createPostTooltip.
   ///
   /// In en, this message translates to:
-  /// **'Create post'**
+  /// **'New report'**
   String get createPostTooltip;
 
   /// No description provided for @typeLost.

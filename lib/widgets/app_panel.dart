@@ -6,7 +6,7 @@ class AppPanel extends StatelessWidget {
     required this.child,
     this.padding = const EdgeInsets.all(18),
     this.margin,
-    this.borderRadius = const BorderRadius.all(Radius.circular(28)),
+    this.borderRadius = const BorderRadius.all(Radius.circular(22)),
     this.gradient,
     this.color,
     this.borderColor,
@@ -36,15 +36,15 @@ class AppPanel extends StatelessWidget {
         color: gradient == null
             ? color ??
                   (isDark
-                      ? const Color(0xFF102038).withAlpha(228)
-                      : Colors.white.withAlpha(236))
+                      ? const Color(0xFF151E2E)
+                      : Colors.white.withAlpha(244))
             : null,
         borderRadius: borderRadius,
         border: Border.all(
           color:
               borderColor ??
               (isDark
-                  ? Colors.white.withAlpha(18)
+                  ? const Color(0xFF334155)
                   : cs.outlineVariant.withAlpha(210)),
         ),
         boxShadow:
@@ -52,10 +52,10 @@ class AppPanel extends StatelessWidget {
             [
               BoxShadow(
                 color: isDark
-                    ? Colors.black.withAlpha(42)
-                    : const Color(0x14082956),
-                blurRadius: isDark ? 24 : 28,
-                offset: const Offset(0, 16),
+                    ? Colors.black.withAlpha(18)
+                    : const Color(0x0F082956),
+                blurRadius: isDark ? 8 : 18,
+                offset: const Offset(0, 5),
               ),
             ],
       ),

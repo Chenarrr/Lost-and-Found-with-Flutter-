@@ -376,7 +376,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get share => 'Share';
 
   @override
-  String get createPost => 'Create Post';
+  String get createPost => 'New Report';
 
   @override
   String get goHome => 'Go Home';
@@ -393,6 +393,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get descriptionOptional => 'Description (optional)';
+
+  @override
+  String get photosOptional =>
+      'Photos are optional, but help people identify the item faster.';
+
+  @override
+  String get postTypeSection => 'Report type';
+
+  @override
+  String get itemDetailsSection => 'Item details';
+
+  @override
+  String get locationSection => 'Location';
 
   @override
   String get city => 'City';
@@ -427,16 +440,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginToPost => 'Please login to create a post.';
 
   @override
-  String get addImage => 'Add Image';
+  String get addImage => 'Add Photos';
 
   @override
-  String get submit => 'Submit';
+  String get submit => 'Publish';
 
   @override
-  String get postCreated => 'Post created successfully.';
+  String get postCreated => 'Report published.';
 
   @override
-  String get postSaveFailed => 'Could not save the post. Please try again.';
+  String get postSaveFailed =>
+      'Could not publish the report. Please try again.';
+
+  @override
+  String get postImageUploadFailed =>
+      'Photo upload failed. Try a smaller image or publish without photos.';
+
+  @override
+  String get postPermissionDenied =>
+      'Could not publish. Please sign in again and retry.';
+
+  @override
+  String get postNetworkFailed =>
+      'Connection problem. Check your internet and try again.';
 
   @override
   String get homeNav => 'Home';
@@ -448,10 +474,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileNav => 'Profile';
 
   @override
-  String get postFab => 'Post';
+  String get postFab => 'Report';
 
   @override
-  String get createPostTooltip => 'Create post';
+  String get createPostTooltip => 'New report';
 
   @override
   String get typeLost => 'Lost';

@@ -75,7 +75,10 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> _init() async {
+    bool authFired = false;
+
     _authSubscription = _auth.authStateChanges().listen((firebaseUser) async {
+      authFired = true;
       if (firebaseUser == null) {
         currentUser = null;
         _listenToPosts();
@@ -83,9 +86,37 @@ class AppState extends ChangeNotifier {
         await _loadUser(firebaseUser.uid);
         _listenToPosts();
       }
-      _isInitialized = true;
-      notifyListeners();
+      if (!_isInitialized) {
+        _isInitialized = true;
+        notifyListeners();
+      }
     });
+
+    // Fallback: if auth stream doesn't fire within 8s, unblock the splash.
+    Future.delayed(const Duration(seconds: 8), () {
+      if (!authFired && !_isInitialized) {
+        currentUser = null;
+        _listenToPosts();
+        _isInitialized = true;
+        notifyListeners();
+      }
+    });
+  }
+
+  static void _convertTimestamps(Map<String, dynamic> data) {
+    if (data['createdAt'] is Timestamp) {
+      data['createdAt'] =
+          (data['createdAt'] as Timestamp).toDate().toIso8601String();
+    }
+    if (data['comments'] != null) {
+      for (final c in data['comments'] as List<dynamic>) {
+        final comment = c as Map<String, dynamic>;
+        if (comment['createdAt'] is Timestamp) {
+          comment['createdAt'] =
+              (comment['createdAt'] as Timestamp).toDate().toIso8601String();
+        }
+      }
+    }
   }
 
   Future<void> _loadUser(String uid) async {
@@ -94,12 +125,7 @@ class AppState extends ChangeNotifier {
       if (doc.exists) {
         final data = doc.data()!;
         data['id'] = doc.id;
-        // Handle Firestore Timestamp to DateTime
-        if (data['createdAt'] is Timestamp) {
-          data['createdAt'] = (data['createdAt'] as Timestamp)
-              .toDate()
-              .toIso8601String();
-        }
+        _convertTimestamps(data);
         currentUser = User.fromJson(data);
       }
     } catch (e) {
@@ -170,26 +196,7 @@ class AppState extends ChangeNotifier {
                 .map((doc) {
                   final data = doc.data();
                   data['id'] = doc.id;
-                  if (data['createdAt'] is Timestamp) {
-                    data['createdAt'] = (data['createdAt'] as Timestamp)
-                        .toDate()
-                        .toIso8601String();
-                  }
-
-                  // Handle comments timestamps
-                  if (data['comments'] != null) {
-                    final comments = data['comments'] as List<dynamic>;
-                    for (var i = 0; i < comments.length; i++) {
-                      final comment = comments[i] as Map<String, dynamic>;
-                      if (comment['createdAt'] is Timestamp) {
-                        comment['createdAt'] =
-                            (comment['createdAt'] as Timestamp)
-                                .toDate()
-                                .toIso8601String();
-                      }
-                    }
-                  }
-
+                  _convertTimestamps(data);
                   return Post.fromJson(data);
                 })
                 .where((p) => !p.isHidden)
@@ -394,33 +401,33 @@ class AppState extends ChangeNotifier {
     _verifyPhone(_pendingPhone!, onCodeSent);
   }
 
+  Future<void> _eraseUserData(String uid) async {
+    final snap = await _firestore
+        .collection('posts')
+        .where('userId', isEqualTo: uid)
+        .get();
+    final imageUrls = [
+      for (final doc in snap.docs)
+        ...List<String>.from(doc.data()['imageUrls'] as List? ?? []),
+    ];
+    final batch = _firestore.batch();
+    for (final doc in snap.docs) {
+      batch.delete(doc.reference);
+    }
+    batch.delete(_firestore.collection('users').doc(uid));
+    await batch.commit();
+    await _deleteStoredImages(imageUrls);
+  }
+
   Future<String?> deleteAccount() async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return 'Not logged in.';
     try {
-      final snap = await _firestore
-          .collection('posts')
-          .where('userId', isEqualTo: uid)
-          .get();
-      final imageUrls = <String>[];
-      for (final doc in snap.docs) {
-        imageUrls.addAll(
-          List<String>.from(doc.data()['imageUrls'] as List? ?? []),
-        );
-      }
-      final batch = _firestore.batch();
-      for (final doc in snap.docs) {
-        batch.delete(doc.reference);
-      }
-      batch.delete(_firestore.collection('users').doc(uid));
-      await batch.commit();
-      await _deleteStoredImages(imageUrls);
+      await _eraseUserData(uid);
       await _auth.currentUser!.delete();
       return null;
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'requires-recent-login') {
-        return 'requires-recent-login';
-      }
+      if (e.code == 'requires-recent-login') return 'requires-recent-login';
       return e.message ?? 'Failed to delete account.';
     } catch (e) {
       debugPrint('Error deleting account: $e');
@@ -450,25 +457,7 @@ class AppState extends ChangeNotifier {
         smsCode: code,
       );
       await user.reauthenticateWithCredential(credential);
-
-      final uid = user.uid;
-      final snap = await _firestore
-          .collection('posts')
-          .where('userId', isEqualTo: uid)
-          .get();
-      final imageUrls = <String>[];
-      for (final doc in snap.docs) {
-        imageUrls.addAll(
-          List<String>.from(doc.data()['imageUrls'] as List? ?? []),
-        );
-      }
-      final batch = _firestore.batch();
-      for (final doc in snap.docs) {
-        batch.delete(doc.reference);
-      }
-      batch.delete(_firestore.collection('users').doc(uid));
-      await batch.commit();
-      await _deleteStoredImages(imageUrls);
+      await _eraseUserData(user.uid);
       await user.delete();
       return null;
     } on FirebaseAuthException catch (e) {

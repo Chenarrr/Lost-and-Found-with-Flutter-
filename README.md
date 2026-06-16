@@ -73,13 +73,15 @@ flutter run
 
 ---
 
-## Recent Improvements (Apr 2026)
+## Recent Improvements (Jun 2026)
 
 - **Onboarding screens** — 3 new post-OTP screens for new signups: city picker (S4), permissions (S5), welcome (S6)
 - **User city field** — `city` added to User model and Firestore; saved during onboarding
 - **Localized city chips** — S4 city picker displays the localized city name (Arabic/Kurdish) while storing the canonical English string to Firestore
 - **Error handling in onboarding** — `updateUserCity` failure now surfaces a snackbar instead of silently ignoring the error
-- **Production audit** — 184 tests passing (up from 143); added widget tests for all 3 onboarding screens + full `city` field coverage in model tests
+- **184 tests, all passing** — added widget tests for all 3 onboarding screens + full `city` field coverage in model tests
+- **Code cleanup** — removed duplicate `AppColors.yellow` token; consolidated `_ActivityEmpty`/`_ProfileLikeEmpty` into single `_EmptyState`; extracted `_CommentCard`; deduplicated Firestore Timestamp conversion and account-deletion logic in `AppState`
+- **CI split into parallel jobs** — `lint` and `test` run simultaneously, cutting CI time in half
 - Unified top-area styling across auth, post, profile, and settings screens using shared backdrop/app bar theme tokens
 - Improved post creation UX with image-first layout, in-place add-image actions, and cleaner category selection
 - Fully localized custom-category text in Create Post and persisted description tagging
@@ -578,22 +580,19 @@ xcrun simctl list devices | grep Booted
 
 ### CI — runs on relevant pushes / PRs to `main`
 
-Single job on `ubuntu-latest`: **l10n drift check → format → analyze → test**.
-Flutter version pinned to `3.41.6` to match local development exactly.
+Two jobs run **in parallel** on `ubuntu-latest`. Flutter pinned to `3.41.6`.
 
-```
-flutter gen-l10n && git diff --exit-code -- lib/l10n/
-dart format --output=none --set-exit-if-changed lib/ test/ integration_test/
-flutter analyze --no-pub --fatal-warnings
-flutter test --no-pub --reporter compact --coverage
-```
+| Job | Steps | Timeout |
+|---|---|---|
+| **Lint & Analyze** | l10n drift check → format (`lib/ test/`) → analyze | 8 min |
+| **Tests** | `flutter test --coverage --concurrency=4` → upload `lcov.info` | 12 min |
 
-CI only triggers when app, platform, rules, or workflow files change. Pub packages and Flutter SDK are cached, and `coverage/lcov.info` is uploaded as an artifact on every successful run.
+CI only triggers when app, platform, rules, or workflow files change. Pub packages and Flutter SDK are cached per `pubspec.lock`.
 
 ### CD — manual trigger only
 
-Run from **GitHub Actions → CD → Run workflow** on `main`. The job targets the `release` environment, builds an iOS `.xcarchive` on `macos-latest`, and uploads it as a downloadable artifact (30-day retention).
+Run from **GitHub Actions → CD → Run workflow** on `main`. Targets the `release` environment, builds an iOS `.xcarchive` on `macos-15` (Apple Silicon runners), and uploads it as a downloadable artifact (30-day retention).
 
-Caches pub packages **and** CocoaPods so repeated builds skip the ~10-minute pod compile.
+Caches pub packages **and** CocoaPods (`ios/Pods` + `~/.cocoapods`) so repeated builds skip the ~10-minute pod compile.
 
 To ship to the App Store: add your distribution certificate + provisioning profile as GitHub secrets and remove `--no-codesign`.

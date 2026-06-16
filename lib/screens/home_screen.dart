@@ -157,6 +157,61 @@ class _HomeScreenState extends State<HomeScreen> {
       sheetAnimationStyle: AppMotion.bottomSheetStyle,
       builder: (ctx) {
         final sheetCs = Theme.of(ctx).colorScheme;
+
+        void pick(AppCity? city) {
+          setState(() => _cityFilter = city);
+          Navigator.pop(ctx);
+        }
+
+        Widget cityTile({
+          required String label,
+          required IconData icon,
+          required bool selected,
+          required VoidCallback onTap,
+        }) {
+          return ListTile(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 2,
+            ),
+            leading: Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: selected
+                    ? AppColors.primaryBlue.withAlpha(18)
+                    : sheetCs.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                size: 18,
+                color: selected
+                    ? AppColors.primaryBlue
+                    : sheetCs.onSurfaceVariant,
+              ),
+            ),
+            title: Text(
+              label,
+              style: GoogleFonts.manrope(
+                fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                color: selected ? AppColors.primaryBlue : sheetCs.onSurface,
+              ),
+            ),
+            trailing: selected
+                ? const Icon(
+                    Icons.check_circle_rounded,
+                    color: AppColors.primaryBlue,
+                    size: 18,
+                  )
+                : null,
+            onTap: onTap,
+          );
+        }
+
         return SafeArea(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -186,102 +241,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  ListTile(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 2,
-                    ),
-                    leading: Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: _cityFilter == null
-                            ? AppColors.primaryBlue.withAlpha(18)
-                            : sheetCs.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        Icons.public_rounded,
-                        size: 18,
-                        color: _cityFilter == null
-                            ? AppColors.primaryBlue
-                            : sheetCs.onSurfaceVariant,
-                      ),
-                    ),
-                    title: Text(
-                      l10n.allCities,
-                      style: GoogleFonts.manrope(
-                        fontWeight: _cityFilter == null
-                            ? FontWeight.w800
-                            : FontWeight.w600,
-                        color: _cityFilter == null
-                            ? AppColors.primaryBlue
-                            : sheetCs.onSurface,
-                      ),
-                    ),
-                    trailing: _cityFilter == null
-                        ? const Icon(
-                            Icons.check_circle_rounded,
-                            color: AppColors.primaryBlue,
-                            size: 18,
-                          )
-                        : null,
-                    onTap: () {
-                      setState(() => _cityFilter = null);
-                      Navigator.pop(ctx);
-                    },
+                  cityTile(
+                    label: l10n.allCities,
+                    icon: Icons.public_rounded,
+                    selected: _cityFilter == null,
+                    onTap: () => pick(null),
                   ),
                   for (final city in AppCity.values)
-                    ListTile(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 2,
-                      ),
-                      leading: Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: city == _cityFilter
-                              ? AppColors.primaryBlue.withAlpha(18)
-                              : sheetCs.surfaceContainerHighest,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(
-                          Icons.location_on_rounded,
-                          size: 18,
-                          color: city == _cityFilter
-                              ? AppColors.primaryBlue
-                              : sheetCs.onSurfaceVariant,
-                        ),
-                      ),
-                      title: Text(
-                        city.localizedLabel(l10n),
-                        style: GoogleFonts.manrope(
-                          fontWeight: city == _cityFilter
-                              ? FontWeight.w800
-                              : FontWeight.w600,
-                          color: city == _cityFilter
-                              ? AppColors.primaryBlue
-                              : sheetCs.onSurface,
-                        ),
-                      ),
-                      trailing: city == _cityFilter
-                          ? const Icon(
-                              Icons.check_circle_rounded,
-                              color: AppColors.primaryBlue,
-                              size: 18,
-                            )
-                          : null,
-                      onTap: () {
-                        setState(() => _cityFilter = city);
-                        Navigator.pop(ctx);
-                      },
+                    cityTile(
+                      label: city.localizedLabel(l10n),
+                      icon: Icons.location_on_rounded,
+                      selected: city == _cityFilter,
+                      onTap: () => pick(city),
                     ),
                 ],
               ),

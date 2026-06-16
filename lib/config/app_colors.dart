@@ -35,7 +35,6 @@ class AppColors {
   static const Color bannerBg = Color(0xFFF2F8FF);
   static const Color bannerBorder = Color(0xFFD1E5FF);
   static const Color bannerText = Color(0xFF123860);
-  static const Color yellow = Color(0xFFFFC85A);
   static const Color yellowDark = Color(0xFFD8A63B);
 
   // Neutrals

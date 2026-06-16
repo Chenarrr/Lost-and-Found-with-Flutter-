@@ -1,6 +1,5 @@
 name: CD
 
-# Manual trigger only — run from the GitHub Actions tab after CI is green
 on:
   workflow_dispatch:
     inputs:
@@ -19,15 +18,14 @@ concurrency:
 jobs:
   build-ios:
     name: Build iOS Archive
-    runs-on: macos-latest
+    runs-on: macos-15
     if: ${{ inputs.build_ios && github.ref == 'refs/heads/main' }}
     environment: release
-    timeout-minutes: 45
+    timeout-minutes: 30
 
     steps:
       - uses: actions/checkout@v4
 
-      # Match the exact Flutter version used in CI and local development
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.41.6'
@@ -44,21 +42,19 @@ jobs:
       - name: Cache CocoaPods
         uses: actions/cache@v4
         with:
-          path: ios/Pods
+          path: |
+            ios/Pods
+            ~/.cocoapods
           key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
           restore-keys: ${{ runner.os }}-pods-
 
-      - name: Install dependencies
-        run: flutter pub get
+      - run: flutter pub get
 
-      - name: Install CocoaPods dependencies
+      - name: Install CocoaPods
         run: pod install --project-directory=ios --deployment
 
-      # Builds the Xcode archive without code signing.
-      # To submit to the App Store: add your distribution certificate +
-      # provisioning profile as GitHub secrets and remove --no-codesign.
       - name: Build iOS archive
-        run: flutter build ipa --no-codesign
+        run: flutter build ipa --no-codesign --no-pub
 
       - name: Upload archive
         uses: actions/upload-artifact@v4

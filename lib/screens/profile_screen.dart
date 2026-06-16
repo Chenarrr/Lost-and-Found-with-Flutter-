@@ -245,40 +245,53 @@ class ProfileScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             if (userPosts.isEmpty)
-              AppPanel(
-                child: Column(
-                  children: [
-                    Container(
-                      width: 76,
-                      height: 76,
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryBlue.withAlpha(16),
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                      child: const Icon(
-                        Icons.inventory_2_outlined,
-                        color: AppColors.primaryBlue,
-                        size: 34,
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    Text(
-                      l10n.noItemsPosted,
-                      style: GoogleFonts.manrope(
-                        color: cs.onSurfaceVariant,
-                        fontWeight: FontWeight.w700,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              )
+              _EmptyPostsPanel(message: l10n.noItemsPosted)
             else
               ...userPosts.map(
                 (post) => PostCard(key: ValueKey(post.id), post: post),
               ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _EmptyPostsPanel extends StatelessWidget {
+  const _EmptyPostsPanel({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return AppPanel(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 76,
+            height: 76,
+            decoration: BoxDecoration(
+              color: AppColors.primaryBlue.withAlpha(16),
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: const Icon(
+              Icons.inventory_2_outlined,
+              color: AppColors.primaryBlue,
+              size: 34,
+            ),
+          ),
+          const SizedBox(height: 14),
+          Text(
+            message,
+            style: GoogleFonts.manrope(
+              color: cs.onSurfaceVariant,
+              fontWeight: FontWeight.w700,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }

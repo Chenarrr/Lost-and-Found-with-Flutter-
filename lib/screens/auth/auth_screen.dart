@@ -31,8 +31,8 @@ class _AuthScreenState extends State<AuthScreen> {
 
   final _lPhone = TextEditingController();
 
-  final _formKeySignup = GlobalKey<FormState>();
-  final _formKeyLogin = GlobalKey<FormState>();
+  var _formKeySignup = GlobalKey<FormState>();
+  var _formKeyLogin = GlobalKey<FormState>();
 
   bool _loading = false;
   _AuthMode _authMode = _AuthMode.login;
@@ -57,6 +57,13 @@ class _AuthScreenState extends State<AuthScreen> {
     setState(() {
       _authModeMovesForward = mode.index > _authMode.index;
       _authMode = mode;
+      // Recreate the incoming pane's form key so it doesn't collide with the
+      // still-animating-out pane that holds the old key instance.
+      if (mode == _AuthMode.login) {
+        _formKeyLogin = GlobalKey<FormState>();
+      } else {
+        _formKeySignup = GlobalKey<FormState>();
+      }
     });
   }
 

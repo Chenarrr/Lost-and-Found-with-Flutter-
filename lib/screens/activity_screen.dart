@@ -148,8 +148,9 @@ class ActivityScreen extends StatelessWidget {
                       ),
                       dividerColor: Colors.transparent,
                       labelColor: Colors.white,
-                      unselectedLabelColor:
-                          Theme.of(context).colorScheme.onSurfaceVariant,
+                      unselectedLabelColor: Theme.of(
+                        context,
+                      ).colorScheme.onSurfaceVariant,
                       overlayColor: const WidgetStatePropertyAll(
                         Colors.transparent,
                       ),
@@ -216,9 +217,8 @@ class ActivityScreen extends StatelessWidget {
                           padding: const EdgeInsets.fromLTRB(18, 14, 18, 150),
                           cacheExtent: 1000,
                           itemCount: userComments.length,
-                          itemBuilder: (_, i) => _CommentCard(
-                            entry: userComments[i],
-                          ),
+                          itemBuilder: (_, i) =>
+                              _CommentCard(entry: userComments[i]),
                         ),
                     ],
                   ),
@@ -374,11 +374,7 @@ class _ActivityMetric extends StatelessWidget {
 }
 
 class _EmptyState extends StatelessWidget {
-  const _EmptyState({
-    required this.icon,
-    required this.message,
-    this.title,
-  });
+  const _EmptyState({required this.icon, required this.message, this.title});
 
   final IconData icon;
   final String message;

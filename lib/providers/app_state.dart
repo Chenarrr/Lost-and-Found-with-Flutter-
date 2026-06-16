@@ -105,15 +105,17 @@ class AppState extends ChangeNotifier {
 
   static void _convertTimestamps(Map<String, dynamic> data) {
     if (data['createdAt'] is Timestamp) {
-      data['createdAt'] =
-          (data['createdAt'] as Timestamp).toDate().toIso8601String();
+      data['createdAt'] = (data['createdAt'] as Timestamp)
+          .toDate()
+          .toIso8601String();
     }
     if (data['comments'] != null) {
       for (final c in data['comments'] as List<dynamic>) {
         final comment = c as Map<String, dynamic>;
         if (comment['createdAt'] is Timestamp) {
-          comment['createdAt'] =
-              (comment['createdAt'] as Timestamp).toDate().toIso8601String();
+          comment['createdAt'] = (comment['createdAt'] as Timestamp)
+              .toDate()
+              .toIso8601String();
         }
       }
     }

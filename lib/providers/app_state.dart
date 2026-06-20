@@ -226,7 +226,7 @@ class AppState extends ChangeNotifier {
     required Function(String?) onCodeSent,
   }) async {
     _pendingName = name;
-    _pendingPhone = _normalizePhoneForAuth(phone);
+    _pendingPhone = normalizePhoneForAuth(phone);
     _pendingEmail = email;
     _pendingGender = gender;
     _pendingAge = age;
@@ -238,11 +238,11 @@ class AppState extends ChangeNotifier {
     required String phone,
     required Function(String?) onCodeSent,
   }) async {
-    _pendingPhone = _normalizePhoneForAuth(phone);
+    _pendingPhone = normalizePhoneForAuth(phone);
     _verifyPhone(_pendingPhone!, onCodeSent);
   }
 
-  String _normalizePhoneForAuth(String phone) {
+  static String normalizePhoneForAuth(String phone) {
     final digits = phone.replaceAll(RegExp(r'\D'), '');
 
     if (digits.startsWith('964') && digits.length == 13) {
@@ -261,7 +261,7 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> _verifyPhone(String phone, Function(String?) onCodeSent) async {
-    final standardizedPhone = _normalizePhoneForAuth(phone);
+    final standardizedPhone = normalizePhoneForAuth(phone);
 
     debugPrint('[Auth] Verifying phone: $standardizedPhone');
 

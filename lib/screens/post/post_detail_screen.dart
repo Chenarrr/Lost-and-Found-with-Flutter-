@@ -10,6 +10,7 @@ import 'package:flutter_application/models/comment.dart';
 import 'package:flutter_application/models/post.dart';
 import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/screens/post/create_post_sheet.dart';
+import 'package:flutter_application/utils/snackbar.dart';
 import 'package:flutter_application/widgets/app_backdrop.dart';
 import 'package:flutter_application/widgets/app_panel.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -46,17 +47,6 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     app.incrementViewCount(widget.postId);
   }
 
-  void _showMessage(String message, {bool isError = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError
-            ? AppColors.lostPrimary
-            : AppColors.primaryBlueDark,
-      ),
-    );
-  }
-
   Future<void> _contactViaWhatsApp(String phone, String itemName) async {
     final message = Uri.encodeComponent(
       '${context.l10n.whatsappMessagePrefix} $itemName',
@@ -75,7 +65,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
       }
     } catch (_) {
       if (!mounted) return;
-      _showMessage(context.l10n.couldNotOpenWhatsapp, isError: true);
+      context.showAppMessage(context.l10n.couldNotOpenWhatsapp, isError: true);
     }
   }
 
@@ -105,15 +95,15 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     final currentUser = app.currentUser;
     final l10n = context.l10n;
     if (currentUser == null) {
-      _showMessage(l10n.loginToReport, isError: true);
+      context.showAppMessage(l10n.loginToReport, isError: true);
       return;
     }
     if (currentUser.id == post.userId) {
-      _showMessage(l10n.cannotReportOwn, isError: true);
+      context.showAppMessage(l10n.cannotReportOwn, isError: true);
       return;
     }
     if (post.reports.contains(currentUser.id)) {
-      _showMessage(l10n.alreadyReported);
+      context.showAppMessage(l10n.alreadyReported);
       return;
     }
 
@@ -145,7 +135,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     if (confirmed != true) return;
     await app.reportPost(post.id, currentUser.id);
     if (!mounted) return;
-    _showMessage(l10n.postReported);
+    context.showAppMessage(l10n.postReported);
   }
 
   Future<void> _markResolved(AppState app, Post post) async {
@@ -178,7 +168,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     if (confirmed != true) return;
     await app.markPostResolved(post.id);
     if (!mounted) return;
-    _showMessage(l10n.postMarkedResolved);
+    context.showAppMessage(l10n.postMarkedResolved);
   }
 
   Future<void> _addComment(AppState app, Post post) async {
@@ -187,7 +177,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
     final user = app.currentUser;
     if (user == null) {
-      _showMessage(context.l10n.loginToComment, isError: true);
+      context.showAppMessage(context.l10n.loginToComment, isError: true);
       return;
     }
 
@@ -203,7 +193,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     await app.addComment(post.id, comment);
     if (!mounted) return;
     _commentController.clear();
-    _showMessage(context.l10n.commentAdded);
+    context.showAppMessage(context.l10n.commentAdded);
   }
 
   Future<void> _deletePost(AppState app, Post post) async {

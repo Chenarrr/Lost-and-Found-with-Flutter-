@@ -9,6 +9,7 @@ import 'package:flutter_application/l10n/app_locale_utils.dart';
 import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/models/post.dart';
 import 'package:flutter_application/providers/app_state.dart';
+import 'package:flutter_application/utils/snackbar.dart';
 import 'package:flutter_application/widgets/app_backdrop.dart';
 import 'package:flutter_application/widgets/app_panel.dart';
 import 'package:flutter_application/widgets/category_visuals.dart';
@@ -70,17 +71,6 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
     super.dispose();
   }
 
-  void _showMessage(String message, {bool isError = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError
-            ? AppColors.lostPrimary
-            : AppColors.primaryBlueDark,
-      ),
-    );
-  }
-
   void _goHome() {
     widget.onGoHome?.call();
     Navigator.of(context).pop();
@@ -111,7 +101,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
 
   Future<void> _pickImage() async {
     if (_imagePaths.length >= 3) {
-      _showMessage(context.l10n.maxImagesReached, isError: true);
+      context.showAppMessage(context.l10n.maxImagesReached, isError: true);
       return;
     }
 
@@ -127,7 +117,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
       setState(() => _imagePaths.add(picked.path));
     } catch (_) {
       if (!mounted) return;
-      _showMessage(context.l10n.couldNotPickImage, isError: true);
+      context.showAppMessage(context.l10n.couldNotPickImage, isError: true);
     }
   }
 
@@ -136,7 +126,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
     final l10n = context.l10n;
 
     if (_useCustomCategory && _customCategoryController.text.trim().isEmpty) {
-      _showMessage(l10n.customCategoryRequired, isError: true);
+      context.showAppMessage(l10n.customCategoryRequired, isError: true);
       return;
     }
 
@@ -144,7 +134,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
     final messenger = ScaffoldMessenger.of(context);
     final currentUser = app.currentUser;
     if (currentUser == null) {
-      _showMessage(l10n.loginToPost, isError: true);
+      context.showAppMessage(l10n.loginToPost, isError: true);
       return;
     }
 
@@ -203,7 +193,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
       debugPrint('Create post failed: $e');
       if (!mounted) return;
       setState(() => _isLoading = false);
-      _showMessage(_postFailureMessage(e, l10n), isError: true);
+      context.showAppMessage(_postFailureMessage(e, l10n), isError: true);
     }
   }
 

@@ -8,6 +8,7 @@ import 'package:flutter_application/providers/app_state.dart';
 import 'package:flutter_application/screens/auth/otp_screen.dart';
 import 'package:flutter_application/utils/app_route.dart';
 import 'package:flutter_application/utils/phone_input_formatter.dart';
+import 'package:flutter_application/utils/snackbar.dart';
 import 'package:flutter_application/widgets/app_backdrop.dart';
 import 'package:flutter_application/widgets/app_panel.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -67,17 +68,6 @@ class _AuthScreenState extends State<AuthScreen> {
     });
   }
 
-  void _showMessage(String message, {bool isError = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError
-            ? AppColors.lostPrimary
-            : AppColors.primaryBlueDark,
-      ),
-    );
-  }
-
   String _extractLocalPhoneDigits(String fieldValue) {
     final digits = fieldValue.replaceAll(RegExp(r'\D'), '');
 
@@ -90,20 +80,15 @@ class _AuthScreenState extends State<AuthScreen> {
     return digits;
   }
 
-  String _toE164(String fieldValue) {
-    final localDigits = _extractLocalPhoneDigits(fieldValue);
-    return '+964$localDigits';
-  }
-
   Future<void> _doSignup() async {
     if (!_formKeySignup.currentState!.validate()) return;
     if (_sGender == null) {
-      _showMessage(context.l10n.genderRequired, isError: true);
+      context.showAppMessage(context.l10n.genderRequired, isError: true);
       return;
     }
 
     final app = Provider.of<AppState>(context, listen: false);
-    final phone = _toE164(_sPhone.text.trim());
+    final phone = AppState.normalizePhoneForAuth(_sPhone.text.trim());
 
     setState(() => _loading = true);
 
@@ -127,7 +112,10 @@ class _AuthScreenState extends State<AuthScreen> {
             ),
           );
         } else if (error.isNotEmpty) {
-          _showMessage(localizeAppError(error, context.l10n), isError: true);
+          context.showAppMessage(
+            localizeAppError(error, context.l10n),
+            isError: true,
+          );
         }
       },
     );
@@ -137,7 +125,7 @@ class _AuthScreenState extends State<AuthScreen> {
     if (!_formKeyLogin.currentState!.validate()) return;
 
     final app = Provider.of<AppState>(context, listen: false);
-    final phone = _toE164(_lPhone.text.trim());
+    final phone = AppState.normalizePhoneForAuth(_lPhone.text.trim());
 
     setState(() => _loading = true);
     await app.initiateOtpLogin(
@@ -152,7 +140,10 @@ class _AuthScreenState extends State<AuthScreen> {
             ),
           );
         } else if (error.isNotEmpty) {
-          _showMessage(localizeAppError(error, context.l10n), isError: true);
+          context.showAppMessage(
+            localizeAppError(error, context.l10n),
+            isError: true,
+          );
         }
       },
     );
